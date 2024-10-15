@@ -136,8 +136,8 @@ The modular design allows for future enhancements and optimizations in specific 
 1. Robustness testing with various image transformations
 2. Adaptive thresholding based on image quality
 3. Image quality assessment using PSNR and SSIM
-4. Enhanced security with AES encryption
-5. Performance optimization using Numba's @jit decorator
+4. Enhanced security with AES encryption 
+5. ~~Performance optimization using Numba's @jit decorator~~
 6. A command-line interface for easy use
 7. A simple GUI for user-friendly interaction
 
