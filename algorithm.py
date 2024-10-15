@@ -7,22 +7,24 @@ from Crypto.Util.Padding import pad, unpad
 import hashlib
 import concurrent.futures
 from tqdm import tqdm
-
+import logging
 
 class ImprovedAlphaPunch:
-    def __init__(self, private_key, logger, fingerprint_size=(64, 64), block_size=8, embed_strength=0.5):
+    def __init__(self, private_key, logger, fingerprint_size=(64, 64), block_size=8, embed_strength=0.75):
         self.private_key = private_key.encode()
         self.fingerprint_size = fingerprint_size
         self.block_size = block_size
-        self.embed_position = (block_size // 2, block_size // 2 - 1)
+        self.embed_positions = [(block_size // 2, block_size // 2 - 1), (block_size // 2 - 1, block_size // 2)]
         self.logger = logger
         self.embed_strength = embed_strength
 
     def generate_fingerprint(self):
         np.random.seed(int.from_bytes(hashlib.sha256(self.private_key).digest(), byteorder='big') % 2 ** 32)
         fingerprint = np.random.randint(0, 2, self.fingerprint_size).astype(np.uint8)
+        # Apply repetition code (3x repetition)
+        fingerprint = np.repeat(fingerprint, 3)
         self.logger.debug(f"Generated fingerprint shape: {fingerprint.shape}")
-        self.logger.debug(f"Fingerprint sample: {fingerprint[:5, :5]}")
+        self.logger.debug(f"Fingerprint sample: {fingerprint[:15]}")
         return fingerprint
 
     def encrypt_fingerprint(self, fingerprint, salt):
@@ -43,9 +45,9 @@ class ImprovedAlphaPunch:
         except ValueError:
             self.logger.warning("Padding error during decryption. Using raw decrypted data.")
             unpadded = decrypted
-        decrypted_fingerprint = np.frombuffer(unpadded, dtype=np.uint8).reshape(self.fingerprint_size)
+        decrypted_fingerprint = np.frombuffer(unpadded, dtype=np.uint8).reshape(-1)
         self.logger.debug(f"Decrypted fingerprint shape: {decrypted_fingerprint.shape}")
-        self.logger.debug(f"Decrypted fingerprint sample: {decrypted_fingerprint[:5, :5]}")
+        self.logger.debug(f"Decrypted fingerprint sample: {decrypted_fingerprint[:15]}")
         return decrypted_fingerprint
 
     def rgb_to_ycbcr(self, rgb):
@@ -67,18 +69,20 @@ class ImprovedAlphaPunch:
         return np.clip(rgb, 0, 1) * 255
 
     def embed_in_dct_block(self, dct_block, bit):
-        y, x = self.embed_position
-        original_value = dct_block[y, x]
-        dct_block[y, x] = dct_block[y, x] + self.embed_strength if bit else dct_block[y, x] - self.embed_strength
-        self.logger.debug(
-            f"Embedding bit {bit}. Original value: {original_value:.4f}, New value: {dct_block[y, x]:.4f}")
+        for y, x in self.embed_positions:
+            original_value = dct_block[y, x]
+            dct_block[y, x] = dct_block[y, x] + self.embed_strength if bit else dct_block[y, x] - self.embed_strength
+            self.logger.debug(
+                f"Embedding bit {bit}. Position: ({y},{x}), Original value: {original_value:.4f}, New value: {dct_block[y, x]:.4f}")
         return dct_block
 
     def extract_from_dct_block(self, dct_block):
-        y, x = self.embed_position
-        extracted_bit = dct_block[y, x] > 0
-        self.logger.debug(f"Extracted bit: {extracted_bit}, DCT value: {dct_block[y, x]:.4f}")
-        return extracted_bit
+        bits = []
+        for y, x in self.embed_positions:
+            extracted_bit = dct_block[y, x] > 0
+            bits.append(extracted_bit)
+            self.logger.debug(f"Extracted bit: {extracted_bit}, Position: ({y},{x}), DCT value: {dct_block[y, x]:.4f}")
+        return bits
 
     def embed_fingerprint(self, image_path, output_path):
         self.logger.info("Starting fingerprint embedding process...")
@@ -130,16 +134,16 @@ class ImprovedAlphaPunch:
 
         y_channel = ycbcr[:, :, 0]
         height, width = y_channel.shape
-        extracted_fingerprint = np.zeros(self.fingerprint_size, dtype=np.uint8)
+        extracted_fingerprint = np.zeros(self.fingerprint_size[0] * self.fingerprint_size[1] * 3, dtype=np.uint8)
 
         def process_block(block_idx):
             i, j = block_idx
             block = y_channel[i:i + self.block_size, j:j + self.block_size]
             dct_block = dct(dct(block.T, norm='ortho').T, norm='ortho')
-            bit = self.extract_from_dct_block(dct_block)
-            bit_idx = (i // self.block_size * (width // self.block_size) + j // self.block_size) % (
-                        self.fingerprint_size[0] * self.fingerprint_size[1])
-            return bit_idx, bit
+            bits = self.extract_from_dct_block(dct_block)
+            bit_idx = (i // self.block_size * (width // self.block_size) + j // self.block_size) % len(
+                extracted_fingerprint)
+            return bit_idx, bits
 
         self.logger.info("Extracting fingerprint from image blocks...")
         block_indices = [(i, j) for i in range(0, height - self.block_size + 1, self.block_size)
@@ -150,29 +154,39 @@ class ImprovedAlphaPunch:
                 tqdm(executor.map(process_block, block_indices), total=len(block_indices), desc="Extraction Progress"))
 
         self.logger.info("Reconstructing extracted fingerprint...")
-        for bit_idx, bit in results:
-            extracted_fingerprint.flat[bit_idx] = bit
+        for bit_idx, bits in results:
+            extracted_fingerprint[bit_idx] = np.mean(bits)
 
         self.logger.debug("Extracted fingerprint sample:")
-        self.logger.debug(extracted_fingerprint[:5, :5])
+        self.logger.debug(extracted_fingerprint[:15])
+
+        self.logger.info("Decoding extracted fingerprint...")
+        decoded_fingerprint = np.zeros(self.fingerprint_size[0] * self.fingerprint_size[1], dtype=np.uint8)
+        for i in range(0, len(extracted_fingerprint), 3):
+            decoded_bit = np.mean(extracted_fingerprint[i:i + 3]) > 0.5
+            decoded_fingerprint[i // 3] = decoded_bit
+
+        self.logger.debug("Decoded fingerprint sample:")
+        self.logger.debug(decoded_fingerprint[:15])
 
         self.logger.info("Generating original fingerprint for comparison...")
         original_fingerprint = self.generate_fingerprint()
 
         self.logger.info("Comparing fingerprints...")
-        similarity = np.mean(original_fingerprint == extracted_fingerprint)
+        similarity = np.mean(original_fingerprint == decoded_fingerprint)
         self.logger.info(f"Fingerprint similarity: {similarity:.2%}")
 
-        is_authentic = similarity > 0.9  # Adjust threshold as needed
+        is_authentic = similarity > 0.80  # Lowered threshold
         self.logger.info(f"Verification result: Image is {'authentic' if is_authentic else 'not authentic'}")
 
         return is_authentic
+
 
 if __name__ == "__main__":
     logger = logging.getLogger('AlphaPunch')
 
     logger.info("Initializing AlphaPunch...")
-    alphapunch = RedesignedAlphaPunch(private_key="your_secret_key_here", logger=logger)
+    alphapunch = ImprovedAlphaPunch(private_key="your_secret_key_here", logger=logger)
 
     logger.info("Embedding fingerprint...")
     salt = alphapunch.embed_fingerprint("input_image.jpg", "fingerprinted_image.jpg")

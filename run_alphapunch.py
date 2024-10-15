@@ -33,7 +33,7 @@ def main():
     logger.info("Initializing ImprovedAlphaPunch...")
 
     private_key = "your_secret_key_here"
-    alphapunch = ImprovedAlphaPunch(private_key=private_key, logger=logger, embed_strength=0.5)
+    alphapunch = ImprovedAlphaPunch(private_key=private_key, logger=logger)
 
     logger.info("Embedding fingerprint...")
     salt = alphapunch.embed_fingerprint("input_image.jpg", "fingerprinted_image.png")
