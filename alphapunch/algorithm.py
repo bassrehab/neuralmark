@@ -16,15 +16,13 @@ from numba import jit
 
 
 class EnhancedAlphaPunch:
-    def __init__(self, private_key, logger, fingerprint_size=(64, 64), block_size=8, embed_strength=0.75,
-                 use_gpu=False):
+    def __init__(self, private_key, logger, fingerprint_size=(64, 64), block_size=8, embed_strength=0.75):
         self.private_key = private_key.encode()
         self.fingerprint_size = fingerprint_size
         self.block_size = block_size
         self.embed_positions = [(block_size // 2, block_size // 2 - 1), (block_size // 2 - 1, block_size // 2)]
         self.logger = logger
         self.embed_strength = embed_strength
-        self.use_gpu = use_gpu
 
     def generate_fingerprint(self):
         np.random.seed(int.from_bytes(hashlib.sha256(self.private_key).digest(), byteorder='big') % 2 ** 32)
@@ -59,25 +57,23 @@ class EnhancedAlphaPunch:
         return decrypted_fingerprint
 
     @staticmethod
-    @jit(nopython=True)
     def rgb_to_ycbcr(rgb):
         rgb = rgb.astype(np.float32) / 255.0
         transform = np.array([[0.299, 0.587, 0.114],
                               [-0.168736, -0.331264, 0.5],
                               [0.5, -0.418688, -0.081312]])
-        ycbcr = rgb.dot(transform.T)
-        ycbcr[:, :, 1:] += 0.5
+        ycbcr = np.dot(rgb, transform.T)
+        ycbcr[:,:,1:] += 0.5
         return np.clip(ycbcr, 0, 1) * 255
 
     @staticmethod
-    @jit(nopython=True)
     def ycbcr_to_rgb(ycbcr):
         ycbcr = ycbcr.astype(np.float32) / 255.0
-        ycbcr[:, :, 1:] -= 0.5
+        ycbcr[:,:,1:] -= 0.5
         transform = np.array([[1.0, 0.0, 1.402],
                               [1.0, -0.344136, -0.714136],
                               [1.0, 1.772, 0.0]])
-        rgb = ycbcr.dot(transform.T)
+        rgb = np.dot(ycbcr, transform.T)
         return np.clip(rgb, 0, 1) * 255
 
     def embed_in_dct_block(self, dct_block, bit):
