@@ -1,0 +1,37 @@
+[
+  {
+    "filename": "73hwx_RvwGI.jpg",
+    "psnr": 51.46436360208575,
+    "ssim": 0.9961927167258668,
+    "is_authentic": true,
+    "similarity": 0.991943359375
+  },
+  {
+    "filename": "B9A7kEq5Rvs.jpg",
+    "psnr": 51.21264218651454,
+    "ssim": 0.9964079616927464,
+    "is_authentic": true,
+    "similarity": 0.991455078125
+  },
+  {
+    "filename": "Frn5hf_j6Pc.jpg",
+    "psnr": 51.29584415072891,
+    "ssim": 0.9967140576033096,
+    "is_authentic": true,
+    "similarity": 0.95703125
+  },
+  {
+    "filename": "uVAL4PrIofA.jpg",
+    "psnr": 51.28600542862407,
+    "ssim": 0.9965968401922153,
+    "is_authentic": true,
+    "similarity": 0.97119140625
+  },
+  {
+    "filename": "gkyAltPdtM8.jpg",
+    "psnr": 51.34427976609018,
+    "ssim": 0.9952439127425387,
+    "is_authentic": true,
+    "similarity": 0.98828125
+  }
+]
