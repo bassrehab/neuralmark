@@ -210,8 +210,23 @@ class EnhancedAlphaPunch:
         original = cv2.imread(original_path)
         fingerprinted = cv2.imread(fingerprinted_path)
 
-        psnr = cv2.PSNR(original, fingerprinted)
-        ssim_value = ssim(original, fingerprinted, multichannel=True)
+        # Ensure both images have the same dimensions
+        if original.shape != fingerprinted.shape:
+            fingerprinted = cv2.resize(fingerprinted, (original.shape[1], original.shape[0]))
+
+        # Calculate PSNR
+        mse = np.mean((original - fingerprinted) ** 2)
+        if mse == 0:
+            psnr = float('inf')
+        else:
+            max_pixel = 255.0
+            psnr = 20 * np.log10(max_pixel / np.sqrt(mse))
+
+        # Calculate SSIM
+        min_dim = min(original.shape[0], original.shape[1])
+        win_size = min(7, min_dim - (min_dim % 2) + 1)  # Ensure win_size is odd and not larger than the image
+
+        ssim_value = ssim(original, fingerprinted, win_size=win_size, channel_axis=2)
 
         return psnr, ssim_value
 
@@ -220,7 +235,6 @@ class EnhancedAlphaPunch:
         psnr, ssim_value = self.assess_image_quality(image_path, output_path)
         self.logger.info(f"Image Quality - PSNR: {psnr:.2f} dB, SSIM: {ssim_value:.4f}")
         return salt, psnr, ssim_value
-
 
 # Additional utility functions for robustness testing
 def apply_transformations(image_path, output_dir):
