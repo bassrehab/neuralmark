@@ -63,13 +63,13 @@ class EnhancedAlphaPunch:
                               [-0.168736, -0.331264, 0.5],
                               [0.5, -0.418688, -0.081312]])
         ycbcr = np.dot(rgb, transform.T)
-        ycbcr[:,:,1:] += 0.5
+        ycbcr[:, :, 1:] += 0.5
         return np.clip(ycbcr, 0, 1) * 255
 
     @staticmethod
     def ycbcr_to_rgb(ycbcr):
         ycbcr = ycbcr.astype(np.float32) / 255.0
-        ycbcr[:,:,1:] -= 0.5
+        ycbcr[:, :, 1:] -= 0.5
         transform = np.array([[1.0, 0.0, 1.402],
                               [1.0, -0.344136, -0.714136],
                               [1.0, 1.772, 0.0]])
@@ -236,6 +236,7 @@ class EnhancedAlphaPunch:
         self.logger.info(f"Image Quality - PSNR: {psnr:.2f} dB, SSIM: {ssim_value:.4f}")
         return salt, psnr, ssim_value
 
+
 # Additional utility functions for robustness testing
 def apply_transformations(image_path, output_dir):
     """Apply various transformations to an image for robustness testing."""
@@ -279,10 +280,11 @@ def batch_test(alphapunch, input_dir, output_dir):
             scaled_result, scaled_similarity = alphapunch.verify_fingerprint(os.path.join(output_dir, 'scaled.png'),
                                                                              salt)
 
-
-            cropped_result, cropped_similarity = alphapunch.verify_fingerprint(os.path.join(output_dir, 'cropped.png'), salt)
-            compressed_result, compressed_similarity = alphapunch.verify_fingerprint(os.path.join(output_dir, 'compressed.jpg'),
-                                                                                     salt)
+            cropped_result, cropped_similarity = alphapunch.verify_fingerprint(os.path.join(output_dir, 'cropped.png'),
+                                                                               salt)
+            compressed_result, compressed_similarity = alphapunch.verify_fingerprint(
+                os.path.join(output_dir, 'compressed.jpg'),
+                salt)
 
             results.append({
                 'filename': filename,
@@ -343,4 +345,3 @@ if __name__ == "__main__":
             f"  Cropped: {'Authentic' if result['cropped'][0] else 'Not authentic'} (Similarity: {result['cropped'][1]:.2%})")
         print(
             f"  Compressed: {'Authentic' if result['compressed'][0] else 'Not authentic'} (Similarity: {result['compressed'][1]:.2%})")
-

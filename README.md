@@ -19,7 +19,7 @@ graph TD
 ```
 
 **Explanation:**
-- We chose this overall flow because it separates the key processes: generation, embedding, verification, and quality assessment.
+- I chose this overall flow because it separates the key processes: generation, embedding, verification, and quality assessment.
 - This modular approach allows for easier testing and optimization of individual components.
 
 ### Fingerprint Generation
@@ -37,7 +37,7 @@ graph TD
 ```
 
 **Explanation:**
-- We use a private key to seed the PRNG for security.
+- I use a private key to seed the PRNG for security.
 - The repetition code (3x repetition) is used for error correction, improving robustness.
 - This approach was chosen over more complex error correction codes for its simplicity and effectiveness.
 
@@ -59,7 +59,7 @@ graph TD
 - DCT (Discrete Cosine Transform) is chosen because:
   1. It's widely used in image compression, making the fingerprint robust against JPEG compression.
   2. It allows for embedding in mid-frequency coefficients, balancing imperceptibility and robustness.
-- We embed in multiple positions for each bit to improve reliability.
+- I embed in multiple positions for each bit to improve reliability.
 
 ### Fingerprint Verification
 
@@ -80,7 +80,7 @@ graph TD
 **Explanation:**
 - The verification process mirrors the embedding process for consistency.
 - Adaptive thresholding is used to account for variations in image quality and potential transformations.
-- We chose to use similarity comparison over exact matching to allow for some level of data loss or modification.
+- I chose to use similarity comparison over exact matching to allow for some level of data loss or modification.
 
 ### Image Quality Assessment
 
