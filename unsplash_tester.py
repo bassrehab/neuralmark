@@ -7,8 +7,9 @@ from alphapunch.algorithm import EnhancedAlphaPunch
 import logging
 from PIL import Image
 import argparse
+import numpy as np
 
-# You need to sign up for a free Unsplash API key at https://unsplash.com/developers
+# Unsplash API key at https://unsplash.com/developers
 UNSPLASH_ACCESS_KEY = "gRMk05LDbP4KvDPQUk2fzf6R8VbCqlcZ_Kvk5TPbVJ0"
 
 
@@ -80,10 +81,10 @@ def test_alphapunch(alphapunch, image_paths, output_dir):
 
         results.append({
             'filename': filename,
-            'psnr': psnr,
-            'ssim': ssim,
-            'is_authentic': is_authentic,
-            'similarity': similarity
+            'psnr': float(psnr),  # Convert to standard Python float
+            'ssim': float(ssim),  # Convert to standard Python float
+            'is_authentic': bool(is_authentic),  # Convert to standard Python bool
+            'similarity': float(similarity)  # Convert to standard Python float
         })
 
     return results
@@ -107,7 +108,6 @@ def generate_report(results, report_path):
     print(f"Average PSNR: {average_psnr:.2f} dB")
     print(f"Average SSIM: {average_ssim:.4f}")
     print(f"Average Similarity: {average_similarity:.2%}")
-
 
 def main():
     parser = argparse.ArgumentParser(description="Test AlphaPunch with random Unsplash images")
