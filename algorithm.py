@@ -7,21 +7,22 @@ from Crypto.Util.Padding import pad, unpad
 import hashlib
 import concurrent.futures
 from tqdm import tqdm
-import logging
 
-class RedesignedAlphaPunch:
-    def __init__(self, private_key, logger, fingerprint_size=(64, 64), block_size=8):
+
+class ImprovedAlphaPunch:
+    def __init__(self, private_key, logger, fingerprint_size=(64, 64), block_size=8, embed_strength=0.5):
         self.private_key = private_key.encode()
         self.fingerprint_size = fingerprint_size
         self.block_size = block_size
         self.embed_position = (block_size // 2, block_size // 2 - 1)
         self.logger = logger
+        self.embed_strength = embed_strength
 
     def generate_fingerprint(self):
-        np.random.seed(int.from_bytes(hashlib.sha256(self.private_key).digest(), byteorder='big') % 2**32)
+        np.random.seed(int.from_bytes(hashlib.sha256(self.private_key).digest(), byteorder='big') % 2 ** 32)
         fingerprint = np.random.randint(0, 2, self.fingerprint_size).astype(np.uint8)
         self.logger.debug(f"Generated fingerprint shape: {fingerprint.shape}")
-        self.logger.debug(f"Fingerprint sample: {fingerprint[:5,:5]}")
+        self.logger.debug(f"Fingerprint sample: {fingerprint[:5, :5]}")
         return fingerprint
 
     def encrypt_fingerprint(self, fingerprint, salt):
@@ -44,7 +45,7 @@ class RedesignedAlphaPunch:
             unpadded = decrypted
         decrypted_fingerprint = np.frombuffer(unpadded, dtype=np.uint8).reshape(self.fingerprint_size)
         self.logger.debug(f"Decrypted fingerprint shape: {decrypted_fingerprint.shape}")
-        self.logger.debug(f"Decrypted fingerprint sample: {decrypted_fingerprint[:5,:5]}")
+        self.logger.debug(f"Decrypted fingerprint sample: {decrypted_fingerprint[:5, :5]}")
         return decrypted_fingerprint
 
     def rgb_to_ycbcr(self, rgb):
@@ -68,8 +69,9 @@ class RedesignedAlphaPunch:
     def embed_in_dct_block(self, dct_block, bit):
         y, x = self.embed_position
         original_value = dct_block[y, x]
-        dct_block[y, x] = dct_block[y, x] + 0.1 if bit else dct_block[y, x] - 0.1
-        self.logger.debug(f"Embedding bit {bit}. Original value: {original_value:.4f}, New value: {dct_block[y, x]:.4f}")
+        dct_block[y, x] = dct_block[y, x] + self.embed_strength if bit else dct_block[y, x] - self.embed_strength
+        self.logger.debug(
+            f"Embedding bit {bit}. Original value: {original_value:.4f}, New value: {dct_block[y, x]:.4f}")
         return dct_block
 
     def extract_from_dct_block(self, dct_block):
@@ -116,7 +118,7 @@ class RedesignedAlphaPunch:
         rgb_image = self.ycbcr_to_rgb(ycbcr).astype(np.uint8)
 
         self.logger.info(f"Saving fingerprinted image to {output_path}...")
-        Image.fromarray(rgb_image).save(output_path)
+        Image.fromarray(rgb_image).save(output_path, format='PNG')
 
         self.logger.info("Fingerprint embedding complete.")
         return salt
@@ -151,8 +153,8 @@ class RedesignedAlphaPunch:
         for bit_idx, bit in results:
             extracted_fingerprint.flat[bit_idx] = bit
 
-        self.logger.info("Extracted fingerprint sample:")
-        self.logger.info(extracted_fingerprint[:5, :5])
+        self.logger.debug("Extracted fingerprint sample:")
+        self.logger.debug(extracted_fingerprint[:5, :5])
 
         self.logger.info("Generating original fingerprint for comparison...")
         original_fingerprint = self.generate_fingerprint()
@@ -165,7 +167,6 @@ class RedesignedAlphaPunch:
         self.logger.info(f"Verification result: Image is {'authentic' if is_authentic else 'not authentic'}")
 
         return is_authentic
-
 
 if __name__ == "__main__":
     logger = logging.getLogger('AlphaPunch')
