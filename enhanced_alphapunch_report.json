@@ -1,29 +1,29 @@
 [
   {
-    "filename": "K40pKB06uEg.jpg",
+    "filename": "DKkhP-YjSQQ.jpg",
     "is_authentic": false,
-    "similarity": 0.09375,
-    "psnr": 48.335785807235936,
-    "ssim": 0.9980772906822196,
-    "embed_time": 2.1868112087249756,
-    "verify_time": 0.012866020202636719
+    "similarity": 0.0078125,
+    "psnr": 48.010824491499505,
+    "ssim": 0.9985629653508926,
+    "embed_time": 2.1339190006256104,
+    "verify_time": 0.016500234603881836
   },
   {
-    "filename": "6WpIxg5tRn4.jpg",
+    "filename": "Ri7fRm0PRCc.jpg",
+    "is_authentic": false,
+    "similarity": 0.01171875,
+    "psnr": 48.137007043022464,
+    "ssim": 0.9978283969077496,
+    "embed_time": 2.1135380268096924,
+    "verify_time": 0.01517796516418457
+  },
+  {
+    "filename": "fSxY06IXZKc.jpg",
     "is_authentic": false,
     "similarity": 0.015625,
-    "psnr": 48.126271213859155,
-    "ssim": 0.9991227097462447,
-    "embed_time": 1.1007940769195557,
-    "verify_time": 0.007436990737915039
-  },
-  {
-    "filename": "NaasFq1Xwmw.jpg",
-    "is_authentic": false,
-    "similarity": 0.046875,
-    "psnr": 49.642350175090186,
-    "ssim": 0.9707957497940933,
-    "embed_time": 1.8173291683197021,
-    "verify_time": 0.009416818618774414
+    "psnr": 48.290321583032345,
+    "ssim": 0.9980273029903398,
+    "embed_time": 2.041343927383423,
+    "verify_time": 0.01367497444152832
   }
 ]

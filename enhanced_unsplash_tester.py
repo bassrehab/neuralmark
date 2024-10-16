@@ -17,7 +17,7 @@ UNSPLASH_ACCESS_KEY = "gRMk05LDbP4KvDPQUk2fzf6R8VbCqlcZ_Kvk5TPbVJ0"
 
 def setup_logger():
     logger = logging.getLogger('EnhancedAlphaPunchTester')
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
     handler = logging.StreamHandler()
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
