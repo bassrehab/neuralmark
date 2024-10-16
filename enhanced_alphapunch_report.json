@@ -1,32 +1,52 @@
 [
   {
-    "filename": "r6yudah1KFk.jpg",
+    "filename": "PrXVzkJOqq4.jpg",
     "is_authentic": true,
     "similarity": 1.0,
     "normalized_hamming_distance": 0.0,
-    "psnr": 81.53581074698826,
-    "ssim": 0.9999979886594819,
-    "embed_time": 0.7246730327606201,
-    "verify_time": 0.023363113403320312
+    "psnr": 79.25256641260164,
+    "ssim": 0.9999921388194132,
+    "embed_time": 0.7080249786376953,
+    "verify_time": 0.019984006881713867
   },
   {
-    "filename": "YMhiFK_KYCg.jpg",
+    "filename": "Waf83aznKO8.jpg",
     "is_authentic": true,
     "similarity": 1.0,
     "normalized_hamming_distance": 0.0,
-    "psnr": 78.7303416389391,
-    "ssim": 0.9999875627012349,
-    "embed_time": 0.5493388175964355,
-    "verify_time": 0.02037501335144043
+    "psnr": 82.1793716027955,
+    "ssim": 0.9999952094476178,
+    "embed_time": 0.7855632305145264,
+    "verify_time": 0.03350210189819336
   },
   {
-    "filename": "mNtfCN5sUBM.jpg",
+    "filename": "eWYRMznARqU.jpg",
     "is_authentic": true,
     "similarity": 1.0,
     "normalized_hamming_distance": 0.0,
-    "psnr": 77.14127233445295,
-    "ssim": 0.9999996112723774,
-    "embed_time": 0.45199108123779297,
-    "verify_time": 0.016089916229248047
+    "psnr": 78.73753932546018,
+    "ssim": 0.9999873842111119,
+    "embed_time": 0.546640157699585,
+    "verify_time": 0.020305871963500977
+  },
+  {
+    "filename": "lVj2cpCOdDI.jpg",
+    "is_authentic": true,
+    "similarity": 1.0,
+    "normalized_hamming_distance": 0.0,
+    "psnr": 82.15913036440733,
+    "ssim": 0.9999980491225693,
+    "embed_time": 0.7844769954681396,
+    "verify_time": 0.02771782875061035
+  },
+  {
+    "filename": "8hFckCG-row.jpg",
+    "is_authentic": true,
+    "similarity": 1.0,
+    "normalized_hamming_distance": 0.0,
+    "psnr": 82.26072434955854,
+    "ssim": 0.9999984099212164,
+    "embed_time": 0.779292106628418,
+    "verify_time": 0.025016069412231445
   }
 ]

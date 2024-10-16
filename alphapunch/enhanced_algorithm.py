@@ -176,12 +176,18 @@ class EnhancedAlphaPunch:
             embedded_image[y, x, channel] = (embedded_image[y, x, channel] & 0xFE) | bit
         return embedded_image
 
-    def embed_fingerprint(self, image_path, output_path):
+    def embed_fingerprint(self, image_input, output_path):
         self.logger.info("Starting enhanced fingerprint embedding process...")
         start_time = time.time()
 
         try:
-            img = np.array(Image.open(image_path))
+            if isinstance(image_input, str):
+                img = np.array(Image.open(image_input))
+            elif isinstance(image_input, np.ndarray):
+                img = image_input
+            else:
+                raise ValueError("image_input must be either a file path or a numpy array")
+
             self.logger.info(f"Image loaded. Shape: {img.shape}. Time: {time.time() - start_time:.2f}s")
 
             fingerprint = self.generate_fractal_fingerprint(img)
@@ -209,10 +215,15 @@ class EnhancedAlphaPunch:
             self.logger.error(traceback.format_exc())
             raise
 
-    def verify_fingerprint(self, image_path, original_fingerprint):
+    def verify_fingerprint(self, image_input, original_fingerprint):
         self.logger.info("Starting fingerprint verification process...")
         start_time = time.time()
-        img = np.array(Image.open(image_path))
+        if isinstance(image_input, str):
+            img = np.array(Image.open(image_input))
+        elif isinstance(image_input, np.ndarray):
+            img = image_input
+        else:
+            raise ValueError("image_input must be either a file path or a numpy array")
 
         # Check if the image has been modified
         embedded_fingerprint = self.extract_fingerprint(img)

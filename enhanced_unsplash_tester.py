@@ -4,6 +4,7 @@ import json
 from tqdm import tqdm
 import random
 from alphapunch.enhanced_algorithm import EnhancedAlphaPunch
+from robustness_tester import run_robustness_tests
 import logging
 from PIL import Image
 import argparse
@@ -152,6 +153,7 @@ def main():
                         help="Directory to store fingerprinted images")
     parser.add_argument('--report_path', type=str, default='enhanced_alphapunch_report.json',
                         help="Path to save the JSON report")
+    parser.add_argument('--run_robustness', action='store_true', help="Run additional robustness tests")
     args = parser.parse_args()
 
     global logger
@@ -170,6 +172,11 @@ def main():
 
     logger.info("Generating report...")
     generate_report(results, args.report_path)
+
+    if args.run_robustness:
+        logger.info("Running robustness tests...")
+        robustness_results = run_robustness_tests(alphapunch, image_paths, args.output_dir)
+        # You can add these results to your main report or generate a separate robustness report
 
 
 if __name__ == "__main__":
