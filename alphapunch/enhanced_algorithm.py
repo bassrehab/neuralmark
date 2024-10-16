@@ -171,17 +171,18 @@ class EnhancedAlphaPunch:
         encrypted_image = image.copy()
         encrypted_image_flat = encrypted_image.flatten()
 
-        binary_fingerprint = bin(int(encrypted_fingerprint, 16))[2:].zfill(2048)
+        binary_fingerprint = ''.join(format(int(char, 16), '04b') for char in encrypted_fingerprint)
         self.logger.debug(f"Binary fingerprint to embed (first 50 bits): {binary_fingerprint[:50]}")
 
         for i, bit in enumerate(binary_fingerprint):
-            idx = i % len(encrypted_image_flat)
-            encrypted_image_flat[idx] = (encrypted_image_flat[idx] & 0xFE) | int(bit)
+            if i >= len(encrypted_image_flat):
+                break
+            encrypted_image_flat[i] = (encrypted_image_flat[i] & 0xFE) | int(bit)
 
         encrypted_image = encrypted_image_flat.reshape(image.shape)
 
         # Verify embedding
-        embedded_bits = ''.join([str(pixel & 0x01) for pixel in encrypted_image_flat[:2048]])
+        embedded_bits = ''.join([str(pixel & 0x01) for pixel in encrypted_image_flat[:len(binary_fingerprint)]])
         self.logger.debug(f"Embedded bits (first 50 bits): {embedded_bits[:50]}")
 
         self.logger.info(f"Embedding completed. Time: {time.time() - start_time:.2f}s")
@@ -258,10 +259,11 @@ class EnhancedAlphaPunch:
 
         # Extract the embedded fingerprint
         img_flat = img.flatten()
-        extracted_bits = ''.join([str(pixel & 0x01) for pixel in img_flat[:2048]])
+        extracted_bits = ''.join([str(pixel & 0x01) for pixel in img_flat[:256 * 4]])  # 256 hex chars * 4 bits each
         self.logger.debug(f"Extracted bits (first 50 bits): {extracted_bits[:50]}")
 
-        extracted_hex = hex(int(extracted_bits, 2))[2:].zfill(256)
+        # Convert bits to hexadecimal
+        extracted_hex = ''.join([hex(int(extracted_bits[i:i + 4], 2))[2:] for i in range(0, len(extracted_bits), 4)])
         self.logger.debug(f"Extracted hex (first 50 chars): {extracted_hex[:50]}")
 
         self.logger.info(f"Extracted fingerprint. Time: {time.time() - start_time:.2f}s")
@@ -273,11 +275,11 @@ class EnhancedAlphaPunch:
         original_encrypted = self.simple_encrypt(original_fingerprint_str)
         self.logger.debug(f"Original encrypted (first 50 chars): {original_encrypted[:50]}")
 
-        # Compare only the first 256 characters of both hexadecimal strings
-        similarity = sum(a == b for a, b in zip(extracted_hex[:256], original_encrypted[:256])) / 256
+        # Compare the hexadecimal strings
+        similarity = sum(a == b for a, b in zip(extracted_hex, original_encrypted)) / len(original_encrypted)
         self.logger.info(f"Fingerprint similarity: {similarity:.2%}")
 
-        is_authentic = similarity > 0.7  # Lowered threshold for testing
+        is_authentic = similarity > 0.7  # Adjust threshold as needed
         self.logger.info(f"Verification result: Image is {'authentic' if is_authentic else 'not authentic'}")
 
         self.logger.info(f"Verification completed. Total time: {time.time() - start_time:.2f}s")
