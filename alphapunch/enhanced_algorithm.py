@@ -92,14 +92,13 @@ class EnhancedAlphaPunch:
         return fingerprint.reshape(self.fingerprint_size)
 
     def add_error_correction(self, fingerprint):
-        # Simple repetition code
+        # Repeat each bit 3 times along both dimensions
         return np.repeat(np.repeat(fingerprint, 3, axis=0), 3, axis=1)
 
     def remove_error_correction(self, extracted_fingerprint):
-        # Majority voting
-        corrected = (convolve2d(extracted_fingerprint, np.ones((3, 3)), mode='valid') > 4).astype(int)
-        # Resize to match the original fingerprint size
-        return cv2.resize(corrected, self.fingerprint_size, interpolation=cv2.INTER_NEAREST)
+        h, w = self.fingerprint_size
+        corrected = extracted_fingerprint.reshape(h, 3, w, 3).sum(axis=(1, 3))
+        return (corrected > 4).astype(int)  # Threshold is 4 because we repeated 3x3 times
 
     def quantum_inspired_embed(self, dct_block, bit):
         embed_strength = 0.1  # Increase this value for stronger embedding
@@ -109,6 +108,36 @@ class EnhancedAlphaPunch:
             else:
                 dct_block[y, x] -= embed_strength
         return dct_block
+
+    def dct_embed(self, image, fingerprint):
+        embedded_image = image.copy()
+        h, w = self.fingerprint_size
+        for i in range(h):
+            for j in range(w):
+                y = i % (image.shape[0] - 8)
+                x = j % (image.shape[1] - 8)
+                block = image[y:y + 8, x:x + 8, 0].astype(float)
+                dct_block = dct(dct(block.T, norm='ortho').T, norm='ortho')
+                if fingerprint[i, j]:
+                    dct_block[5, 5] = np.floor(
+                        dct_block[5, 5] / self.embed_strength) * self.embed_strength + self.embed_strength / 2
+                else:
+                    dct_block[5, 5] = np.floor(dct_block[5, 5] / self.embed_strength) * self.embed_strength
+                block = idct(idct(dct_block.T, norm='ortho').T, norm='ortho')
+                embedded_image[y:y + 8, x:x + 8, 0] = block
+        return embedded_image
+
+    def dct_extract(self, image):
+        h, w = self.fingerprint_size
+        extracted_fingerprint = np.zeros((h, w), dtype=bool)
+        for i in range(h):
+            for j in range(w):
+                y = i % (image.shape[0] - 8)
+                x = j % (image.shape[1] - 8)
+                block = image[y:y + 8, x:x + 8, 0].astype(float)
+                dct_block = dct(dct(block.T, norm='ortho').T, norm='ortho')
+                extracted_fingerprint[i, j] = (dct_block[5, 5] % self.embed_strength) > self.embed_strength / 2
+        return extracted_fingerprint
 
     def wavelet_embed(self, image, fingerprint):
         # Convert image to float32 and scale to [0, 1]
@@ -168,12 +197,13 @@ class EnhancedAlphaPunch:
 
     def homomorphic_embed(self, image, fingerprint):
         embedded_image = image.copy()
-        fingerprint_flat = fingerprint.flatten()
-        for i, bit in enumerate(fingerprint_flat):
-            y = (i // self.fingerprint_size[1]) % image.shape[0]
-            x = (i % self.fingerprint_size[1]) % image.shape[1]
-            channel = i % 3
-            embedded_image[y, x, channel] = (embedded_image[y, x, channel] & 0xFE) | bit
+        h, w = self.fingerprint_size
+        for i in range(h * 3):
+            for j in range(w * 3):
+                y = i % image.shape[0]
+                x = j % image.shape[1]
+                channel = (i * w * 3 + j) % 3
+                embedded_image[y, x, channel] = (embedded_image[y, x, channel] & 0xFE) | fingerprint[i, j]
         return embedded_image
 
     def embed_fingerprint(self, image_input, output_path):
@@ -191,11 +221,13 @@ class EnhancedAlphaPunch:
             self.logger.info(f"Image loaded. Shape: {img.shape}. Time: {time.time() - start_time:.2f}s")
 
             fingerprint = self.generate_fractal_fingerprint(img)
-            self.logger.info(f"Fractal fingerprint generated. Time: {time.time() - start_time:.2f}s")
-            self.logger.debug(f"Original fingerprint (first 10 bits): {fingerprint.flatten()[:10]}")
+            self.logger.debug(f"Original fingerprint (first 20 bits): {fingerprint.flatten()[:20]}")
+            self.logger.debug(f"Original fingerprint shape: {fingerprint.shape}")
 
-            # Simplify embedding process - use only homomorphic embedding
-            embedded_img = self.homomorphic_embed(img, fingerprint)
+            fingerprint_with_ec = self.add_error_correction(fingerprint)
+            self.logger.debug(f"Fingerprint with EC (shape): {fingerprint_with_ec.shape}")
+
+            embedded_img = self.homomorphic_embed(img, fingerprint_with_ec)
             self.logger.info(f"Homomorphic embedding completed. Time: {time.time() - start_time:.2f}s")
 
             self.logger.debug(
@@ -218,6 +250,7 @@ class EnhancedAlphaPunch:
     def verify_fingerprint(self, image_input, original_fingerprint):
         self.logger.info("Starting fingerprint verification process...")
         start_time = time.time()
+
         if isinstance(image_input, str):
             img = np.array(Image.open(image_input))
         elif isinstance(image_input, np.ndarray):
@@ -225,48 +258,43 @@ class EnhancedAlphaPunch:
         else:
             raise ValueError("image_input must be either a file path or a numpy array")
 
-        # Check if the image has been modified
-        embedded_fingerprint = self.extract_fingerprint(img)
-        self.logger.debug(f"Embedded fingerprint (first 20 bits): {embedded_fingerprint.flatten()[:20]}")
-
-        if not np.array_equal(embedded_fingerprint, original_fingerprint):
-            self.logger.warning(
-                "The embedded fingerprint does not match the original. The image may have been modified.")
-
         extracted_fingerprint = self.extract_fingerprint(img)
         self.logger.info(f"Extracted fingerprint. Time: {time.time() - start_time:.2f}s")
+        self.logger.debug(f"Extracted fingerprint shape: {extracted_fingerprint.shape}")
+
+        corrected_fingerprint = self.remove_error_correction(extracted_fingerprint)
+        self.logger.debug(f"Corrected fingerprint shape: {corrected_fingerprint.shape}")
 
         self.logger.debug(f"Original fingerprint (first 20 bits): {original_fingerprint.flatten()[:20]}")
-        self.logger.debug(f"Extracted fingerprint (first 20 bits): {extracted_fingerprint.flatten()[:20]}")
+        self.logger.debug(f"Corrected fingerprint (first 20 bits): {corrected_fingerprint.flatten()[:20]}")
 
-        similarity = np.mean(extracted_fingerprint == original_fingerprint)
+        similarity = np.mean(corrected_fingerprint == original_fingerprint)
         self.logger.info(f"Fingerprint similarity: {similarity:.2%}")
 
-        hamming_distance = np.sum(extracted_fingerprint != original_fingerprint)
+        hamming_distance = np.sum(corrected_fingerprint != original_fingerprint)
         normalized_hamming_distance = hamming_distance / (original_fingerprint.shape[0] * original_fingerprint.shape[1])
         self.logger.info(f"Normalized Hamming distance: {normalized_hamming_distance:.2%}")
 
-        is_authentic = normalized_hamming_distance < 0.3  # Adjust threshold as needed
+        is_authentic = similarity > 0.6  # Adjust threshold as needed
         self.logger.info(f"Verification result: Image is {'authentic' if is_authentic else 'not authentic'}")
 
-        # Add detailed comparison logging
-        correct_bits = np.sum(extracted_fingerprint == original_fingerprint)
+        correct_bits = np.sum(corrected_fingerprint == original_fingerprint)
         total_bits = original_fingerprint.size
         self.logger.debug(f"Correct bits: {correct_bits}/{total_bits}")
 
         self.logger.info(f"Verification completed. Total time: {time.time() - start_time:.2f}s")
         return is_authentic, similarity, normalized_hamming_distance
 
-    def extract_fingerprint(self, img):
-        extracted_bits = np.zeros(self.fingerprint_size, dtype=int)
-        for i in range(self.fingerprint_size[0] * self.fingerprint_size[1]):
-            y = (i // self.fingerprint_size[1]) % img.shape[0]
-            x = (i % self.fingerprint_size[1]) % img.shape[1]
-            channel = i % 3
-            # Use a threshold to determine the bit value
-            extracted_bits.flat[i] = 1 if img[y, x, channel] % 2 > 0 else 0
 
-        self.logger.debug(f"Extracted fingerprint (first 10 bits): {extracted_bits.flatten()[:10]}")
+    def extract_fingerprint(self, img):
+        h, w = self.fingerprint_size
+        extracted_bits = np.zeros((h * 3, w * 3), dtype=int)
+        for i in range(h * 3):
+            for j in range(w * 3):
+                y = i % img.shape[0]
+                x = j % img.shape[1]
+                channel = (i * w * 3 + j) % 3
+                extracted_bits[i, j] = img[y, x, channel] & 0x01
         return extracted_bits
 
     def extract_bit_from_dct(self, dct_block):

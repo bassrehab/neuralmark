@@ -1,52 +1,52 @@
 [
   {
-    "filename": "PrXVzkJOqq4.jpg",
+    "filename": "4Q9aOJF-6vI.jpg",
     "is_authentic": true,
     "similarity": 1.0,
     "normalized_hamming_distance": 0.0,
-    "psnr": 79.25256641260164,
-    "ssim": 0.9999921388194132,
-    "embed_time": 0.7080249786376953,
-    "verify_time": 0.019984006881713867
+    "psnr": 71.89353795177865,
+    "ssim": 0.9999401155004598,
+    "embed_time": 0.7958197593688965,
+    "verify_time": 0.05096077919006348
   },
   {
-    "filename": "Waf83aznKO8.jpg",
+    "filename": "IAeo1QNl0Hk.jpg",
     "is_authentic": true,
     "similarity": 1.0,
     "normalized_hamming_distance": 0.0,
-    "psnr": 82.1793716027955,
-    "ssim": 0.9999952094476178,
-    "embed_time": 0.7855632305145264,
-    "verify_time": 0.03350210189819336
+    "psnr": 72.63674142241467,
+    "ssim": 0.9999680191237665,
+    "embed_time": 0.8587460517883301,
+    "verify_time": 0.05808424949645996
   },
   {
-    "filename": "eWYRMznARqU.jpg",
+    "filename": "gpp6ryvpdhY.jpg",
     "is_authentic": true,
     "similarity": 1.0,
     "normalized_hamming_distance": 0.0,
-    "psnr": 78.73753932546018,
-    "ssim": 0.9999873842111119,
-    "embed_time": 0.546640157699585,
-    "verify_time": 0.020305871963500977
+    "psnr": 72.70404605950667,
+    "ssim": 0.999973890639038,
+    "embed_time": 0.832629919052124,
+    "verify_time": 0.053734779357910156
   },
   {
-    "filename": "lVj2cpCOdDI.jpg",
+    "filename": "leFTO_0yAfI.jpg",
     "is_authentic": true,
     "similarity": 1.0,
     "normalized_hamming_distance": 0.0,
-    "psnr": 82.15913036440733,
-    "ssim": 0.9999980491225693,
-    "embed_time": 0.7844769954681396,
-    "verify_time": 0.02771782875061035
+    "psnr": 71.89708157382559,
+    "ssim": 0.9999340168981616,
+    "embed_time": 0.7596020698547363,
+    "verify_time": 0.05217313766479492
   },
   {
-    "filename": "8hFckCG-row.jpg",
+    "filename": "NLJqK1djfqE.jpg",
     "is_authentic": true,
     "similarity": 1.0,
     "normalized_hamming_distance": 0.0,
-    "psnr": 82.26072434955854,
-    "ssim": 0.9999984099212164,
-    "embed_time": 0.779292106628418,
-    "verify_time": 0.025016069412231445
+    "psnr": 72.6194954691586,
+    "ssim": 0.9999466096284174,
+    "embed_time": 0.847059965133667,
+    "verify_time": 0.05856800079345703
   }
 ]

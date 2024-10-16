@@ -74,6 +74,8 @@ print(f"Similarity: {similarity:.2%}")
    ```
    python enhanced_unsplash_tester.py --num_images 20
    ```
+4. Run with Robustness tests:
+```python enhanced_unsplash_tester.py --num_images 5 --run_robustness ```
 
 ## Advanced Techniques
 

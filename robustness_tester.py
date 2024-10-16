@@ -95,11 +95,11 @@ def apply_filter(image, filter_type, params):
         raise ValueError("Unsupported filter type")
 
 
-def test_robustness(alphapunch, original_image, fingerprint, manipulations):
+def test_robustness(alphapunch, original_image, original_fingerprint, manipulations):
     results = []
     for manipulation, params in tqdm(manipulations, desc="Testing manipulations"):
         manipulated_image = manipulation(original_image, *params)
-        is_authentic, similarity, _ = alphapunch.verify_fingerprint(manipulated_image, fingerprint)
+        is_authentic, similarity, _ = alphapunch.verify_fingerprint(manipulated_image, original_fingerprint)
         results.append({
             'manipulation': manipulation.__name__,
             'params': params,
