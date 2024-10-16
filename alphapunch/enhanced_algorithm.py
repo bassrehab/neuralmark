@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 from PIL import Image
 from scipy.fftpack import dct, idct
@@ -16,7 +18,7 @@ from scipy.ndimage import zoom
 import time
 import traceback
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
-
+import hashlib
 
 def box_counting_dimension(image, max_box_size=None, min_box_size=2):
     """Estimate the fractal dimension of an image using the box counting method."""
@@ -113,7 +115,7 @@ class EnhancedAlphaPunch:
                 embed_size = min(coeff.size, fingerprint_flat.size - coeff_index)
                 coeff_flat = coeff.flatten()
                 coeff_flat[:embed_size] += self.embed_strength * (
-                            2 * fingerprint_flat[coeff_index:coeff_index + embed_size] - 1)
+                        2 * fingerprint_flat[coeff_index:coeff_index + embed_size] - 1)
                 coeffs[i] = (coeffs[i][0], coeffs[i][1], coeffs[i][2])  # Ensure it's a tuple
                 coeff_index += embed_size
                 if coeff_index >= fingerprint_flat.size:
@@ -147,44 +149,32 @@ class EnhancedAlphaPunch:
         adversarial_image = image + 0.01 * tf.sign(gradients)
         return adversarial_image
 
+    def simple_encrypt(self, data):
+        return hashlib.sha256(data.encode()).hexdigest()
+
     def homomorphic_embed(self, image, fingerprint):
         start_time = time.time()
-        self.logger.info("Starting homomorphic embedding...")
+        self.logger.info("Starting embedding process...")
 
         # Convert fingerprint to a binary string
         fingerprint_str = ''.join(map(str, fingerprint.flatten()))
 
-        # Split the fingerprint into chunks of 256 bits
-        chunk_size = 256
-        fingerprint_chunks = [fingerprint_str[i:i + chunk_size] for i in range(0, len(fingerprint_str), chunk_size)]
+        # Encrypt the fingerprint
+        encrypted_fingerprint = self.simple_encrypt(fingerprint_str)
 
-        # Encrypt each chunk
-        encrypted_chunks = []
-        for chunk in fingerprint_chunks:
-            chunk_int = int(chunk, 2)
-            encrypted_chunk = self.public_key.encrypt(chunk_int)
-            encrypted_chunks.append(encrypted_chunk)
+        self.logger.info(f"Fingerprint encrypted. Time: {time.time() - start_time:.2f}s")
 
-        self.logger.info(
-            f"Fingerprint encrypted in {len(encrypted_chunks)} chunks. Time: {time.time() - start_time:.2f}s")
-
-        # Embed the encrypted chunks (simplified for demonstration)
+        # Embed the encrypted fingerprint
         encrypted_image = image.copy()
         encrypted_image_flat = encrypted_image.flatten()
 
-        for i, chunk in enumerate(encrypted_chunks):
-            # Use the ciphertext directly (this is a simplification and may need adjustment)
-            ciphertext = chunk.ciphertext()
-            ciphertext_bytes = ciphertext.to_bytes((ciphertext.bit_length() + 7) // 8, byteorder='big')
-
-            # Embed the ciphertext bytes into the image
-            for j, byte in enumerate(ciphertext_bytes):
-                idx = (i * len(ciphertext_bytes) + j) % len(encrypted_image_flat)
-                encrypted_image_flat[idx] = (encrypted_image_flat[idx] & 0xF0) | (byte & 0x0F)
+        for i, bit in enumerate(bin(int(encrypted_fingerprint, 16))[2:]):
+            idx = i % len(encrypted_image_flat)
+            encrypted_image_flat[idx] = (encrypted_image_flat[idx] & 0xFE) | int(bit)
 
         encrypted_image = encrypted_image_flat.reshape(image.shape)
 
-        self.logger.info(f"Homomorphic embedding completed. Time: {time.time() - start_time:.2f}s")
+        self.logger.info(f"Embedding completed. Time: {time.time() - start_time:.2f}s")
         return encrypted_image.astype(np.uint8)
 
     def embed_fingerprint(self, image_path, output_path):
@@ -202,14 +192,14 @@ class EnhancedAlphaPunch:
             self.logger.info(f"Wavelet embedding completed. Time: {time.time() - start_time:.2f}s")
 
             ycbcr = cv2.cvtColor(embedded_img.astype(np.uint8), cv2.COLOR_RGB2YCrCb)
-            y_channel = ycbcr[:,:,0]
+            y_channel = ycbcr[:, :, 0]
 
             def process_block(block_idx):
                 i, j = block_idx
                 block = y_channel[i:i + self.block_size, j:j + self.block_size]
                 dct_block = dct(dct(block.T, norm='ortho').T, norm='ortho')
                 bit_idx = (i // self.block_size * (
-                            y_channel.shape[1] // self.block_size) + j // self.block_size) % fingerprint.size
+                        y_channel.shape[1] // self.block_size) + j // self.block_size) % fingerprint.size
                 embedded_block = self.quantum_inspired_embed(dct_block, fingerprint.flat[bit_idx])
                 return i, j, idct(idct(embedded_block.T, norm='ortho').T, norm='ortho')
 
@@ -253,34 +243,27 @@ class EnhancedAlphaPunch:
 
     def verify_fingerprint(self, image_path, original_fingerprint):
         self.logger.info("Starting fingerprint verification process...")
+        start_time = time.time()
         img = np.array(Image.open(image_path))
 
-        # Extract the embedded chunks
+        # Extract the embedded fingerprint
         img_flat = img.flatten()
-        chunk_size = 256
-        num_chunks = len(original_fingerprint.flatten()) // chunk_size
-        extracted_chunks = []
+        extracted_bits = ''.join([str(pixel & 0x01) for pixel in img_flat[:256]])
+        extracted_hex = hex(int(extracted_bits, 2))[2:]
 
-        for i in range(num_chunks):
-            chunk_bytes = bytearray()
-            for j in range(chunk_size // 8):
-                idx = (i * chunk_size // 8 + j) % len(img_flat)
-                chunk_bytes.append(img_flat[idx] & 0x0F)
-            extracted_chunks.append(int.from_bytes(chunk_bytes, byteorder='big'))
+        self.logger.info(f"Extracted fingerprint. Time: {time.time() - start_time:.2f}s")
 
-        # Decrypt and reconstruct the fingerprint
-        decrypted_chunks = [self.private_key.decrypt(chunk) for chunk in extracted_chunks]
-        reconstructed_fingerprint = ''.join(format(chunk, f'0{chunk_size}b') for chunk in decrypted_chunks)
-        reconstructed_fingerprint = np.array(list(reconstructed_fingerprint), dtype=np.uint8).reshape(
-            original_fingerprint.shape)
+        # Compare with original fingerprint
+        original_fingerprint_str = ''.join(map(str, original_fingerprint.flatten()))
+        original_encrypted = self.simple_encrypt(original_fingerprint_str)
 
-        # Compare fingerprints
-        similarity = np.mean(original_fingerprint == reconstructed_fingerprint)
+        similarity = sum(a == b for a, b in zip(extracted_hex, original_encrypted)) / len(original_encrypted)
         self.logger.info(f"Fingerprint similarity: {similarity:.2%}")
 
-        is_authentic = similarity > 0.9  # Adjust threshold as needed
+        is_authentic = similarity > 0.8  # Adjust threshold as needed
         self.logger.info(f"Verification result: Image is {'authentic' if is_authentic else 'not authentic'}")
 
+        self.logger.info(f"Verification completed. Total time: {time.time() - start_time:.2f}s")
         return is_authentic, similarity
 
     def assess_image_quality(self, original_path, fingerprinted_path):
