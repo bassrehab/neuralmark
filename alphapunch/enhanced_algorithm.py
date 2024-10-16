@@ -1,4 +1,3 @@
-import concurrent.futures
 import hashlib
 import time
 import traceback
@@ -10,14 +9,12 @@ import tensorflow as tf
 from PIL import Image
 from phe import paillier
 from scipy.fftpack import dct, idct
-from scipy.signal import convolve2d
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from skimage.metrics import structural_similarity as ssim
-from tqdm import tqdm
 
 
 class EnhancedAlphaPunch:
-    def __init__(self, private_key, logger, fingerprint_size=(64, 64), block_size=8, embed_strength=0.75):
+    def __init__(self, private_key, logger, fingerprint_size=(64, 64), block_size=8, embed_strength=20):
         self.private_key = private_key.encode()
         self.fingerprint_size = fingerprint_size
         self.block_size = block_size
@@ -221,26 +218,19 @@ class EnhancedAlphaPunch:
             self.logger.info(f"Image loaded. Shape: {img.shape}. Time: {time.time() - start_time:.2f}s")
 
             fingerprint = self.generate_fractal_fingerprint(img)
-            self.logger.debug(f"Original fingerprint (first 20 bits): {fingerprint.flatten()[:20]}")
-            self.logger.debug(f"Original fingerprint shape: {fingerprint.shape}")
+            fingerprint_bool = fingerprint.astype(bool)
+            self.logger.debug(f"Original fingerprint (first 20 bits): {fingerprint_bool.flatten()[:20]}")
 
-            fingerprint_with_ec = self.add_error_correction(fingerprint)
-            self.logger.debug(f"Fingerprint with EC (shape): {fingerprint_with_ec.shape}")
+            embedded_img = self.dct_embed(img, fingerprint_bool)
 
-            embedded_img = self.homomorphic_embed(img, fingerprint_with_ec)
-            self.logger.info(f"Homomorphic embedding completed. Time: {time.time() - start_time:.2f}s")
-
-            self.logger.debug(
-                f"Embedded fingerprint (first 20 bits): {self.extract_fingerprint(embedded_img).flatten()[:20]}")
-
-            Image.fromarray(embedded_img).save(output_path, format='PNG', compress_level=0)
+            Image.fromarray(embedded_img.astype(np.uint8)).save(output_path, format='PNG', compress_level=0)
             self.logger.info(f"Fingerprinted image saved. Total time: {time.time() - start_time:.2f}s")
 
             psnr = peak_signal_noise_ratio(img, embedded_img)
             ssim = structural_similarity(img, embedded_img, channel_axis=2, data_range=255)
             self.logger.info(f"PSNR: {psnr:.2f}, SSIM: {ssim:.4f}")
 
-            return fingerprint, psnr, ssim
+            return fingerprint_bool, psnr, ssim
 
         except Exception as e:
             self.logger.error(f"Error in embed_fingerprint: {str(e)}")
@@ -258,33 +248,29 @@ class EnhancedAlphaPunch:
         else:
             raise ValueError("image_input must be either a file path or a numpy array")
 
-        extracted_fingerprint = self.extract_fingerprint(img)
+        extracted_fingerprint = self.dct_extract(img)
         self.logger.info(f"Extracted fingerprint. Time: {time.time() - start_time:.2f}s")
         self.logger.debug(f"Extracted fingerprint shape: {extracted_fingerprint.shape}")
 
-        corrected_fingerprint = self.remove_error_correction(extracted_fingerprint)
-        self.logger.debug(f"Corrected fingerprint shape: {corrected_fingerprint.shape}")
-
         self.logger.debug(f"Original fingerprint (first 20 bits): {original_fingerprint.flatten()[:20]}")
-        self.logger.debug(f"Corrected fingerprint (first 20 bits): {corrected_fingerprint.flatten()[:20]}")
+        self.logger.debug(f"Extracted fingerprint (first 20 bits): {extracted_fingerprint.flatten()[:20]}")
 
-        similarity = np.mean(corrected_fingerprint == original_fingerprint)
+        similarity = np.mean(extracted_fingerprint == original_fingerprint)
         self.logger.info(f"Fingerprint similarity: {similarity:.2%}")
 
-        hamming_distance = np.sum(corrected_fingerprint != original_fingerprint)
+        hamming_distance = np.sum(extracted_fingerprint != original_fingerprint)
         normalized_hamming_distance = hamming_distance / (original_fingerprint.shape[0] * original_fingerprint.shape[1])
         self.logger.info(f"Normalized Hamming distance: {normalized_hamming_distance:.2%}")
 
         is_authentic = similarity > 0.6  # Adjust threshold as needed
         self.logger.info(f"Verification result: Image is {'authentic' if is_authentic else 'not authentic'}")
 
-        correct_bits = np.sum(corrected_fingerprint == original_fingerprint)
+        correct_bits = np.sum(extracted_fingerprint == original_fingerprint)
         total_bits = original_fingerprint.size
         self.logger.debug(f"Correct bits: {correct_bits}/{total_bits}")
 
         self.logger.info(f"Verification completed. Total time: {time.time() - start_time:.2f}s")
         return is_authentic, similarity, normalized_hamming_distance
-
 
     def extract_fingerprint(self, img):
         h, w = self.fingerprint_size

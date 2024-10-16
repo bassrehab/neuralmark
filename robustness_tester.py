@@ -104,10 +104,9 @@ def test_robustness(alphapunch, original_image, original_fingerprint, manipulati
             'manipulation': manipulation.__name__,
             'params': params,
             'is_authentic': is_authentic,
-            'similarity': similarity
+            'similarity': float(similarity)  # Convert to float for JSON serialization
         })
     return results
-
 
 def run_robustness_tests(alphapunch, image_paths, output_dir):
     robustness_results = {}
