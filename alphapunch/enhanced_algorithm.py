@@ -1,59 +1,19 @@
-import random
-
-import numpy as np
-from PIL import Image
-from scipy.fftpack import dct, idct
-from Crypto.Cipher import AES
-from Crypto.Random import get_random_bytes
-from Crypto.Util.Padding import pad, unpad
-import hashlib
 import concurrent.futures
-from tqdm import tqdm
-import cv2
-from skimage.metrics import structural_similarity as ssim
-import pywt
-import tensorflow as tf
-from phe import paillier
-from scipy.ndimage import zoom
+import hashlib
 import time
 import traceback
+
+import cv2
+import numpy as np
+import pywt
+import tensorflow as tf
+from PIL import Image
+from phe import paillier
+from scipy.fftpack import dct, idct
+from scipy.signal import convolve2d
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
-import hashlib
-
-
-def box_counting_dimension(image, max_box_size=None, min_box_size=2):
-    """Estimate the fractal dimension of an image using the box counting method."""
-    # Convert to grayscale if it's a color image
-    if len(image.shape) == 3:
-        img = np.mean(image, axis=2).astype(np.uint8)
-    else:
-        img = image.astype(np.uint8)
-
-    if max_box_size is None:
-        max_box_size = min(img.shape)
-
-    img = (img > img.mean()).astype(np.uint8)
-
-    box_sizes = np.floor(np.logspace(np.log2(min_box_size), np.log2(max_box_size), num=10, base=2)).astype(int)
-    box_sizes = np.unique(box_sizes)  # Remove duplicate sizes
-
-    counts = []
-    for size in box_sizes:
-        padded_size = (np.ceil(np.array(img.shape) / size) * size).astype(int)
-        padded_img = np.zeros(padded_size)
-        padded_img[:img.shape[0], :img.shape[1]] = img
-
-        box_count = (padded_img.reshape(padded_size[0] // size, size, -1, size)
-                     .sum(axis=(1, 3)) > 0).sum()
-        counts.append(max(1, box_count))  # Ensure count is at least 1 to avoid log(0)
-
-    # Use only non-zero counts for the fit
-    valid_indices = np.array(counts) > 0
-    if np.sum(valid_indices) < 2:
-        return 0  # Not enough valid points for a fit
-
-    coeffs = np.polyfit(np.log(box_sizes[valid_indices]), np.log(np.array(counts)[valid_indices]), 1)
-    return -coeffs[0]
+from skimage.metrics import structural_similarity as ssim
+from tqdm import tqdm
 
 
 class EnhancedAlphaPunch:
@@ -66,70 +26,123 @@ class EnhancedAlphaPunch:
         self.embed_strength = embed_strength
         self.public_key, self.private_key = paillier.generate_paillier_keypair()
 
+    def box_counting_dimension(self, image, max_box_size=None, min_box_size=2):
+        if len(image.shape) == 3:
+            img = np.mean(image, axis=2).astype(np.uint8)
+        else:
+            img = image.astype(np.uint8)
+
+        if max_box_size is None:
+            max_box_size = min(img.shape)
+
+        # Ensure we have at least 2 different box sizes
+        if max_box_size <= min_box_size:
+            return 0
+
+        img = (img > img.mean()).astype(np.uint8)
+
+        box_sizes = np.floor(np.logspace(np.log2(min_box_size), np.log2(max_box_size), num=10, base=2)).astype(int)
+        box_sizes = np.unique(box_sizes)
+
+        counts = []
+        for size in box_sizes:
+            padded_size = (np.ceil(np.array(img.shape) / size) * size).astype(int)
+            padded_img = np.zeros(padded_size)
+            padded_img[:img.shape[0], :img.shape[1]] = img
+
+            box_count = (padded_img.reshape(padded_size[0] // size, size, -1, size)
+                         .sum(axis=(1, 3)) > 0).sum()
+            counts.append(max(1, box_count))
+
+        valid_indices = np.array(counts) > 0
+        if np.sum(valid_indices) < 2:
+            return 0
+
+        coeffs = np.polyfit(np.log(box_sizes[valid_indices]), np.log(np.array(counts)[valid_indices]), 1)
+        return -coeffs[0]
+
     def generate_fractal_fingerprint(self, image):
-        # Calculate the number of regions based on the image and fingerprint size
-        rows = image.shape[0] // self.fingerprint_size[0]
-        cols = image.shape[1] // self.fingerprint_size[1]
+        gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 
-        regions = [image[i * self.fingerprint_size[0]:(i + 1) * self.fingerprint_size[0],
-                   j * self.fingerprint_size[1]:(j + 1) * self.fingerprint_size[1]]
-                   for i in range(rows) for j in range(cols)]
+        # Calculate the step size to ensure we get the correct number of fractal dimensions
+        steps = (self.fingerprint_size[0] * self.fingerprint_size[1])
+        step_y = max(1, gray_image.shape[0] // self.fingerprint_size[0])
+        step_x = max(1, gray_image.shape[1] // self.fingerprint_size[1])
 
-        fractal_dims = [box_counting_dimension(region) for region in regions]
-        fingerprint = np.array(fractal_dims) > np.median(fractal_dims)
+        fractal_dims = []
+        for i in range(0, gray_image.shape[0], step_y):
+            for j in range(0, gray_image.shape[1], step_x):
+                region = gray_image[i:i + step_y, j:j + step_x]
+                fd = self.box_counting_dimension(region)
+                fractal_dims.append(fd)
 
-        # Resize the fingerprint to match the desired size
-        fingerprint_resized = zoom(fingerprint.reshape(rows, cols),
-                                   (self.fingerprint_size[0] / rows, self.fingerprint_size[1] / cols),
-                                   order=0)
+                if len(fractal_dims) == steps:
+                    break
+            if len(fractal_dims) == steps:
+                break
 
-        return (fingerprint_resized > 0.5).astype(np.uint8)
+        # If we don't have enough dimensions, pad with zeros
+        fractal_dims += [0] * (steps - len(fractal_dims))
+
+        # If we have too many dimensions, truncate
+        fractal_dims = fractal_dims[:steps]
+
+        median_fd = np.median(fractal_dims)
+        fingerprint = (np.array(fractal_dims) > median_fd).astype(np.uint8)
+        return fingerprint.reshape(self.fingerprint_size)
+
+    def add_error_correction(self, fingerprint):
+        # Simple repetition code
+        return np.repeat(np.repeat(fingerprint, 3, axis=0), 3, axis=1)
+
+    def remove_error_correction(self, extracted_fingerprint):
+        # Majority voting
+        corrected = (convolve2d(extracted_fingerprint, np.ones((3, 3)), mode='valid') > 4).astype(int)
+        # Resize to match the original fingerprint size
+        return cv2.resize(corrected, self.fingerprint_size, interpolation=cv2.INTER_NEAREST)
 
     def quantum_inspired_embed(self, dct_block, bit):
-        superposition = np.array([0.5, 0.5])
-        if bit:
-            superposition = np.array([0.15, 0.85])
-        else:
-            superposition = np.array([0.85, 0.15])
-
+        embed_strength = 0.1  # Increase this value for stronger embedding
         for y, x in self.embed_positions:
-            dct_block[y, x] += np.random.choice([-0.1, 0.1], p=superposition)
+            if bit:
+                dct_block[y, x] += embed_strength
+            else:
+                dct_block[y, x] -= embed_strength
         return dct_block
 
     def wavelet_embed(self, image, fingerprint):
-        # Convert image to float32 for wavelet transform
+        # Convert image to float32 and scale to [0, 1]
         img_float = image.astype(np.float32) / 255.0
 
-        # Determine the appropriate wavelet decomposition level
-        max_level = pywt.dwt_max_level(min(img_float.shape[:2]), 'db1')
-        level = min(3, max_level)  # Use 3 or the maximum possible level, whichever is smaller
+        # Apply wavelet embedding to each color channel
+        embedded_channels = []
+        for channel in range(3):
+            coeffs = pywt.wavedec2(img_float[:, :, channel], 'db1', level=3)
 
-        # Perform 2D wavelet decomposition
-        coeffs = pywt.wavedec2(img_float, 'db1', level=level)
+            fingerprint_flat = fingerprint.flatten()
+            coeff_index = 0
 
-        # Embed fingerprint in the wavelet coefficients
-        fingerprint_flat = fingerprint.flatten()
-        coeff_index = 0
-        for i in range(1, len(coeffs)):  # Start from 1 to skip the approximation coefficients
-            for j in range(3):  # There are 3 detail coefficient arrays at each level
-                coeff = coeffs[i][j]
-                embed_size = min(coeff.size, fingerprint_flat.size - coeff_index)
-                coeff_flat = coeff.flatten()
-                coeff_flat[:embed_size] += self.embed_strength * (
-                        2 * fingerprint_flat[coeff_index:coeff_index + embed_size] - 1)
-                coeffs[i] = (coeffs[i][0], coeffs[i][1], coeffs[i][2])  # Ensure it's a tuple
-                coeff_index += embed_size
+            for i in range(1, 3):
+                for j in range(3):
+                    coeff = coeffs[i][j]
+                    embed_size = min(coeff.size, fingerprint_flat.size - coeff_index)
+                    coeff_flat = coeff.flatten()
+                    coeff_flat[:embed_size] += self.embed_strength * (
+                                2 * fingerprint_flat[coeff_index:coeff_index + embed_size] - 1)
+                    coeffs[i] = (coeffs[i][0], coeffs[i][1], coeffs[i][2])
+                    coeff_index += embed_size
+                    if coeff_index >= fingerprint_flat.size:
+                        break
                 if coeff_index >= fingerprint_flat.size:
                     break
-            if coeff_index >= fingerprint_flat.size:
-                break
 
-        # Reconstruct the image
-        reconstructed = pywt.waverec2(coeffs, 'db1')
+            embedded_channels.append(pywt.waverec2(coeffs, 'db1'))
 
-        # Clip and convert back to uint8
-        reconstructed = np.clip(reconstructed, 0, 1) * 255
-        return reconstructed.astype(np.uint8)
+        # Combine channels and clip to [0, 1]
+        embedded_img = np.clip(np.stack(embedded_channels, axis=-1), 0, 1)
+
+        # Convert back to uint8
+        return (embedded_img * 255).astype(np.uint8)
 
     def blockchain_fingerprint(self, image):
         blocks = []
@@ -154,39 +167,15 @@ class EnhancedAlphaPunch:
         return hashlib.sha256(data.encode()).hexdigest()[:64]  # Use only first 64 characters for consistency
 
     def homomorphic_embed(self, image, fingerprint):
-        start_time = time.time()
-        self.logger.info("Starting embedding process...")
-
-        # Convert fingerprint to a binary string
-        fingerprint_str = ''.join(map(str, fingerprint.flatten()))
-        self.logger.debug(f"Original fingerprint (first 50 bits): {fingerprint_str[:50]}")
-
-        # Encrypt the fingerprint
-        encrypted_fingerprint = self.simple_encrypt(fingerprint_str)
-        self.logger.debug(f"Encrypted fingerprint (first 50 chars): {encrypted_fingerprint[:50]}")
-
-        self.logger.info(f"Fingerprint encrypted. Time: {time.time() - start_time:.2f}s")
-
-        # Embed the encrypted fingerprint
-        encrypted_image = image.copy()
-        encrypted_image_flat = encrypted_image.flatten()
-
-        binary_fingerprint = ''.join(format(int(char, 16), '04b') for char in encrypted_fingerprint)
-        self.logger.debug(f"Binary fingerprint to embed (first 50 bits): {binary_fingerprint[:50]}")
-
-        for i, bit in enumerate(binary_fingerprint):
-            if i >= len(encrypted_image_flat):
-                break
-            encrypted_image_flat[i] = (encrypted_image_flat[i] & 0xFE) | int(bit)
-
-        encrypted_image = encrypted_image_flat.reshape(image.shape)
-
-        # Verify embedding
-        embedded_bits = ''.join([str(pixel & 0x01) for pixel in encrypted_image_flat[:len(binary_fingerprint)]])
-        self.logger.debug(f"Embedded bits (first 50 bits): {embedded_bits[:50]}")
-
-        self.logger.info(f"Embedding completed. Time: {time.time() - start_time:.2f}s")
-        return encrypted_image.astype(np.uint8)
+        embedded_image = image.copy()
+        fingerprint_flat = fingerprint.flatten()
+        for i, bit in enumerate(fingerprint_flat):
+            if i < image.shape[0] * image.shape[1]:
+                y = i // image.shape[1]
+                x = i % image.shape[1]
+                channel = i % 3
+                embedded_image[y, x, channel] = (embedded_image[y, x, channel] & 0xFE) | bit
+        return embedded_image
 
     def embed_fingerprint(self, image_path, output_path):
         self.logger.info("Starting enhanced fingerprint embedding process...")
@@ -199,23 +188,24 @@ class EnhancedAlphaPunch:
             fingerprint = self.generate_fractal_fingerprint(img)
             self.logger.info(f"Fractal fingerprint generated. Time: {time.time() - start_time:.2f}s")
 
-            embedded_img = self.wavelet_embed(img, fingerprint)
-            self.logger.info(f"Wavelet embedding completed. Time: {time.time() - start_time:.2f}s")
+            # Add error correction
+            fingerprint_with_ec = self.add_error_correction(fingerprint)
+            self.logger.info(f"Error correction added to fingerprint. New shape: {fingerprint_with_ec.shape}")
 
-            ycbcr = cv2.cvtColor(embedded_img.astype(np.uint8), cv2.COLOR_RGB2YCrCb)
-            y_channel = ycbcr[:, :, 0]
+            embedded_img = self.wavelet_embed(img, fingerprint_with_ec)
+            self.logger.info(f"Wavelet embedding completed. Time: {time.time() - start_time:.2f}s")
 
             def process_block(block_idx):
                 i, j = block_idx
-                block = y_channel[i:i + self.block_size, j:j + self.block_size]
+                block = embedded_img[i:i + self.block_size, j:j + self.block_size]
                 dct_block = dct(dct(block.T, norm='ortho').T, norm='ortho')
                 bit_idx = (i // self.block_size * (
-                        y_channel.shape[1] // self.block_size) + j // self.block_size) % fingerprint.size
+                        embedded_img.shape[1] // self.block_size) + j // self.block_size) % fingerprint.size
                 embedded_block = self.quantum_inspired_embed(dct_block, fingerprint.flat[bit_idx])
                 return i, j, idct(idct(embedded_block.T, norm='ortho').T, norm='ortho')
 
-            block_indices = [(i, j) for i in range(0, y_channel.shape[0] - self.block_size + 1, self.block_size)
-                             for j in range(0, y_channel.shape[1] - self.block_size + 1, self.block_size)]
+            block_indices = [(i, j) for i in range(0, embedded_img.shape[0] - self.block_size + 1, self.block_size)
+                             for j in range(0, embedded_img.shape[1] - self.block_size + 1, self.block_size)]
 
             self.logger.info(
                 f"Starting DCT embedding. Total blocks: {len(block_indices)}. Time: {time.time() - start_time:.2f}s")
@@ -225,7 +215,8 @@ class EnhancedAlphaPunch:
 
             self.logger.info(f"DCT embedding completed. Time: {time.time() - start_time:.2f}s")
 
-            embedded_img = cv2.cvtColor(ycbcr, cv2.COLOR_YCrCb2RGB)
+            for i, j, block in results:
+                embedded_img[i:i + self.block_size, j:j + self.block_size] = block
 
             self.blockchain_fingerprint(embedded_img)
             self.logger.info(f"Blockchain-inspired chaining completed. Time: {time.time() - start_time:.2f}s")
@@ -238,14 +229,14 @@ class EnhancedAlphaPunch:
 
             # Calculate PSNR and SSIM with adjusted parameters
             psnr = peak_signal_noise_ratio(img, encrypted_img)
-            win_size = min(7, min(img.shape[0],
-                                  img.shape[1]) - 1)  # Ensure window size is odd and not larger than image
+            win_size = min(7,
+                           min(img.shape[0], img.shape[1]) - 1)  # Ensure window size is odd and not larger than image
             if win_size % 2 == 0:
                 win_size -= 1
             ssim = structural_similarity(img, encrypted_img, win_size=win_size, channel_axis=2, data_range=255)
             self.logger.info(f"PSNR: {psnr:.2f}, SSIM: {ssim:.4f}")
 
-            return fingerprint, psnr, ssim
+            return fingerprint, psnr, ssim  # Return fingerprint without error correction
 
         except Exception as e:
             self.logger.error(f"Error in embed_fingerprint: {str(e)}")
@@ -258,32 +249,53 @@ class EnhancedAlphaPunch:
         img = np.array(Image.open(image_path))
 
         # Extract the embedded fingerprint
-        img_flat = img.flatten()
-        extracted_bits = ''.join([str(pixel & 0x01) for pixel in img_flat[:256 * 4]])  # 256 hex chars * 4 bits each
-        self.logger.debug(f"Extracted bits (first 50 bits): {extracted_bits[:50]}")
-
-        # Convert bits to hexadecimal
-        extracted_hex = ''.join([hex(int(extracted_bits[i:i + 4], 2))[2:] for i in range(0, len(extracted_bits), 4)])
-        self.logger.debug(f"Extracted hex (first 50 chars): {extracted_hex[:50]}")
-
+        extracted_fingerprint = self.extract_fingerprint(img)
         self.logger.info(f"Extracted fingerprint. Time: {time.time() - start_time:.2f}s")
 
+        # Remove error correction
+        extracted_fingerprint_no_ec = self.remove_error_correction(extracted_fingerprint)
+        self.logger.info(
+            f"Error correction removed from extracted fingerprint. Shape: {extracted_fingerprint_no_ec.shape}")
+
+        # Ensure shapes match
+        if extracted_fingerprint_no_ec.shape != original_fingerprint.shape:
+            self.logger.warning(
+                f"Shape mismatch: extracted {extracted_fingerprint_no_ec.shape} vs original {original_fingerprint.shape}")
+            extracted_fingerprint_no_ec = cv2.resize(extracted_fingerprint_no_ec,
+                                                     (original_fingerprint.shape[1], original_fingerprint.shape[0]),
+                                                     interpolation=cv2.INTER_NEAREST)
+
         # Compare with original fingerprint
-        original_fingerprint_str = ''.join(map(str, original_fingerprint.flatten()))
-        self.logger.debug(f"Original fingerprint (first 50 bits): {original_fingerprint_str[:50]}")
-
-        original_encrypted = self.simple_encrypt(original_fingerprint_str)
-        self.logger.debug(f"Original encrypted (first 50 chars): {original_encrypted[:50]}")
-
-        # Compare the hexadecimal strings
-        similarity = sum(a == b for a, b in zip(extracted_hex, original_encrypted)) / len(original_encrypted)
+        similarity = np.mean(extracted_fingerprint_no_ec == original_fingerprint)
         self.logger.info(f"Fingerprint similarity: {similarity:.2%}")
 
-        is_authentic = similarity > 0.7  # Adjust threshold as needed
+        # Use a more robust comparison
+        hamming_distance = np.sum(extracted_fingerprint_no_ec != original_fingerprint)
+        normalized_hamming_distance = hamming_distance / (original_fingerprint.shape[0] * original_fingerprint.shape[1])
+        self.logger.info(f"Normalized Hamming distance: {normalized_hamming_distance:.2%}")
+
+        is_authentic = normalized_hamming_distance < 0.3  # Adjust threshold as needed
         self.logger.info(f"Verification result: Image is {'authentic' if is_authentic else 'not authentic'}")
 
         self.logger.info(f"Verification completed. Total time: {time.time() - start_time:.2f}s")
-        return is_authentic, similarity
+        return is_authentic, similarity, normalized_hamming_distance
+
+    def extract_fingerprint(self, img):
+        fingerprint_size_with_ec = (self.fingerprint_size[0] * 3, self.fingerprint_size[1] * 3)
+        extracted_bits = np.zeros(fingerprint_size_with_ec, dtype=int)
+
+        for y in range(fingerprint_size_with_ec[0]):
+            for x in range(fingerprint_size_with_ec[1]):
+                pixel_index = (y * img.shape[1] + x) % (img.shape[0] * img.shape[1])
+                channel = pixel_index % 3
+                extracted_bits[y, x] = img.flat[pixel_index * 3 + channel] & 0x01
+
+        return extracted_bits
+
+    def extract_bit_from_dct(self, dct_block):
+        # Extract the bit based on the embedding positions
+        values = [dct_block[y, x] for y, x in self.embed_positions]
+        return int(np.mean(values) > 0)
 
     def assess_image_quality(self, original_path, fingerprinted_path):
         original = cv2.imread(original_path)
@@ -307,10 +319,9 @@ class EnhancedAlphaPunch:
         return psnr, ssim_value
 
     def embed_fingerprint_with_quality(self, image_path, output_path):
-        fingerprint = self.embed_fingerprint(image_path, output_path)
-        psnr, ssim_value = self.assess_image_quality(image_path, output_path)
-        self.logger.info(f"Image Quality - PSNR: {psnr:.2f} dB, SSIM: {ssim_value:.4f}")
-        return fingerprint, psnr, ssim_value
+        fingerprint, psnr, ssim = self.embed_fingerprint(image_path, output_path)
+        self.logger.info(f"Image Quality - PSNR: {psnr:.2f} dB, SSIM: {ssim:.4f}")
+        return fingerprint, psnr, ssim
 
 
 if __name__ == "__main__":
@@ -325,5 +336,5 @@ if __name__ == "__main__":
     fingerprint, psnr, ssim = alphapunch.embed_fingerprint_with_quality('input_image.jpg', 'fingerprinted_image.png')
     print(f"Embedding complete. PSNR: {psnr:.2f} dB, SSIM: {ssim:.4f}")
 
-    is_authentic, similarity = alphapunch.verify_fingerprint('fingerprinted_image.png', fingerprint)
-    print(f"Verification result: {'Authentic' if is_authentic else 'Not authentic'}, Similarity: {similarity:.2%}")
+    is_authentic, similarity, normalized_hamming_distance = alphapunch.verify_fingerprint('fingerprinted_image.png', fingerprint)
+    print(f"Verification result: {'Authentic' if is_authentic else 'Not authentic'}, Similarity: {similarity:.2%}, Normalized Hamming Distance: {normalized_hamming_distance:.2%}")

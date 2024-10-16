@@ -88,13 +88,14 @@ def test_enhanced_alphapunch(alphapunch, image_paths, output_dir, timeout=600): 
             embed_time = time.time() - start_time
 
             start_time = time.time()
-            is_authentic, similarity = alphapunch.verify_fingerprint(output_path, fingerprint)
+            is_authentic, similarity, normalized_hamming_distance = alphapunch.verify_fingerprint(output_path, fingerprint)
             verify_time = time.time() - start_time
 
             results.append({
                 'filename': filename,
                 'is_authentic': bool(is_authentic),
                 'similarity': float(similarity),
+                'normalized_hamming_distance': float(normalized_hamming_distance),
                 'psnr': float(psnr),
                 'ssim': float(ssim),
                 'embed_time': embed_time,
@@ -122,6 +123,7 @@ def generate_report(results, report_path):
         average_psnr = sum(r['psnr'] for r in results) / len(results)
         average_ssim = sum(r['ssim'] for r in results) / len(results)
         average_similarity = sum(r['similarity'] for r in results) / len(results)
+        average_hamming_distance = sum(r['normalized_hamming_distance'] for r in results) / len(results)
 
         print("\nTest Summary:")
         print(f"Total images tested: {len(results)}")
@@ -129,6 +131,7 @@ def generate_report(results, report_path):
         print(f"Average PSNR: {average_psnr:.2f} dB")
         print(f"Average SSIM: {average_ssim:.4f}")
         print(f"Average Similarity: {average_similarity:.2%}")
+        print(f"Average Normalized Hamming Distance: {average_hamming_distance:.2%}")
     else:
         print("\nNo results to report.")
 
