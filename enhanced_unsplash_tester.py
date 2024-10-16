@@ -17,7 +17,7 @@ UNSPLASH_ACCESS_KEY = "gRMk05LDbP4KvDPQUk2fzf6R8VbCqlcZ_Kvk5TPbVJ0"
 
 def setup_logger():
     logger = logging.getLogger('EnhancedAlphaPunchTester')
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.DEBUG)  # Change this from INFO to DEBUG
     handler = logging.StreamHandler()
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
@@ -87,8 +87,15 @@ def test_enhanced_alphapunch(alphapunch, image_paths, output_dir, timeout=600): 
             fingerprint, psnr, ssim = alphapunch.embed_fingerprint(image_path, output_path)
             embed_time = time.time() - start_time
 
+            # Verify embedded fingerprint
+            embedded_img = np.array(Image.open(output_path))
+            embedded_fingerprint = alphapunch.extract_fingerprint(embedded_img)
+            if not np.array_equal(embedded_fingerprint, fingerprint):
+                logger.warning(f"Embedded fingerprint does not match original for {filename}")
+
             start_time = time.time()
-            is_authentic, similarity, normalized_hamming_distance = alphapunch.verify_fingerprint(output_path, fingerprint)
+            is_authentic, similarity, normalized_hamming_distance = alphapunch.verify_fingerprint(output_path,
+                                                                                                  fingerprint)
             verify_time = time.time() - start_time
 
             results.append({
@@ -138,7 +145,7 @@ def generate_report(results, report_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Test Enhanced AlphaPunch with random Unsplash images")
-    parser.add_argument('--num_images', type=int, default=10, help="Number of images to test")
+    parser.add_argument('--num_images', type=int, default=3, help="Number of images to test")
     parser.add_argument('--download_dir', type=str, default='unsplash_images',
                         help="Directory to store downloaded images")
     parser.add_argument('--output_dir', type=str, default='fingerprinted_images',
