@@ -1,0 +1,34 @@
+# config.yaml
+
+algorithm:
+  fingerprint_size: [64, 64]
+  embed_strength: 0.3
+  tile_size: 8
+
+training:
+  epochs: 20
+  batch_size: 32
+  validation_split: 0.2
+
+testing:
+  num_images: 20
+  run_robustness: true
+
+thresholds:
+  initial_similarity: 0.5
+  min_similarity: 0.3
+  max_similarity: 0.7
+
+directories:
+  download: "unsplash_images"
+  output: "fingerprinted_images"
+  reports: "reports"
+
+unsplash:
+  access_key: "YOUR ACCESS KEY"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+private_key: "your_secret_key_here"

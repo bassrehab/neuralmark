@@ -95,60 +95,82 @@ def apply_filter(image, filter_type, params):
         raise ValueError("Unsupported filter type")
 
 
-def test_robustness(alphapunch, original_image, original_fingerprint, manipulations):
+def apply_jpeg_compression(image, quality):
+    _, encoded_image = cv2.imencode('.jpg', image, [int(cv2.IMWRITE_JPEG_QUALITY), quality])
+    return cv2.imdecode(encoded_image, 1)
+
+
+def apply_gaussian_noise(image, mean, std):
+    noise = np.random.normal(mean, std, image.shape).astype(np.uint8)
+    return cv2.add(image, noise)
+
+
+def apply_rotation(image, angle):
+    h, w = image.shape[:2]
+    M = cv2.getRotationMatrix2D((w / 2, h / 2), angle, 1)
+    return cv2.warpAffine(image, M, (w, h))
+
+
+def apply_scaling(image, scale):
+    h, w = image.shape[:2]
+    return cv2.resize(image, (int(w * scale), int(h * scale)))
+
+
+def apply_cropping(image, crop_percent):
+    h, w = image.shape[:2]
+    crop_h, crop_w = int(h * crop_percent), int(w * crop_percent)
+    start_h, start_w = (h - crop_h) // 2, (w - crop_w) // 2
+    return image[start_h:start_h + crop_h, start_w:start_w + crop_w]
+
+
+def test_robustness(alphapunch, original_image, fingerprint, manipulations):
     results = []
-    for manipulation, params in tqdm(manipulations, desc="Testing manipulations"):
-        manipulated_image = manipulation(original_image, *params)
-        is_authentic, similarity, _ = alphapunch.verify_fingerprint(manipulated_image, original_fingerprint)
+
+    for name, func, params in manipulations:
+        manipulated_image = func(original_image, *params)
+        is_authentic, similarity, normalized_hamming_distance = alphapunch.verify_fingerprint(manipulated_image,
+                                                                                              fingerprint)
+
         results.append({
-            'manipulation': manipulation.__name__,
-            'params': params,
+            'manipulation': name,
             'is_authentic': is_authentic,
-            'similarity': float(similarity)  # Convert to float for JSON serialization
+            'similarity': similarity,
+            'normalized_hamming_distance': normalized_hamming_distance
         })
+
+        logger.info(
+            f"Manipulation: {name}, Authentic: {is_authentic}, Similarity: {similarity:.2f}, NHD: {normalized_hamming_distance:.2f}")
+
     return results
 
+
 def run_robustness_tests(alphapunch, image_paths, output_dir):
-    robustness_results = {}
+    all_results = []
 
     for image_path in image_paths:
         logger.info(f"Running robustness tests on image: {image_path}")
+
         original_image = cv2.imread(image_path)
-        fingerprint, _, _ = alphapunch.embed_fingerprint(original_image, os.path.join(output_dir, f'fingerprinted_{os.path.basename(image_path)}'))
+        fingerprint, _, _ = alphapunch.embed_fingerprint(image_path,
+                                                         f"{output_dir}/fingerprinted_{image_path.split('/')[-1]}")
 
         manipulations = [
-            (compress_jpeg, (75,)),
-            (compress_jpeg, (50,)),
-            (resize_image, (0.75,)),
-            (resize_image, (1.25,)),
-            (crop_image, (0.9,)),
-            (crop_image, (0.75,)),
-            (rotate_image, (5,)),
-            (rotate_image, (90,)),
-            (flip_image, ('horizontal',)),
-            (flip_image, ('vertical',)),
-            (adjust_brightness, (1.1,)),
-            (adjust_brightness, (0.9,)),
-            (adjust_contrast, (1.1,)),
-            (adjust_contrast, (0.9,)),
-            (add_noise, ('gaussian', 0.01)),
-            (add_noise, ('salt_and_pepper', 0.01)),
-            (apply_filter, ('gaussian_blur', 1)),
-            (apply_filter, ('median_blur', 3)),
-            (apply_filter, ('sharpen', None)),
+            ('JPEG Compression (50%)', apply_jpeg_compression, [50]),
+            ('JPEG Compression (80%)', apply_jpeg_compression, [80]),
+            ('Gaussian Noise (10)', apply_gaussian_noise, [0, 10]),
+            ('Gaussian Noise (20)', apply_gaussian_noise, [0, 20]),
+            ('Rotation (5°)', apply_rotation, [5]),
+            ('Rotation (10°)', apply_rotation, [10]),
+            ('Scaling (0.9)', apply_scaling, [0.9]),
+            ('Scaling (1.1)', apply_scaling, [1.1]),
+            ('Cropping (10%)', apply_cropping, [0.9]),
+            ('Cropping (20%)', apply_cropping, [0.8]),
         ]
 
         results = test_robustness(alphapunch, original_image, fingerprint, manipulations)
-        robustness_results[image_path] = results
+        all_results.append({'image': image_path, 'results': results})
 
-        # Log results
-        logger.info(f"Robustness test results for {image_path}:")
-        for result in results:
-            logger.info(f"Manipulation: {result['manipulation']}, Params: {result['params']}")
-            logger.info(f"Authentic: {result['is_authentic']}, Similarity: {result['similarity']:.2%}")
-            logger.info("---")
-
-    return robustness_results
+    return all_results
 
 
 def run_robustness_tests_wrapper(alphapunch, image_paths, output_dir):
