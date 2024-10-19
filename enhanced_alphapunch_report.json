@@ -1,0 +1,12 @@
+[
+  {
+    "filename": "HZ-pMYRoGNk.jpg",
+    "is_authentic": false,
+    "similarity": 0.513671875,
+    "normalized_hamming_distance": 0.486328125,
+    "psnr": 76.8224920148123,
+    "ssim": 0.9999991988042606,
+    "embed_time": 0.835655927658081,
+    "verify_time": 0.04601693153381348
+  }
+]
