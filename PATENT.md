@@ -57,18 +57,52 @@ Recent tests demonstrate the algorithm's effectiveness:
 
 **Test Summary:**
 _Run ID: 20241020_002410_
-- Total images tested: 40 (200 total)
+- Total images tested: 200 (1000 total)
 - Average PSNR: 51.59 dB 
 - Average SSIM: 0.9968 
 - Authentication Accuracy: 72.50% (on a set of 200 images)
 - Average Similarity: 33.13% (balancing between distinctiveness and robustness)
 
 _Run ID: 20241019_233849._
-- Total images tested: 40
+- Total images tested: 40 (200 total)
 - Average PSNR: 64.12 dB (indicating excellent image quality preservation)
 - Average SSIM: 0.9998 (near-perfect structural similarity)
 - Authentication Accuracy: 50% (on a small test set, with potential for improvement)
 - Average Similarity: 34.31% 
+
+### Detailed Analysis of the Algorithm’s Effectiveness:
+
+1. **Image Quality Preservation (PSNR)**:
+   - **Run 20241020_002410**: An average PSNR of 51.59 dB indicates good image quality retention post-algorithmic processing, although not as high as the other run.
+   - **Run 20241019_233849**: With a PSNR of 64.12 dB, this run demonstrates superior image quality preservation, suggesting less degradation after applying the algorithm.
+
+   **Conclusion**: The algorithm consistently maintains high image quality, with the second run performing even better in this aspect.
+
+2. **Structural Similarity (SSIM)**:
+   - **Run 20241020_002410**: An SSIM of 0.9968 shows that the algorithm preserves most structural details of the images.
+   - **Run 20241019_233849**: An SSIM of 0.9998 implies near-perfect structural preservation.
+
+   **Conclusion**: The algorithm excels at maintaining structural integrity in both runs, with only a slight difference favoring the second run.
+
+3. **Authentication Accuracy**:
+   - **Run 20241020_002410**: Achieves a 72.5% authentication accuracy, showing reasonable effectiveness in distinguishing altered or original images. This score is respectable for a larger test set.
+   - **Run 20241019_233849**: Only 50% authentication accuracy, which is low and indicates potential issues with identifying differences in smaller image sets.
+
+   **Conclusion**: The algorithm shows better authentication accuracy with larger data sets. The lower accuracy in the second run may suggest that the algorithm struggles when tested with a smaller, less diverse set of images.
+
+4. **Average Similarity**:
+   - **Run 20241020_002410**: The average similarity score of 33.13% indicates a moderate balance between robustness and distinctiveness.
+   - **Run 20241019_233849**: A slightly higher similarity of 34.31% indicates better distinctiveness while maintaining robustness.
+
+   **Conclusion**: The similarity scores suggest that the algorithm strikes a consistent balance between identifying similarities and handling variations, though the differences are marginal.
+
+### Overall Assessment:
+- **Image Quality & Structural Similarity**: The algorithm performs exceptionally well in preserving both the visual and structural aspects of the images across both runs.
+- **Authentication Accuracy**: The first run shows promising accuracy, but the second run underperforms, suggesting that the algorithm may require tuning to perform better on smaller test sets or when faced with different types of image alterations.
+- **Similarity Balance**: The algorithm consistently balances robustness and distinctiveness, though there is slight variation in the two runs.
+
+The algorithm is overall effective, particularly in image preservation, but there is room for improvement in authentication accuracy, especially for smaller or less diverse datasets.
+
 
 ## Potential Applications
 

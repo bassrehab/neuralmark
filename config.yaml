@@ -25,7 +25,7 @@ directories:
   reports: "reports"
 
 unsplash:
-  access_key: "gRMk05LDbP4KvDPQUk2fzf6R8VbCqlcZ_Kvk5TPbVJ0"
+  access_key: "YOUR_ACCESS_KEY"
 
 logging:
   level: "INFO"
