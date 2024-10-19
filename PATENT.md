@@ -55,10 +55,20 @@ The algorithm is implemented in Python, utilizing libraries such as TensorFlow, 
 
 Recent tests demonstrate the algorithm's effectiveness:
 
+**Test Summary:**
+_Run ID: 20241020_002410_
+- Total images tested: 40 (200 total)
+- Average PSNR: 51.59 dB 
+- Average SSIM: 0.9968 
+- Authentication Accuracy: 72.50% (on a set of 200 images)
+- Average Similarity: 33.13% (balancing between distinctiveness and robustness)
+
+_Run ID: 20241019_233849._
+- Total images tested: 40
 - Average PSNR: 64.12 dB (indicating excellent image quality preservation)
 - Average SSIM: 0.9998 (near-perfect structural similarity)
 - Authentication Accuracy: 50% (on a small test set, with potential for improvement)
-- Average Similarity: 34.31% (balancing between distinctiveness and robustness)
+- Average Similarity: 34.31% 
 
 ## Potential Applications
 
