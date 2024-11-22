@@ -81,27 +81,39 @@ class AdaptiveMultiDomainFingerprinting:
         if pad_h or pad_w:
             image = np.pad(image, ((0, pad_h), (0, pad_w), (0, 0)), mode='reflect')
 
-        # Apply DWT to each color channel
-        coeffs = [pywt.dwt2(image[:, :, i], 'haar') for i in range(3)]
+        # Apply multi-level DWT for better embedding
+        coeffs = [pywt.wavedec2(image[:, :, i], 'haar', level=2) for i in range(3)]
 
         # Tile the fingerprint to match the size of the approximation coefficients
         h, w = coeffs[0][0].shape
         tiled_fingerprint = np.tile(fingerprint, (h // fingerprint.shape[0] + 1, w // fingerprint.shape[1] + 1))
         tiled_fingerprint = tiled_fingerprint[:h, :w]
 
-        # Embed the fingerprint in the approximation coefficients of each channel
+        # Enhanced embedding in multiple subbands
         for i in range(3):
-            cA, (cH, cV, cD) = coeffs[i]
-            cA += self.embed_strength * tiled_fingerprint
-            coeffs[i] = (cA, (cH, cV, cD))
+            # Embed in approximation coefficients (LL)
+            coeffs[i][0] += self.embed_strength * tiled_fingerprint
+
+            # Embed in horizontal details (LH) with reduced strength
+            h_shape = coeffs[i][1][0].shape
+            h_fingerprint = cv2.resize(tiled_fingerprint, (h_shape[1], h_shape[0]))
+            coeffs[i][1] = (
+                coeffs[i][1][0] + 0.3 * self.embed_strength * h_fingerprint,
+                coeffs[i][1][1],
+                coeffs[i][1][2]
+            )
 
         # Apply inverse DWT to each channel
-        embedded_image = np.stack([pywt.idwt2(coeff, 'haar') for coeff in coeffs], axis=-1)
+        embedded_image = np.stack([pywt.waverec2(coeff, 'haar') for coeff in coeffs], axis=-1)
 
         # Remove padding if added
         embedded_image = embedded_image[:original_shape[0], :original_shape[1], :]
 
+        # Apply additional enhancement
+        embedded_image = cv2.GaussianBlur(embedded_image, (3, 3), 0.5)
+
         return np.clip(embedded_image, 0, 255).astype(np.uint8)
+
 
     def extract_fingerprint(self, image):
         # Convert image to float32
@@ -125,8 +137,29 @@ class AdaptiveMultiDomainFingerprinting:
         return cv2.resize(extracted, (w, h))
 
     def apply_error_correction(self, fingerprint):
-        # Simple error correction: apply median filter
-        return cv2.medianBlur(fingerprint.astype(np.float32), 3)
+        # Enhanced error correction
+        # 1. Apply bilateral filter for edge-preserving smoothing
+        smoothed = cv2.bilateralFilter(fingerprint.astype(np.float32), 5, 75, 75)
+
+        # 2. Apply adaptive thresholding
+        binary = cv2.adaptiveThreshold(
+            (smoothed * 255).astype(np.uint8),
+            255,
+            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+            cv2.THRESH_BINARY,
+            11,
+            2
+        )
+
+        # 3. Remove small noise using morphological operations
+        kernel = np.ones((3, 3), np.uint8)
+        cleaned = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+
+        # 4. Convert back to float and normalize
+        corrected = cleaned.astype(np.float32) / 255.0
+
+        # 5. Blend with original fingerprint
+        return 0.7 * corrected + 0.3 * fingerprint
 
     def verify_fingerprint(self, image, original_fingerprint):
         extracted = self.extract_fingerprint(image)

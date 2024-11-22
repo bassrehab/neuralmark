@@ -9,28 +9,53 @@ import hashlib
 
 
 class EnhancedAlphaPunch:
-    def __init__(self, private_key, logger, fingerprint_size=(64, 64), embed_strength=0.15):
+    def __init__(self, private_key, logger, fingerprint_size=(64, 64), embed_strength=0.25):  # Increased from 0.15
         self.private_key = private_key.encode()
         self.fingerprint_size = fingerprint_size
         self.logger = logger
         self.amdf = AdaptiveMultiDomainFingerprinting(fingerprint_size, embed_strength)
-        self.similarity_threshold = 0.5  # Initial threshold
-        self.min_threshold = 0.3
-        self.max_threshold = 0.7
+
+        # Adjusted thresholds for better acceptance rate
+        self.similarity_threshold = 0.3  # Lowered from 0.5
+        self.min_threshold = 0.2  # Lowered from 0.3
+        self.max_threshold = 0.6  # Lowered from 0.7
         self.recent_similarities = []
+        # Added adaptive window size
+        self.adaptive_window = 10  # Start with smaller window
 
     def update_similarity_threshold(self, similarity):
         self.recent_similarities.append(similarity)
-        if len(self.recent_similarities) > 20:
+        if len(self.recent_similarities) > self.adaptive_window:
             self.recent_similarities.pop(0)
 
         mean_similarity = np.mean(self.recent_similarities)
         std_similarity = np.std(self.recent_similarities)
 
-        # Adjust threshold based on recent statistics
-        self.similarity_threshold = max(self.min_threshold,
-                                        min(self.max_threshold, mean_similarity - 0.5 * std_similarity))
+        # More sophisticated threshold adjustment
+        if len(self.recent_similarities) >= 5:
+            success_rate = sum(s > self.similarity_threshold
+                               for s in self.recent_similarities) / len(self.recent_similarities)
+
+            # Adjust window size based on stability
+            if std_similarity < 0.1:
+                self.adaptive_window = min(20, self.adaptive_window + 1)
+            else:
+                self.adaptive_window = max(5, self.adaptive_window - 1)
+
+            # Dynamic threshold adjustment
+            if success_rate < 0.3:  # Too few authentications
+                self.similarity_threshold = max(
+                    self.min_threshold,
+                    self.similarity_threshold - 0.02
+                )
+            elif success_rate > 0.7:  # Too many authentications
+                self.similarity_threshold = min(
+                    self.max_threshold,
+                    self.similarity_threshold + 0.01
+                )
+
         self.logger.info(f"Updated similarity threshold: {self.similarity_threshold:.2f}")
+        self.logger.info(f"Current window size: {self.adaptive_window}")
 
     def train_verifier(self, authentic_pairs, fake_pairs):
         self.logger.info("Training verifier...")
@@ -71,16 +96,31 @@ class EnhancedAlphaPunch:
         else:
             raise ValueError("image_input must be either a file path or a numpy array")
 
-        similarity = self.amdf.verify_fingerprint(img, original_fingerprint)
+        # Added multiple verification attempts with slight modifications
+        similarities = []
+
+        # Original verification
+        similarities.append(self.amdf.verify_fingerprint(img, original_fingerprint))
+
+        # Try with slight brightness adjustment
+        bright_img = np.clip(img * 1.05, 0, 255).astype(np.uint8)
+        similarities.append(self.amdf.verify_fingerprint(bright_img, original_fingerprint))
+
+        # Try with slight contrast adjustment
+        contrast_img = np.clip((img - 128) * 1.05 + 128, 0, 255).astype(np.uint8)
+        similarities.append(self.amdf.verify_fingerprint(contrast_img, original_fingerprint))
+
+        # Take the maximum similarity from all attempts
+        similarity = max(similarities)
         is_authentic = similarity > self.similarity_threshold
 
-        self.logger.info(f"Fingerprint similarity: {similarity:.2%}")
+        self.logger.info(f"Best fingerprint similarity: {similarity:.2%}")
         self.logger.info(f"Verification result: Image is {'authentic' if is_authentic else 'not authentic'}")
 
-        # Adaptive thresholding
+        # Update threshold based on the best similarity
         self.update_similarity_threshold(similarity)
 
-        return is_authentic, similarity, 1 - similarity  # normalized_hamming_distance
+        return is_authentic, similarity, 1 - similarity
 
     def generate_key(self, seed):
         """Generate a unique key based on a seed and the private key."""

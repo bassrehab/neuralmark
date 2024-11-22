@@ -2,7 +2,7 @@
 
 algorithm:
   fingerprint_size: [64, 64]
-  embed_strength: 0.3
+  embed_strength: 0.4
   tile_size: 8
 
 training:
@@ -25,7 +25,7 @@ directories:
   reports: "reports"
 
 unsplash:
-  access_key: "YOUR_ACCESS_KEY"
+  access_key: "gRMk05LDbP4KvDPQUk2fzf6R8VbCqlcZ_Kvk5TPbVJ0"
 
 logging:
   level: "INFO"

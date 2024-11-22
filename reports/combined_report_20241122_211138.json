@@ -1,0 +1,1614 @@
+{
+  "test_summary": {
+    "total_images": 40,
+    "authentic_images": 12,
+    "average_psnr": 51.14634732293814,
+    "average_ssim": 0.9959410901300467,
+    "average_similarity": 0.2626542508602142,
+    "average_hamming_distance": 0.7373457491397858
+  },
+  "detailed_results": [
+    {
+      "filename": "EoCLHvM4W4E.jpg",
+      "is_authentic": false,
+      "similarity": 0.30695801973342896,
+      "normalized_hamming_distance": 0.693041980266571,
+      "psnr": 50.855688081853216,
+      "ssim": 0.9991001096048775,
+      "embed_time": 0.35475707054138184,
+      "verify_time": 0.0747060775756836
+    },
+    {
+      "filename": "hERzLkn5jlY.jpg",
+      "is_authentic": false,
+      "similarity": 0.2545853853225708,
+      "normalized_hamming_distance": 0.7454146146774292,
+      "psnr": 50.802608434279286,
+      "ssim": 0.9968689666239242,
+      "embed_time": 0.3792548179626465,
+      "verify_time": 0.056617021560668945
+    },
+    {
+      "filename": "RM2x5lO4lQc.jpg",
+      "is_authentic": false,
+      "similarity": 0.28688058257102966,
+      "normalized_hamming_distance": 0.7131194174289703,
+      "psnr": 50.93574814467206,
+      "ssim": 0.9969776722507112,
+      "embed_time": 0.3715701103210449,
+      "verify_time": 0.05695796012878418
+    },
+    {
+      "filename": "BZV9JLXKTV4.jpg",
+      "is_authentic": false,
+      "similarity": 0.25506529211997986,
+      "normalized_hamming_distance": 0.7449347078800201,
+      "psnr": 50.90879798395724,
+      "ssim": 0.9985725730918373,
+      "embed_time": 0.18505191802978516,
+      "verify_time": 0.0343317985534668
+    },
+    {
+      "filename": "nKI8etar_aw.jpg",
+      "is_authentic": false,
+      "similarity": 0.2917812764644623,
+      "normalized_hamming_distance": 0.7082187235355377,
+      "psnr": 52.057284423006266,
+      "ssim": 0.9982335087263129,
+      "embed_time": 0.3349118232727051,
+      "verify_time": 0.05043220520019531
+    },
+    {
+      "filename": "YgDvjtlWcc0.jpg",
+      "is_authentic": false,
+      "similarity": 0.27503272891044617,
+      "normalized_hamming_distance": 0.7249672710895538,
+      "psnr": 51.982855348246304,
+      "ssim": 0.9951705553648501,
+      "embed_time": 0.40407705307006836,
+      "verify_time": 0.05679798126220703
+    },
+    {
+      "filename": "ZV_-UdaJymQ.jpg",
+      "is_authentic": false,
+      "similarity": 0.2962895929813385,
+      "normalized_hamming_distance": 0.7037104070186615,
+      "psnr": 50.704884745651164,
+      "ssim": 0.997295882400958,
+      "embed_time": 0.36162829399108887,
+      "verify_time": 0.05494189262390137
+    },
+    {
+      "filename": "XTUydjIJIdc.jpg",
+      "is_authentic": false,
+      "similarity": 0.1522785723209381,
+      "normalized_hamming_distance": 0.8477214276790619,
+      "psnr": 50.79015221837543,
+      "ssim": 0.9933180614407332,
+      "embed_time": 0.3676769733428955,
+      "verify_time": 0.05620622634887695
+    },
+    {
+      "filename": "nsEZ9wH6_fI.jpg",
+      "is_authentic": false,
+      "similarity": 0.24520382285118103,
+      "normalized_hamming_distance": 0.754796177148819,
+      "psnr": 51.31419412386876,
+      "ssim": 0.9987448305263467,
+      "embed_time": 0.37576913833618164,
+      "verify_time": 0.05324387550354004
+    },
+    {
+      "filename": "DSnjrPUenCU.jpg",
+      "is_authentic": false,
+      "similarity": 0.19639275968074799,
+      "normalized_hamming_distance": 0.803607240319252,
+      "psnr": 50.938743413631755,
+      "ssim": 0.9984359407429925,
+      "embed_time": 0.38309812545776367,
+      "verify_time": 0.05685091018676758
+    },
+    {
+      "filename": "2WRO5DwwQtA.jpg",
+      "is_authentic": false,
+      "similarity": 0.1950771063566208,
+      "normalized_hamming_distance": 0.8049228936433792,
+      "psnr": 50.86743796439832,
+      "ssim": 0.9991491185709295,
+      "embed_time": 0.39166903495788574,
+      "verify_time": 0.06282329559326172
+    },
+    {
+      "filename": "D_8zbi9Cl_E.jpg",
+      "is_authentic": false,
+      "similarity": 0.23391644656658173,
+      "normalized_hamming_distance": 0.7660835534334183,
+      "psnr": 51.00570797491562,
+      "ssim": 0.9982055208722406,
+      "embed_time": 0.38251209259033203,
+      "verify_time": 0.05559206008911133
+    },
+    {
+      "filename": "FyaYqc6Y1s0.jpg",
+      "is_authentic": true,
+      "similarity": 0.30645135045051575,
+      "normalized_hamming_distance": 0.6935486495494843,
+      "psnr": 50.638951127309,
+      "ssim": 0.9986523819285757,
+      "embed_time": 0.4135427474975586,
+      "verify_time": 0.05212903022766113
+    },
+    {
+      "filename": "gVFEAmRpvjQ.jpg",
+      "is_authentic": false,
+      "similarity": 0.11502163857221603,
+      "normalized_hamming_distance": 0.884978361427784,
+      "psnr": 49.9031503643278,
+      "ssim": 0.9472643426503454,
+      "embed_time": 0.19505000114440918,
+      "verify_time": 0.032649993896484375
+    },
+    {
+      "filename": "9gjgOiLAoe8.jpg",
+      "is_authentic": false,
+      "similarity": 0.27580270171165466,
+      "normalized_hamming_distance": 0.7241972982883453,
+      "psnr": 51.216152499983494,
+      "ssim": 0.9974646728779133,
+      "embed_time": 0.15829992294311523,
+      "verify_time": 0.03241586685180664
+    },
+    {
+      "filename": "bmGeFmPfhRs.jpg",
+      "is_authentic": true,
+      "similarity": 0.3273196816444397,
+      "normalized_hamming_distance": 0.6726803183555603,
+      "psnr": 50.94911589576553,
+      "ssim": 0.9724796290036055,
+      "embed_time": 0.32034826278686523,
+      "verify_time": 0.0444798469543457
+    },
+    {
+      "filename": "HCyqiQT9_xI.jpg",
+      "is_authentic": true,
+      "similarity": 0.3365273177623749,
+      "normalized_hamming_distance": 0.6634726822376251,
+      "psnr": 52.09245623663027,
+      "ssim": 0.998321945252561,
+      "embed_time": 0.16790199279785156,
+      "verify_time": 0.03122091293334961
+    },
+    {
+      "filename": "lIDcBVLV7GU.jpg",
+      "is_authentic": true,
+      "similarity": 0.31501835584640503,
+      "normalized_hamming_distance": 0.684981644153595,
+      "psnr": 51.61480992237536,
+      "ssim": 0.9983695997647422,
+      "embed_time": 0.25867271423339844,
+      "verify_time": 0.03754019737243652
+    },
+    {
+      "filename": "sVGqAT7k5EI.jpg",
+      "is_authentic": false,
+      "similarity": 0.29345256090164185,
+      "normalized_hamming_distance": 0.7065474390983582,
+      "psnr": 51.91447865440732,
+      "ssim": 0.9949525664132955,
+      "embed_time": 0.14161205291748047,
+      "verify_time": 0.029874801635742188
+    },
+    {
+      "filename": "e7r0_QMJTLc.jpg",
+      "is_authentic": true,
+      "similarity": 0.3372727930545807,
+      "normalized_hamming_distance": 0.6627272069454193,
+      "psnr": 50.66003596997585,
+      "ssim": 0.9989801996142815,
+      "embed_time": 0.385998010635376,
+      "verify_time": 0.05645895004272461
+    },
+    {
+      "filename": "HumE-iC2wLU.jpg",
+      "is_authentic": true,
+      "similarity": 0.30083146691322327,
+      "normalized_hamming_distance": 0.6991685330867767,
+      "psnr": 51.83542744697253,
+      "ssim": 0.9985410468313686,
+      "embed_time": 0.37100887298583984,
+      "verify_time": 0.053848981857299805
+    },
+    {
+      "filename": "2Dnibzk_INU.jpg",
+      "is_authentic": true,
+      "similarity": 0.34820032119750977,
+      "normalized_hamming_distance": 0.6517996788024902,
+      "psnr": 51.11795467601392,
+      "ssim": 0.9973370687627642,
+      "embed_time": 0.3763697147369385,
+      "verify_time": 0.052503108978271484
+    },
+    {
+      "filename": "ybk2WyE6CGs.jpg",
+      "is_authentic": false,
+      "similarity": 0.18350742757320404,
+      "normalized_hamming_distance": 0.816492572426796,
+      "psnr": 51.344640905570884,
+      "ssim": 0.9978363098308479,
+      "embed_time": 0.18900084495544434,
+      "verify_time": 0.04353904724121094
+    },
+    {
+      "filename": "aUyECE8Tt9k.jpg",
+      "is_authentic": false,
+      "similarity": 0.28742748498916626,
+      "normalized_hamming_distance": 0.7125725150108337,
+      "psnr": 51.94064368765439,
+      "ssim": 0.9992389860982319,
+      "embed_time": 0.31759190559387207,
+      "verify_time": 0.04466104507446289
+    },
+    {
+      "filename": "CsbuZOQOHGo.jpg",
+      "is_authentic": true,
+      "similarity": 0.3263668119907379,
+      "normalized_hamming_distance": 0.6736331880092621,
+      "psnr": 51.10374467338087,
+      "ssim": 0.9987472065829429,
+      "embed_time": 0.42649292945861816,
+      "verify_time": 0.06290602684020996
+    },
+    {
+      "filename": "NK1PqT_j5s8.jpg",
+      "is_authentic": false,
+      "similarity": 0.2392202615737915,
+      "normalized_hamming_distance": 0.7607797384262085,
+      "psnr": 50.744663571508504,
+      "ssim": 0.996034177651984,
+      "embed_time": 0.3398311138153076,
+      "verify_time": 0.044744014739990234
+    },
+    {
+      "filename": "PtfizgVedcw.jpg",
+      "is_authentic": false,
+      "similarity": 0.20813648402690887,
+      "normalized_hamming_distance": 0.7918635159730911,
+      "psnr": 51.42926700286094,
+      "ssim": 0.9970042900926049,
+      "embed_time": 0.36710214614868164,
+      "verify_time": 0.05538511276245117
+    },
+    {
+      "filename": "7rWbNT2B0Jc.jpg",
+      "is_authentic": false,
+      "similarity": 0.13813069462776184,
+      "normalized_hamming_distance": 0.8618693053722382,
+      "psnr": 51.11762153105646,
+      "ssim": 0.9984239076384572,
+      "embed_time": 0.3217782974243164,
+      "verify_time": 0.043045759201049805
+    },
+    {
+      "filename": "H8j0d7NlYyI.jpg",
+      "is_authentic": false,
+      "similarity": 0.16839787364006042,
+      "normalized_hamming_distance": 0.8316021263599396,
+      "psnr": 51.04743635466348,
+      "ssim": 0.9986638020655944,
+      "embed_time": 0.38052868843078613,
+      "verify_time": 0.0587770938873291
+    },
+    {
+      "filename": "XWSPqY6CCcQ.jpg",
+      "is_authentic": false,
+      "similarity": 0.25782668590545654,
+      "normalized_hamming_distance": 0.7421733140945435,
+      "psnr": 51.392471671354116,
+      "ssim": 0.9973805689299903,
+      "embed_time": 0.3769989013671875,
+      "verify_time": 0.05369997024536133
+    },
+    {
+      "filename": "Q4urud1ytyQ.jpg",
+      "is_authentic": false,
+      "similarity": 0.27957621216773987,
+      "normalized_hamming_distance": 0.7204237878322601,
+      "psnr": 50.754267916867434,
+      "ssim": 0.9990859610555353,
+      "embed_time": 0.38397812843322754,
+      "verify_time": 0.07026100158691406
+    },
+    {
+      "filename": "llfRxOQgoPA.jpg",
+      "is_authentic": true,
+      "similarity": 0.34248483180999756,
+      "normalized_hamming_distance": 0.6575151681900024,
+      "psnr": 50.78737359199515,
+      "ssim": 0.9986899210326392,
+      "embed_time": 0.2022409439086914,
+      "verify_time": 0.03681302070617676
+    },
+    {
+      "filename": "u8w5OdRFPn8.jpg",
+      "is_authentic": false,
+      "similarity": 0.09247816354036331,
+      "normalized_hamming_distance": 0.9075218364596367,
+      "psnr": 50.6584890509943,
+      "ssim": 0.9976899331483141,
+      "embed_time": 0.38111400604248047,
+      "verify_time": 0.061225175857543945
+    },
+    {
+      "filename": "mPzjn-ix_O0.jpg",
+      "is_authentic": true,
+      "similarity": 0.31503352522850037,
+      "normalized_hamming_distance": 0.6849664747714996,
+      "psnr": 51.29490193808906,
+      "ssim": 0.9984319344869723,
+      "embed_time": 0.15401196479797363,
+      "verify_time": 0.0314638614654541
+    },
+    {
+      "filename": "i8T12vwCxQo.jpg",
+      "is_authentic": true,
+      "similarity": 0.3222215175628662,
+      "normalized_hamming_distance": 0.6777784824371338,
+      "psnr": 51.489732848764035,
+      "ssim": 0.9979763982290413,
+      "embed_time": 0.1582479476928711,
+      "verify_time": 0.03244376182556152
+    },
+    {
+      "filename": "4IYfToYJ2E8.jpg",
+      "is_authentic": false,
+      "similarity": 0.27780798077583313,
+      "normalized_hamming_distance": 0.7221920192241669,
+      "psnr": 51.57331421618501,
+      "ssim": 0.9985631402777306,
+      "embed_time": 0.15220904350280762,
+      "verify_time": 0.030276775360107422
+    },
+    {
+      "filename": "neyPm5G8wUg.jpg",
+      "is_authentic": true,
+      "similarity": 0.32314032316207886,
+      "normalized_hamming_distance": 0.6768596768379211,
+      "psnr": 50.1427867565708,
+      "ssim": 0.9979609406094593,
+      "embed_time": 0.3196990489959717,
+      "verify_time": 0.0465550422668457
+    },
+    {
+      "filename": "B9YuXF92e0U.jpg",
+      "is_authentic": false,
+      "similarity": 0.23673541843891144,
+      "normalized_hamming_distance": 0.7632645815610886,
+      "psnr": 51.6382431796577,
+      "ssim": 0.9975797318518097,
+      "embed_time": 0.15959405899047852,
+      "verify_time": 0.03249192237854004
+    },
+    {
+      "filename": "xcgq5iN7z9s.jpg",
+      "is_authentic": false,
+      "similarity": 0.26997846364974976,
+      "normalized_hamming_distance": 0.7300215363502502,
+      "psnr": 51.23363264545061,
+      "ssim": 0.9979691151546178,
+      "embed_time": 0.1573028564453125,
+      "verify_time": 0.034149885177612305
+    },
+    {
+      "filename": "YLJxTG_dF3I.jpg",
+      "is_authentic": false,
+      "similarity": 0.29234009981155396,
+      "normalized_hamming_distance": 0.707659900188446,
+      "psnr": 51.05402572428547,
+      "ssim": 0.9979310871489254,
+      "embed_time": 0.37100696563720703,
+      "verify_time": 0.05557990074157715
+    }
+  ],
+  "robustness_results": [
+    {
+      "filename": "EoCLHvM4W4E.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": true,
+      "similarity": 0.30818507075309753
+    },
+    {
+      "filename": "EoCLHvM4W4E.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": true,
+      "similarity": 0.3208298683166504
+    },
+    {
+      "filename": "EoCLHvM4W4E.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": true,
+      "similarity": 0.309813916683197
+    },
+    {
+      "filename": "EoCLHvM4W4E.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": true,
+      "similarity": 0.309012770652771
+    },
+    {
+      "filename": "EoCLHvM4W4E.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.288813054561615
+    },
+    {
+      "filename": "hERzLkn5jlY.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.25494763255119324
+    },
+    {
+      "filename": "hERzLkn5jlY.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.25985801219940186
+    },
+    {
+      "filename": "hERzLkn5jlY.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.2526438534259796
+    },
+    {
+      "filename": "hERzLkn5jlY.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.25463664531707764
+    },
+    {
+      "filename": "hERzLkn5jlY.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.26636022329330444
+    },
+    {
+      "filename": "RM2x5lO4lQc.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.2880604565143585
+    },
+    {
+      "filename": "RM2x5lO4lQc.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.2869010865688324
+    },
+    {
+      "filename": "RM2x5lO4lQc.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.2905515432357788
+    },
+    {
+      "filename": "RM2x5lO4lQc.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.28824663162231445
+    },
+    {
+      "filename": "RM2x5lO4lQc.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.29812878370285034
+    },
+    {
+      "filename": "BZV9JLXKTV4.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.24954549968242645
+    },
+    {
+      "filename": "BZV9JLXKTV4.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.2909492254257202
+    },
+    {
+      "filename": "BZV9JLXKTV4.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.21551623940467834
+    },
+    {
+      "filename": "BZV9JLXKTV4.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.25986385345458984
+    },
+    {
+      "filename": "BZV9JLXKTV4.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.2582339644432068
+    },
+    {
+      "filename": "nKI8etar_aw.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.28995266556739807
+    },
+    {
+      "filename": "nKI8etar_aw.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.2844972610473633
+    },
+    {
+      "filename": "nKI8etar_aw.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": true,
+      "similarity": 0.3124144673347473
+    },
+    {
+      "filename": "nKI8etar_aw.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.2895826995372772
+    },
+    {
+      "filename": "nKI8etar_aw.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.2325347512960434
+    },
+    {
+      "filename": "YgDvjtlWcc0.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.2746717631816864
+    },
+    {
+      "filename": "YgDvjtlWcc0.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": true,
+      "similarity": 0.3032315671443939
+    },
+    {
+      "filename": "YgDvjtlWcc0.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.27954867482185364
+    },
+    {
+      "filename": "YgDvjtlWcc0.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.2756026089191437
+    },
+    {
+      "filename": "YgDvjtlWcc0.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.2814345359802246
+    },
+    {
+      "filename": "ZV_-UdaJymQ.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.2969481647014618
+    },
+    {
+      "filename": "ZV_-UdaJymQ.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": true,
+      "similarity": 0.3043350577354431
+    },
+    {
+      "filename": "ZV_-UdaJymQ.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.2892081141471863
+    },
+    {
+      "filename": "ZV_-UdaJymQ.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.2959975004196167
+    },
+    {
+      "filename": "ZV_-UdaJymQ.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.28121963143348694
+    },
+    {
+      "filename": "XTUydjIJIdc.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.15479271113872528
+    },
+    {
+      "filename": "XTUydjIJIdc.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.263654887676239
+    },
+    {
+      "filename": "XTUydjIJIdc.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.1138731986284256
+    },
+    {
+      "filename": "XTUydjIJIdc.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.15380702912807465
+    },
+    {
+      "filename": "XTUydjIJIdc.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.16413307189941406
+    },
+    {
+      "filename": "nsEZ9wH6_fI.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.2413714975118637
+    },
+    {
+      "filename": "nsEZ9wH6_fI.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.2401263266801834
+    },
+    {
+      "filename": "nsEZ9wH6_fI.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.2654643952846527
+    },
+    {
+      "filename": "nsEZ9wH6_fI.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.24096077680587769
+    },
+    {
+      "filename": "nsEZ9wH6_fI.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.28166040778160095
+    },
+    {
+      "filename": "DSnjrPUenCU.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.1959795355796814
+    },
+    {
+      "filename": "DSnjrPUenCU.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.19334304332733154
+    },
+    {
+      "filename": "DSnjrPUenCU.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.17222315073013306
+    },
+    {
+      "filename": "DSnjrPUenCU.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.19621503353118896
+    },
+    {
+      "filename": "DSnjrPUenCU.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.1700526624917984
+    },
+    {
+      "filename": "2WRO5DwwQtA.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.20347312092781067
+    },
+    {
+      "filename": "2WRO5DwwQtA.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.2145555019378662
+    },
+    {
+      "filename": "2WRO5DwwQtA.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.26782679557800293
+    },
+    {
+      "filename": "2WRO5DwwQtA.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.19409388303756714
+    },
+    {
+      "filename": "2WRO5DwwQtA.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": true,
+      "similarity": 0.31101012229919434
+    },
+    {
+      "filename": "D_8zbi9Cl_E.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.23551777005195618
+    },
+    {
+      "filename": "D_8zbi9Cl_E.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.23729078471660614
+    },
+    {
+      "filename": "D_8zbi9Cl_E.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.21345606446266174
+    },
+    {
+      "filename": "D_8zbi9Cl_E.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.23482070863246918
+    },
+    {
+      "filename": "D_8zbi9Cl_E.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.28734612464904785
+    },
+    {
+      "filename": "FyaYqc6Y1s0.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": true,
+      "similarity": 0.3071388006210327
+    },
+    {
+      "filename": "FyaYqc6Y1s0.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": true,
+      "similarity": 0.3144541084766388
+    },
+    {
+      "filename": "FyaYqc6Y1s0.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.2934958040714264
+    },
+    {
+      "filename": "FyaYqc6Y1s0.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": true,
+      "similarity": 0.30681368708610535
+    },
+    {
+      "filename": "FyaYqc6Y1s0.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.28295186161994934
+    },
+    {
+      "filename": "gVFEAmRpvjQ.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.1144239753484726
+    },
+    {
+      "filename": "gVFEAmRpvjQ.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.2327507585287094
+    },
+    {
+      "filename": "gVFEAmRpvjQ.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.13453975319862366
+    },
+    {
+      "filename": "gVFEAmRpvjQ.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.1186889111995697
+    },
+    {
+      "filename": "gVFEAmRpvjQ.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.1825655847787857
+    },
+    {
+      "filename": "9gjgOiLAoe8.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.2770794630050659
+    },
+    {
+      "filename": "9gjgOiLAoe8.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.2862514853477478
+    },
+    {
+      "filename": "9gjgOiLAoe8.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.29796451330184937
+    },
+    {
+      "filename": "9gjgOiLAoe8.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.278245210647583
+    },
+    {
+      "filename": "9gjgOiLAoe8.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.2115936130285263
+    },
+    {
+      "filename": "bmGeFmPfhRs.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": true,
+      "similarity": 0.3248112201690674
+    },
+    {
+      "filename": "bmGeFmPfhRs.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": true,
+      "similarity": 0.331217885017395
+    },
+    {
+      "filename": "bmGeFmPfhRs.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": true,
+      "similarity": 0.3264976739883423
+    },
+    {
+      "filename": "bmGeFmPfhRs.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": true,
+      "similarity": 0.3303002715110779
+    },
+    {
+      "filename": "bmGeFmPfhRs.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": true,
+      "similarity": 0.3383452296257019
+    },
+    {
+      "filename": "HCyqiQT9_xI.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": true,
+      "similarity": 0.3348817229270935
+    },
+    {
+      "filename": "HCyqiQT9_xI.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": true,
+      "similarity": 0.3289203345775604
+    },
+    {
+      "filename": "HCyqiQT9_xI.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": true,
+      "similarity": 0.3301025927066803
+    },
+    {
+      "filename": "HCyqiQT9_xI.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": true,
+      "similarity": 0.3354402482509613
+    },
+    {
+      "filename": "HCyqiQT9_xI.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": true,
+      "similarity": 0.32137712836265564
+    },
+    {
+      "filename": "lIDcBVLV7GU.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": true,
+      "similarity": 0.3135845959186554
+    },
+    {
+      "filename": "lIDcBVLV7GU.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": true,
+      "similarity": 0.3163507580757141
+    },
+    {
+      "filename": "lIDcBVLV7GU.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": true,
+      "similarity": 0.3052600026130676
+    },
+    {
+      "filename": "lIDcBVLV7GU.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": true,
+      "similarity": 0.3157133460044861
+    },
+    {
+      "filename": "lIDcBVLV7GU.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": true,
+      "similarity": 0.3155725300312042
+    },
+    {
+      "filename": "sVGqAT7k5EI.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.29380255937576294
+    },
+    {
+      "filename": "sVGqAT7k5EI.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.29425543546676636
+    },
+    {
+      "filename": "sVGqAT7k5EI.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": true,
+      "similarity": 0.30127885937690735
+    },
+    {
+      "filename": "sVGqAT7k5EI.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.292604923248291
+    },
+    {
+      "filename": "sVGqAT7k5EI.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.25690844655036926
+    },
+    {
+      "filename": "e7r0_QMJTLc.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": true,
+      "similarity": 0.33282676339149475
+    },
+    {
+      "filename": "e7r0_QMJTLc.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": true,
+      "similarity": 0.32304462790489197
+    },
+    {
+      "filename": "e7r0_QMJTLc.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": true,
+      "similarity": 0.3133055567741394
+    },
+    {
+      "filename": "e7r0_QMJTLc.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": true,
+      "similarity": 0.33573994040489197
+    },
+    {
+      "filename": "e7r0_QMJTLc.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": true,
+      "similarity": 0.3081375062465668
+    },
+    {
+      "filename": "HumE-iC2wLU.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.3001948595046997
+    },
+    {
+      "filename": "HumE-iC2wLU.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": true,
+      "similarity": 0.30382341146469116
+    },
+    {
+      "filename": "HumE-iC2wLU.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.300057053565979
+    },
+    {
+      "filename": "HumE-iC2wLU.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": true,
+      "similarity": 0.3001877963542938
+    },
+    {
+      "filename": "HumE-iC2wLU.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": true,
+      "similarity": 0.32804444432258606
+    },
+    {
+      "filename": "2Dnibzk_INU.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": true,
+      "similarity": 0.3474372625350952
+    },
+    {
+      "filename": "2Dnibzk_INU.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": true,
+      "similarity": 0.3198743462562561
+    },
+    {
+      "filename": "2Dnibzk_INU.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.26371705532073975
+    },
+    {
+      "filename": "2Dnibzk_INU.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": true,
+      "similarity": 0.3502510190010071
+    },
+    {
+      "filename": "2Dnibzk_INU.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.28128793835639954
+    },
+    {
+      "filename": "ybk2WyE6CGs.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.17623209953308105
+    },
+    {
+      "filename": "ybk2WyE6CGs.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.17314870655536652
+    },
+    {
+      "filename": "ybk2WyE6CGs.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.18549634516239166
+    },
+    {
+      "filename": "ybk2WyE6CGs.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.18790479004383087
+    },
+    {
+      "filename": "ybk2WyE6CGs.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.2503451704978943
+    },
+    {
+      "filename": "aUyECE8Tt9k.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.2923184633255005
+    },
+    {
+      "filename": "aUyECE8Tt9k.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.2873617112636566
+    },
+    {
+      "filename": "aUyECE8Tt9k.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.2606647312641144
+    },
+    {
+      "filename": "aUyECE8Tt9k.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.28514915704727173
+    },
+    {
+      "filename": "aUyECE8Tt9k.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": true,
+      "similarity": 0.30499786138534546
+    },
+    {
+      "filename": "CsbuZOQOHGo.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": true,
+      "similarity": 0.3274998962879181
+    },
+    {
+      "filename": "CsbuZOQOHGo.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": true,
+      "similarity": 0.30723342299461365
+    },
+    {
+      "filename": "CsbuZOQOHGo.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.29355141520500183
+    },
+    {
+      "filename": "CsbuZOQOHGo.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": true,
+      "similarity": 0.3276726007461548
+    },
+    {
+      "filename": "CsbuZOQOHGo.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.29986345767974854
+    },
+    {
+      "filename": "NK1PqT_j5s8.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.23769544064998627
+    },
+    {
+      "filename": "NK1PqT_j5s8.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.26991215348243713
+    },
+    {
+      "filename": "NK1PqT_j5s8.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.22855931520462036
+    },
+    {
+      "filename": "NK1PqT_j5s8.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.24102357029914856
+    },
+    {
+      "filename": "NK1PqT_j5s8.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.13814671337604523
+    },
+    {
+      "filename": "PtfizgVedcw.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.2071632593870163
+    },
+    {
+      "filename": "PtfizgVedcw.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.2026418000459671
+    },
+    {
+      "filename": "PtfizgVedcw.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.1791210025548935
+    },
+    {
+      "filename": "PtfizgVedcw.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.20865246653556824
+    },
+    {
+      "filename": "PtfizgVedcw.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.2514409124851227
+    },
+    {
+      "filename": "7rWbNT2B0Jc.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.13818083703517914
+    },
+    {
+      "filename": "7rWbNT2B0Jc.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.17616143822669983
+    },
+    {
+      "filename": "7rWbNT2B0Jc.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.15811926126480103
+    },
+    {
+      "filename": "7rWbNT2B0Jc.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.13767652213573456
+    },
+    {
+      "filename": "7rWbNT2B0Jc.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.18080461025238037
+    },
+    {
+      "filename": "H8j0d7NlYyI.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.1617167443037033
+    },
+    {
+      "filename": "H8j0d7NlYyI.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.17431770265102386
+    },
+    {
+      "filename": "H8j0d7NlYyI.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.15681497752666473
+    },
+    {
+      "filename": "H8j0d7NlYyI.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.17377512156963348
+    },
+    {
+      "filename": "H8j0d7NlYyI.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.18108342587947845
+    },
+    {
+      "filename": "XWSPqY6CCcQ.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.2594948709011078
+    },
+    {
+      "filename": "XWSPqY6CCcQ.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.2888106107711792
+    },
+    {
+      "filename": "XWSPqY6CCcQ.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.24415156245231628
+    },
+    {
+      "filename": "XWSPqY6CCcQ.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.2583039700984955
+    },
+    {
+      "filename": "XWSPqY6CCcQ.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.25235655903816223
+    },
+    {
+      "filename": "Q4urud1ytyQ.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.2720089852809906
+    },
+    {
+      "filename": "Q4urud1ytyQ.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": true,
+      "similarity": 0.30854180455207825
+    },
+    {
+      "filename": "Q4urud1ytyQ.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.25783607363700867
+    },
+    {
+      "filename": "Q4urud1ytyQ.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.28013619780540466
+    },
+    {
+      "filename": "Q4urud1ytyQ.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.2154272198677063
+    },
+    {
+      "filename": "llfRxOQgoPA.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": true,
+      "similarity": 0.340641051530838
+    },
+    {
+      "filename": "llfRxOQgoPA.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": true,
+      "similarity": 0.33908236026763916
+    },
+    {
+      "filename": "llfRxOQgoPA.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.29146891832351685
+    },
+    {
+      "filename": "llfRxOQgoPA.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": true,
+      "similarity": 0.3453179597854614
+    },
+    {
+      "filename": "llfRxOQgoPA.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": true,
+      "similarity": 0.344003826379776
+    },
+    {
+      "filename": "u8w5OdRFPn8.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.09547818452119827
+    },
+    {
+      "filename": "u8w5OdRFPn8.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.11910668015480042
+    },
+    {
+      "filename": "u8w5OdRFPn8.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.09093628078699112
+    },
+    {
+      "filename": "u8w5OdRFPn8.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.09593810886144638
+    },
+    {
+      "filename": "u8w5OdRFPn8.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.11205916851758957
+    },
+    {
+      "filename": "mPzjn-ix_O0.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": true,
+      "similarity": 0.31310662627220154
+    },
+    {
+      "filename": "mPzjn-ix_O0.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": true,
+      "similarity": 0.30393892526626587
+    },
+    {
+      "filename": "mPzjn-ix_O0.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": true,
+      "similarity": 0.30463194847106934
+    },
+    {
+      "filename": "mPzjn-ix_O0.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": true,
+      "similarity": 0.31423598527908325
+    },
+    {
+      "filename": "mPzjn-ix_O0.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.28013429045677185
+    },
+    {
+      "filename": "i8T12vwCxQo.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": true,
+      "similarity": 0.319330632686615
+    },
+    {
+      "filename": "i8T12vwCxQo.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": true,
+      "similarity": 0.315689355134964
+    },
+    {
+      "filename": "i8T12vwCxQo.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.28513264656066895
+    },
+    {
+      "filename": "i8T12vwCxQo.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": true,
+      "similarity": 0.3221774399280548
+    },
+    {
+      "filename": "i8T12vwCxQo.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.28075411915779114
+    },
+    {
+      "filename": "4IYfToYJ2E8.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.27780798077583313
+    },
+    {
+      "filename": "4IYfToYJ2E8.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.27780798077583313
+    },
+    {
+      "filename": "4IYfToYJ2E8.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.2476353943347931
+    },
+    {
+      "filename": "4IYfToYJ2E8.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.27780798077583313
+    },
+    {
+      "filename": "4IYfToYJ2E8.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.2983125150203705
+    },
+    {
+      "filename": "neyPm5G8wUg.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": true,
+      "similarity": 0.3231865465641022
+    },
+    {
+      "filename": "neyPm5G8wUg.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": true,
+      "similarity": 0.3252063989639282
+    },
+    {
+      "filename": "neyPm5G8wUg.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.2912130355834961
+    },
+    {
+      "filename": "neyPm5G8wUg.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": true,
+      "similarity": 0.32059499621391296
+    },
+    {
+      "filename": "neyPm5G8wUg.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": true,
+      "similarity": 0.3145323693752289
+    },
+    {
+      "filename": "B9YuXF92e0U.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.2374764084815979
+    },
+    {
+      "filename": "B9YuXF92e0U.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.27965378761291504
+    },
+    {
+      "filename": "B9YuXF92e0U.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.19777648150920868
+    },
+    {
+      "filename": "B9YuXF92e0U.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.23449140787124634
+    },
+    {
+      "filename": "B9YuXF92e0U.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.28435376286506653
+    },
+    {
+      "filename": "xcgq5iN7z9s.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.27057576179504395
+    },
+    {
+      "filename": "xcgq5iN7z9s.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": true,
+      "similarity": 0.30181869864463806
+    },
+    {
+      "filename": "xcgq5iN7z9s.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": false,
+      "similarity": 0.21939480304718018
+    },
+    {
+      "filename": "xcgq5iN7z9s.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.27804848551750183
+    },
+    {
+      "filename": "xcgq5iN7z9s.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.26026755571365356
+    },
+    {
+      "filename": "YLJxTG_dF3I.jpg",
+      "manipulation": "JPEG Compression",
+      "is_authentic": false,
+      "similarity": 0.2870188355445862
+    },
+    {
+      "filename": "YLJxTG_dF3I.jpg",
+      "manipulation": "Gaussian Noise",
+      "is_authentic": false,
+      "similarity": 0.2911139726638794
+    },
+    {
+      "filename": "YLJxTG_dF3I.jpg",
+      "manipulation": "Rotation",
+      "is_authentic": true,
+      "similarity": 0.33541393280029297
+    },
+    {
+      "filename": "YLJxTG_dF3I.jpg",
+      "manipulation": "Scaling",
+      "is_authentic": false,
+      "similarity": 0.2853940725326538
+    },
+    {
+      "filename": "YLJxTG_dF3I.jpg",
+      "manipulation": "Cropping",
+      "is_authentic": false,
+      "similarity": 0.2691369652748108
+    }
+  ]
+}
