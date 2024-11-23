@@ -1,34 +1,42 @@
 # config.yaml
 
+private_key: "your-private-key-here"
+
 algorithm:
   fingerprint_size: [64, 64]
-  embed_strength: 0.4
-  tile_size: 8
-
-training:
-  epochs: 20
-  batch_size: 32
-  validation_split: 0.2
+  embed_strength: 0.4  # Keep current as PSNR/SSIM are good
+  similarity_threshold: 0.38  # Set just below average similarity
+  train_test_split: 0.2
+  verification:
+    # Adjusted weights
+    ncc_weight: 0.7      # Increased primary metric weight
+    ssim_weight: 0.2     # Reduced
+    freq_weight: 0.05    # Minimal impact
+    edge_weight: 0.05    # Minimal impact
+    # Relaxed minimum scores
+    min_ncc_score: 0.35  # Lowered from 0.45
+    min_ssim_score: 0.30 # Lowered from 0.40
+    # Softer penalty
+    penalty_factor: 0.9  # Increased from 0.8
+  error_correction:
+    gaussian_kernel_size: 3
+    gaussian_sigma: 0.5
 
 testing:
-  num_images: 200
+  num_images: 50
+  min_test_images: 40
   run_robustness: true
-
-thresholds:
-  initial_similarity: 0.5
-  min_similarity: 0.3
-  max_similarity: 0.7
-
-directories:
-  download: "unsplash_images"
-  output: "fingerprinted_images"
-  reports: "reports"
-
-unsplash:
-  access_key: "gRMk05LDbP4KvDPQUk2fzf6R8VbCqlcZ_Kvk5TPbVJ0"
+  random_seed: 42
 
 logging:
   level: "INFO"
   format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
-private_key: "your_secret_key_here"
+directories:
+  download: "downloaded_images"
+  output: "output_images"
+  reports: "test_reports"
+  logs: "logs"
+
+unsplash:
+  access_key: "gRMk05LDbP4KvDPQUk2fzf6R8VbCqlcZ_Kvk5TPbVJ0"

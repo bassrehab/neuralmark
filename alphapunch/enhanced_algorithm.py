@@ -9,53 +9,38 @@ import hashlib
 
 
 class EnhancedAlphaPunch:
-    def __init__(self, private_key, logger, fingerprint_size=(64, 64), embed_strength=0.25):  # Increased from 0.15
+    def __init__(self, private_key, logger, config):
         self.private_key = private_key.encode()
-        self.fingerprint_size = fingerprint_size
+        self.fingerprint_size = tuple(config['algorithm']['fingerprint_size'])
         self.logger = logger
-        self.amdf = AdaptiveMultiDomainFingerprinting(fingerprint_size, embed_strength)
+        self.config = config  # Store the config
+        self.amdf = AdaptiveMultiDomainFingerprinting(
+            fingerprint_size=self.fingerprint_size,
+            embed_strength=config['algorithm']['embed_strength'],
+            config=config
+        )
+        self.similarity_threshold = config['algorithm']['similarity_threshold']
 
-        # Adjusted thresholds for better acceptance rate
-        self.similarity_threshold = 0.3  # Lowered from 0.5
-        self.min_threshold = 0.2  # Lowered from 0.3
-        self.max_threshold = 0.6  # Lowered from 0.7
-        self.recent_similarities = []
-        # Added adaptive window size
-        self.adaptive_window = 10  # Start with smaller window
+        # Set random seed for reproducibility
+        np.random.seed(hash(private_key) % 2 ** 32)
 
     def update_similarity_threshold(self, similarity):
         self.recent_similarities.append(similarity)
         if len(self.recent_similarities) > self.adaptive_window:
             self.recent_similarities.pop(0)
 
-        mean_similarity = np.mean(self.recent_similarities)
-        std_similarity = np.std(self.recent_similarities)
+        if len(self.recent_similarities) >= 3:
+            # Sort similarities to find median
+            sorted_sims = sorted(self.recent_similarities)
+            median = sorted_sims[len(sorted_sims) // 2]
 
-        # More sophisticated threshold adjustment
-        if len(self.recent_similarities) >= 5:
-            success_rate = sum(s > self.similarity_threshold
-                               for s in self.recent_similarities) / len(self.recent_similarities)
-
-            # Adjust window size based on stability
-            if std_similarity < 0.1:
-                self.adaptive_window = min(20, self.adaptive_window + 1)
-            else:
-                self.adaptive_window = max(5, self.adaptive_window - 1)
-
-            # Dynamic threshold adjustment
-            if success_rate < 0.3:  # Too few authentications
-                self.similarity_threshold = max(
-                    self.min_threshold,
-                    self.similarity_threshold - 0.02
-                )
-            elif success_rate > 0.7:  # Too many authentications
-                self.similarity_threshold = min(
-                    self.max_threshold,
-                    self.similarity_threshold + 0.01
-                )
+            # Adjust threshold to be slightly below median for better acceptance
+            self.similarity_threshold = max(
+                self.min_threshold,
+                min(self.max_threshold, median * 0.85)
+            )
 
         self.logger.info(f"Updated similarity threshold: {self.similarity_threshold:.2f}")
-        self.logger.info(f"Current window size: {self.adaptive_window}")
 
     def train_verifier(self, authentic_pairs, fake_pairs):
         self.logger.info("Training verifier...")
@@ -63,7 +48,8 @@ class EnhancedAlphaPunch:
         self.logger.info("Verifier training complete.")
 
     def embed_fingerprint(self, image_input, output_path):
-        self.logger.info("Starting enhanced fingerprint embedding process...")
+        """Embed fingerprint in image."""
+        self.logger.info("Starting fingerprint embedding process...")
 
         if isinstance(image_input, str):
             img = cv2.imread(image_input)
@@ -86,9 +72,10 @@ class EnhancedAlphaPunch:
 
         return fingerprint, psnr, ssim
 
-    def verify_fingerprint(self, image_input, original_fingerprint):
-        self.logger.info("Starting fingerprint verification process...")
+    # enhanced_algorithm.py
 
+    def verify_fingerprint(self, image_input, original_fingerprint):
+        """Enhanced verification with stricter checks."""
         if isinstance(image_input, str):
             img = cv2.imread(image_input)
         elif isinstance(image_input, np.ndarray):
@@ -96,29 +83,62 @@ class EnhancedAlphaPunch:
         else:
             raise ValueError("image_input must be either a file path or a numpy array")
 
-        # Added multiple verification attempts with slight modifications
-        similarities = []
+        ver_config = self.config['algorithm']['verification']
 
-        # Original verification
-        similarities.append(self.amdf.verify_fingerprint(img, original_fingerprint))
+        # Extract and normalize fingerprints
+        extracted = self.amdf.extract_fingerprint(img)
+        extracted_norm = cv2.normalize(extracted, None, 0, 1, cv2.NORM_MINMAX)
+        original_norm = cv2.normalize(original_fingerprint, None, 0, 1, cv2.NORM_MINMAX)
 
-        # Try with slight brightness adjustment
-        bright_img = np.clip(img * 1.05, 0, 255).astype(np.uint8)
-        similarities.append(self.amdf.verify_fingerprint(bright_img, original_fingerprint))
+        # 1. Normalized Cross-Correlation (NCC)
+        ncc = cv2.matchTemplate(
+            extracted_norm.astype(np.float32),
+            original_norm.astype(np.float32),
+            cv2.TM_CCORR_NORMED
+        )[0][0]
 
-        # Try with slight contrast adjustment
-        contrast_img = np.clip((img - 128) * 1.05 + 128, 0, 255).astype(np.uint8)
-        similarities.append(self.amdf.verify_fingerprint(contrast_img, original_fingerprint))
+        # 2. Structural Similarity (SSIM)
+        ssim = structural_similarity(extracted_norm, original_norm, data_range=1.0)
 
-        # Take the maximum similarity from all attempts
-        similarity = max(similarities)
+        # 3. Frequency Domain Similarity
+        f1 = np.fft.fft2(extracted_norm)
+        f2 = np.fft.fft2(original_norm)
+        freq_sim = np.abs(np.corrcoef(np.abs(f1).flatten(), np.abs(f2).flatten())[0, 1])
+
+        # 4. Edge Similarity
+        edges_extracted = cv2.Sobel(extracted_norm, cv2.CV_64F, 1, 1)
+        edges_original = cv2.Sobel(original_norm, cv2.CV_64F, 1, 1)
+        edge_sim = structural_similarity(
+            edges_extracted,
+            edges_original,
+            data_range=np.max(edges_extracted) - np.min(edges_extracted)
+        )
+
+        # Calculate weighted similarity
+        similarity = (
+                ncc * ver_config['ncc_weight'] +
+                ssim * ver_config['ssim_weight'] +
+                freq_sim * ver_config['freq_weight'] +
+                edge_sim * ver_config['edge_weight']
+        )
+
+        # Apply penalties for low individual scores
+        if ncc < ver_config['min_ncc_score'] or ssim < ver_config['min_ssim_score']:
+            similarity *= ver_config['penalty_factor']
+            self.logger.debug(f"Applied penalty. Original similarity: {similarity / ver_config['penalty_factor']:.2%}, "
+                              f"After penalty: {similarity:.2%}")
+
+        # Final authentication decision
         is_authentic = similarity > self.similarity_threshold
 
-        self.logger.info(f"Best fingerprint similarity: {similarity:.2%}")
+        # Detailed logging
+        self.logger.info(f"NCC: {ncc:.2%}")
+        self.logger.info(f"SSIM: {ssim:.2%}")
+        self.logger.info(f"Frequency similarity: {freq_sim:.2%}")
+        self.logger.info(f"Edge similarity: {edge_sim:.2%}")
+        self.logger.info(f"Final similarity: {similarity:.2%}")
+        self.logger.info(f"Threshold: {self.similarity_threshold:.2%}")
         self.logger.info(f"Verification result: Image is {'authentic' if is_authentic else 'not authentic'}")
-
-        # Update threshold based on the best similarity
-        self.update_similarity_threshold(similarity)
 
         return is_authentic, similarity, 1 - similarity
 

@@ -10,16 +10,40 @@ from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, c
 from tensorflow.keras.models import Model
 from scipy.signal import convolve2d
 import pywt
+from skimage.metrics import structural_similarity
 
 
 class AdaptiveMultiDomainFingerprinting:
-    def __init__(self, fingerprint_size=(64, 64), embed_strength=0.15, tile_size=8):
+    def __init__(self, fingerprint_size=(64, 64), embed_strength=0.4, config=None):
         self.fingerprint_size = fingerprint_size
         self.embed_strength = embed_strength
-        self.tile_size = tile_size
+        self.config = config  # Store the config
+
+        # Store config sections for easier access
+        if config:
+            self.verification_config = config['algorithm']['verification']
+            self.error_correction_config = config['algorithm']['error_correction']
+        else:
+            # Default configurations if no config provided
+            self.verification_config = {
+                'ncc_weight': 0.5,
+                'ssim_weight': 0.3,
+                'min_individual_score': 0.4
+            }
+            self.error_correction_config = {
+                'gaussian_kernel_size': 3,
+                'gaussian_sigma': 0.5
+            }
+
+        # Initialize models
         self.feature_extractor = self._build_feature_extractor()
         self.fingerprint_generator = self._build_fingerprint_generator()
         self.verifier = self._build_verifier()
+
+        # Set random seeds if config is provided
+        if config and 'testing' in config:
+            np.random.seed(config['testing']['random_seed'])
+            tf.random.set_seed(config['testing']['random_seed'])
 
     def _build_feature_extractor(self):
         base_model = VGG16(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
@@ -63,109 +87,131 @@ class AdaptiveMultiDomainFingerprinting:
         return model
 
     def generate_fingerprint(self, image):
+        # Preprocess image for VGG16
         img_tensor = tf.convert_to_tensor(image, dtype=tf.float32)
         img_tensor = tf.image.resize(img_tensor, (224, 224))
         img_tensor = preprocess_input(img_tensor)
+
+        # Extract features and generate fingerprint
         features = self.feature_extractor(tf.expand_dims(img_tensor, 0))
         fingerprint = self.fingerprint_generator(features)
+
+        # Resize to desired fingerprint size
         return tf.image.resize(fingerprint, self.fingerprint_size).numpy().squeeze()
 
     def embed_fingerprint(self, image, fingerprint):
-        # Convert image to float32
         image = image.astype(np.float32)
         original_shape = image.shape
 
-        # Pad the image if dimensions are not even
-        pad_h = 0 if image.shape[0] % 2 == 0 else 1
-        pad_w = 0 if image.shape[1] % 2 == 0 else 1
-        if pad_h or pad_w:
-            image = np.pad(image, ((0, pad_h), (0, pad_w), (0, 0)), mode='reflect')
+        # Pre-process fingerprint
+        fingerprint = cv2.normalize(fingerprint, None, 0, 1, cv2.NORM_MINMAX)
+        fingerprint = cv2.GaussianBlur(fingerprint, (3, 3), 0.5)
 
-        # Apply multi-level DWT for better embedding
-        coeffs = [pywt.wavedec2(image[:, :, i], 'haar', level=2) for i in range(3)]
+        # Decompose image into multiple levels
+        coeffs = [pywt.wavedec2(image[:, :, i], 'haar', level=3) for i in range(3)]
 
-        # Tile the fingerprint to match the size of the approximation coefficients
-        h, w = coeffs[0][0].shape
-        tiled_fingerprint = np.tile(fingerprint, (h // fingerprint.shape[0] + 1, w // fingerprint.shape[1] + 1))
-        tiled_fingerprint = tiled_fingerprint[:h, :w]
-
-        # Enhanced embedding in multiple subbands
         for i in range(3):
-            # Embed in approximation coefficients (LL)
-            coeffs[i][0] += self.embed_strength * tiled_fingerprint
+            # Get all coefficients
+            c = list(coeffs[i])
 
-            # Embed in horizontal details (LH) with reduced strength
-            h_shape = coeffs[i][1][0].shape
-            h_fingerprint = cv2.resize(tiled_fingerprint, (h_shape[1], h_shape[0]))
-            coeffs[i][1] = (
-                coeffs[i][1][0] + 0.3 * self.embed_strength * h_fingerprint,
-                coeffs[i][1][1],
-                coeffs[i][1][2]
-            )
+            # Embed in approximation coefficients (strongest)
+            h, w = c[0].shape
+            tiled = cv2.resize(fingerprint, (w, h))
+            c[0] += self.embed_strength * 2.0 * tiled
 
-        # Apply inverse DWT to each channel
+            # Embed in first level details (medium strength)
+            h, w = c[1][0].shape
+            tiled = cv2.resize(fingerprint, (w, h))
+            c[1] = tuple(coef + self.embed_strength * 0.5 * tiled for coef in c[1])
+
+            # Embed in second level details (weak strength)
+            h, w = c[2][0].shape
+            tiled = cv2.resize(fingerprint, (w, h))
+            c[2] = tuple(coef + self.embed_strength * 0.25 * tiled for coef in c[2])
+
+            coeffs[i] = tuple(c)
+
+        # Reconstruct image
         embedded_image = np.stack([pywt.waverec2(coeff, 'haar') for coeff in coeffs], axis=-1)
-
-        # Remove padding if added
         embedded_image = embedded_image[:original_shape[0], :original_shape[1], :]
-
-        # Apply additional enhancement
-        embedded_image = cv2.GaussianBlur(embedded_image, (3, 3), 0.5)
 
         return np.clip(embedded_image, 0, 255).astype(np.uint8)
 
-
     def extract_fingerprint(self, image):
-        # Convert image to float32
         image = image.astype(np.float32)
 
-        # Pad the image if dimensions are not even
-        pad_h = 0 if image.shape[0] % 2 == 0 else 1
-        pad_w = 0 if image.shape[1] % 2 == 0 else 1
-        if pad_h or pad_w:
-            image = np.pad(image, ((0, pad_h), (0, pad_w), (0, 0)), mode='reflect')
+        # Extract from multiple wavelet levels
+        fingerprints = []
 
-        # Apply DWT to each color channel
-        coeffs = [pywt.dwt2(image[:, :, i], 'haar') for i in range(3)]
+        for i in range(3):
+            coeffs = pywt.wavedec2(image[:, :, i], 'haar', level=3)
 
-        # Extract fingerprint from the approximation coefficients of the first channel
-        cA, _ = coeffs[0]
-        extracted = cA / self.embed_strength
+            # Extract from each level with appropriate weights
+            f1 = coeffs[0] / (self.embed_strength * 2.0)
+            f2 = coeffs[1][0] / (self.embed_strength * 0.5)
+            f3 = coeffs[2][0] / (self.embed_strength * 0.25)
 
-        # Reshape to original fingerprint size
-        h, w = self.fingerprint_size
-        return cv2.resize(extracted, (w, h))
+            # Resize all to fingerprint size
+            h, w = self.fingerprint_size
+            f1 = cv2.resize(f1, (w, h))
+            f2 = cv2.resize(f2, (w, h))
+            f3 = cv2.resize(f3, (w, h))
+
+            # Weighted combination
+            fingerprint = 0.6 * f1 + 0.3 * f2 + 0.1 * f3
+            fingerprints.append(fingerprint)
+
+        # Combine fingerprints from all channels
+        extracted = np.mean(fingerprints, axis=0)
+        extracted = cv2.normalize(extracted, None, 0, 1, cv2.NORM_MINMAX)
+
+        return extracted
 
     def apply_error_correction(self, fingerprint):
-        # Enhanced error correction
-        # 1. Apply bilateral filter for edge-preserving smoothing
-        smoothed = cv2.bilateralFilter(fingerprint.astype(np.float32), 5, 75, 75)
+        """Apply error correction to the fingerprint."""
+        # Ensure kernel size is odd
+        kernel_size = self.error_correction_config['gaussian_kernel_size']
+        if kernel_size % 2 == 0:
+            kernel_size += 1
 
-        # 2. Apply adaptive thresholding
-        binary = cv2.adaptiveThreshold(
-            (smoothed * 255).astype(np.uint8),
-            255,
-            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-            cv2.THRESH_BINARY,
-            11,
-            2
+        sigma = self.error_correction_config['gaussian_sigma']
+
+        # Apply Gaussian blur for denoising
+        denoised = cv2.GaussianBlur(
+            fingerprint,
+            (kernel_size, kernel_size),
+            sigma
         )
 
-        # 3. Remove small noise using morphological operations
-        kernel = np.ones((3, 3), np.uint8)
-        cleaned = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+        # Normalize output
+        corrected = cv2.normalize(denoised, None, 0, 1, cv2.NORM_MINMAX)
 
-        # 4. Convert back to float and normalize
-        corrected = cleaned.astype(np.float32) / 255.0
-
-        # 5. Blend with original fingerprint
-        return 0.7 * corrected + 0.3 * fingerprint
+        return corrected
 
     def verify_fingerprint(self, image, original_fingerprint):
         extracted = self.extract_fingerprint(image)
         extracted = self.apply_error_correction(extracted)
-        difference = np.abs(extracted - original_fingerprint)
-        return self.verifier.predict(difference[np.newaxis, ..., np.newaxis])[0, 0]
+
+        # Normalize fingerprints
+        extracted = cv2.normalize(extracted, None, 0, 1, cv2.NORM_MINMAX)
+        original = cv2.normalize(original_fingerprint, None, 0, 1, cv2.NORM_MINMAX)
+
+        ver_config = self.config['algorithm']['verification']
+
+        # Calculate multiple similarity metrics
+        ncc = cv2.matchTemplate(extracted, original, cv2.TM_CCORR_NORMED)[0][0]
+        ssim = structural_similarity(extracted, original, data_range=1.0)
+
+        # Combined similarity with configured weights
+        similarity = (ncc * ver_config['ncc_weight'] +
+                      ssim * ver_config['ssim_weight'])
+
+        # Penalty for low individual scores
+        min_score = ver_config['min_individual_score']
+        if ncc < min_score or ssim < min_score:
+            similarity *= 0.8
+
+        return similarity
 
     def train_verifier(self, authentic_pairs, fake_pairs, epochs=20, batch_size=32, validation_split=0.2):
         X = []
