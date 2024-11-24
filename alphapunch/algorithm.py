@@ -128,6 +128,7 @@ class AlphaPunch:
             return np.ones((image.shape[0], image.shape[1]), dtype=np.float32)
 
 
+
     def embed_fingerprint(self, image: np.ndarray, fingerprint: np.ndarray) -> np.ndarray:
         """Embed fingerprint into image with neural attention enhancement."""
         try:

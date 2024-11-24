@@ -14,6 +14,11 @@ clean:
 run:
 	python main.py --mode test
 
+
+debug:
+	python main.py --mode test --log-level DEBUG
+
+
 benchmark:
 	python main.py --mode benchmark
 
