@@ -154,5 +154,3 @@ cache:
   max_size: 1024  # MB
   ttl: 3600  # seconds
   cleanup_interval: 600  # seconds
-
-private_key: "alphapunch-test-key-2024"  # Default test key
