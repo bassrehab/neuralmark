@@ -2,7 +2,8 @@ import hashlib
 import logging
 import os
 import random
-from datetime import datetime, time
+from datetime import datetime
+import time
 from typing import List, Tuple
 
 import cv2

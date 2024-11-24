@@ -37,6 +37,9 @@ algorithm:
   neural_attention:
     enabled: true
     attention_layers: 3
+    max_memory_gb: 16
+    use_cpu_fallback: true
+    block_size: 64
     base_filters: 64
     attention_dropout: 0.1
     feature_channels: 256

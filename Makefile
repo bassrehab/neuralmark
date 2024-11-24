@@ -1,7 +1,7 @@
 .PHONY: install test clean run benchmark
 
 install:
-	pip install -r requirements.txt
+	python setup.py
 
 test:
 	python -m unittest discover tests

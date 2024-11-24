@@ -34,9 +34,6 @@ class AlphaPunch:
         self.fingerprint_size = tuple(config['algorithm']['fingerprint_size'])
         self.embed_strength = config['algorithm']['embed_strength']
 
-        if self.logger:
-            self.logger.info("EnhancedAlphaPunch initialized successfully")
-
     def generate_fingerprint(self, image: np.ndarray) -> np.ndarray:
         """Generate fingerprint for an image with optional neural attention enhancement."""
         self.logger.debug("Generating fingerprint...")
@@ -61,7 +58,7 @@ class AlphaPunch:
             raise
 
     def _calculate_embedding_mask(self, image: np.ndarray) -> np.ndarray:
-        """Calculate embedding mask with neural attention if enabled."""
+        """Calculate embedding mask with proper size handling."""
         try:
             # Ensure image is uint8
             image = image.astype(np.uint8)
@@ -72,39 +69,64 @@ class AlphaPunch:
             else:
                 gray = image
 
+            height, width = gray.shape[:2]
+
             if self.use_attention:
-                # Get attention-based mask
-                _, attention_mask = self.attention_enhancer.enhance_fingerprint(
-                    image, np.zeros(self.fingerprint_size)
-                )
+                try:
+                    # Get attention-based mask
+                    dummy_fingerprint = np.zeros(self.fingerprint_size)
+                    _, attention_mask = self.attention_enhancer.enhance_fingerprint(
+                        image, dummy_fingerprint
+                    )
 
-                # Combine with traditional mask
-                edges = cv2.Canny(gray, 100, 200)
-                texture = cv2.Laplacian(gray, cv2.CV_64F)
-                texture = np.abs(texture)
-                texture = cv2.normalize(texture, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+                    # Resize attention mask to match image size
+                    attention_mask = cv2.resize(
+                        attention_mask.astype(np.float32),
+                        (width, height)
+                    )
+                    attention_mask = cv2.normalize(
+                        attention_mask, None, 0, 1, cv2.NORM_MINMAX
+                    )
+                except Exception as e:
+                    self.logger.error(f"Error in attention mask: {str(e)}")
+                    attention_mask = np.ones((height, width), dtype=np.float32)
 
-                traditional_mask = cv2.addWeighted(edges, 0.5, texture, 0.5, 0)
-                traditional_mask = cv2.GaussianBlur(traditional_mask, (5, 5), 0)
-
-                # Combine masks
-                combined_mask = cv2.addWeighted(
-                    attention_mask.astype(np.float32), 0.6,
-                    traditional_mask.astype(np.float32) / 255.0, 0.4, 0
-                )
-                return combined_mask
-            else:
                 # Calculate traditional mask
                 edges = cv2.Canny(gray, 100, 200)
                 texture = cv2.Laplacian(gray, cv2.CV_64F)
                 texture = np.abs(texture)
+                texture = cv2.normalize(texture, None, 0, 1, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+
+                # Ensure edges are float32 and normalized
+                edges = edges.astype(np.float32) / 255.0
+
+                # Combine traditional components
+                traditional_mask = cv2.addWeighted(edges, 0.5, texture, 0.5, 0)
+                traditional_mask = cv2.GaussianBlur(traditional_mask, (5, 5), 0)
+
+                # Combine with attention mask
+                combined_mask = cv2.addWeighted(
+                    attention_mask, 0.6,
+                    traditional_mask, 0.4,
+                    0
+                )
+
+                return combined_mask
+            else:
+                # Traditional mask only
+                edges = cv2.Canny(gray, 100, 200)
+                texture = cv2.Laplacian(gray, cv2.CV_64F)
+                texture = np.abs(texture)
                 texture = cv2.normalize(texture, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+
                 combined = cv2.addWeighted(edges, 0.5, texture, 0.5, 0)
                 return cv2.GaussianBlur(combined, (5, 5), 0) / 255.0
 
         except Exception as e:
             self.logger.error(f"Error in _calculate_embedding_mask: {str(e)}")
-            raise
+            # Return uniform mask as fallback
+            return np.ones((image.shape[0], image.shape[1]), dtype=np.float32)
+
 
     def embed_fingerprint(self, image: np.ndarray, fingerprint: np.ndarray) -> np.ndarray:
         """Embed fingerprint into image with neural attention enhancement."""

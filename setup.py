@@ -10,25 +10,25 @@ def get_platform_requirements():
 
     if system == "darwin":  # macOS
         if "arm" in machine:
-            return "requirements-macos-arm.txt"
+            return "./requirements/requirements-macos-arm.txt"
         else:
-            return "requirements-macos-intel.txt"
+            return "./requirements/requirements-macos-intel.txt"
 
     elif system == "linux":
         # Check for NVIDIA GPU
         try:
             subprocess.run(["nvidia-smi"], capture_output=True)
-            return "requirements-linux-gpu.txt"
+            return "./requirements/requirements-linux-gpu.txt"
         except FileNotFoundError:
-            return "requirements-linux-cpu.txt"
+            return "./requirements/requirements-linux-cpu.txt"
 
     elif system == "windows":
         # Check for NVIDIA GPU
         try:
             subprocess.run(["nvidia-smi"], capture_output=True)
-            return "requirements-windows-gpu.txt"
+            return "./requirements/requirements-windows-gpu.txt"
         except FileNotFoundError:
-            return "requirements-windows-cpu.txt"
+            return "./requirements/requirements-windows-cpu.txt"
 
     else:
         print(f"Unsupported platform: {system}")
@@ -46,12 +46,12 @@ def install_requirements():
         # Install development requirements if specified
         if "--dev" in sys.argv:
             print("Installing development requirements")
-            subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements-dev.txt"])
+            subprocess.run([sys.executable, "-m", "pip", "install", "-r", "./requirements/requirements-dev.txt"])
 
         # Install documentation requirements if specified
         if "--docs" in sys.argv:
             print("Installing documentation requirements")
-            subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements-docs.txt"])
+            subprocess.run([sys.executable, "-m", "pip", "install", "-r", "./requirements/requirements-docs.txt"])
 
     except subprocess.CalledProcessError as e:
         print(f"Error installing requirements: {e}")

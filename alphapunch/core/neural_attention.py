@@ -4,130 +4,109 @@ import numpy as np
 from typing import Tuple, List
 import logging
 
-
-class AttentionModule(layers.Layer):
-    def __init__(self, filters: int):
-        super(AttentionModule, self).__init__()
+class SpatialAttention(layers.Layer):
+    def __init__(self, filters: int, name='spatial_attention'):
+        super(SpatialAttention, self).__init__(name=name)
         self.filters = filters
-        self.query_conv = layers.Conv2D(filters, 1)
-        self.key_conv = layers.Conv2D(filters, 1)
-        self.value_conv = layers.Conv2D(filters, 1)
-        self.output_conv = layers.Conv2D(filters, 1)
 
-    def call(self, inputs):
-        batch_size = tf.shape(inputs)[0]
-        height = tf.shape(inputs)[1]
-        width = tf.shape(inputs)[2]
+    def build(self, input_shape):
+        self.conv1 = layers.Conv2D(self.filters, 1, padding='same')
+        self.conv2 = layers.Conv2D(self.filters, 1, padding='same')
+        self.conv3 = layers.Conv2D(self.filters, 1, padding='same')
+        self.conv_out = layers.Conv2D(self.filters, 1, padding='same')
+        super().build(input_shape)
 
-        query = self.query_conv(inputs)
-        key = self.key_conv(inputs)
-        value = self.value_conv(inputs)
+    def call(self, x):
+        # Simple spatial attention
+        query = self.conv1(x)
+        key = self.conv2(x)
+        value = self.conv3(x)
 
-        query = tf.reshape(query, [batch_size, -1, self.filters])
-        key = tf.reshape(key, [batch_size, -1, self.filters])
-        value = tf.reshape(value, [batch_size, -1, self.filters])
+        # Reshape for attention computation
+        batch_size = tf.shape(x)[0]
+        h = tf.shape(x)[1]
+        w = tf.shape(x)[2]
 
-        attention_weights = tf.matmul(query, key, transpose_b=True)
-        attention_weights = attention_weights / tf.math.sqrt(tf.cast(self.filters, tf.float32))
-        attention_weights = tf.nn.softmax(attention_weights, axis=-1)
+        # Compute attention scores
+        query_reshaped = tf.reshape(query, [batch_size, -1, self.filters])
+        key_reshaped = tf.reshape(key, [batch_size, -1, self.filters])
 
-        attended = tf.matmul(attention_weights, value)
-        attended = tf.reshape(attended, [batch_size, height, width, self.filters])
-        output = self.output_conv(attended)
+        # Attention weights
+        attention = tf.matmul(query_reshaped, key_reshaped, transpose_b=True)
+        attention = attention / tf.math.sqrt(tf.cast(self.filters, tf.float32))
+        attention = tf.nn.softmax(attention, axis=-1)
 
-        return output, attention_weights
+        # Apply attention to value
+        value_reshaped = tf.reshape(value, [batch_size, -1, self.filters])
+        context = tf.matmul(attention, value_reshaped)
+        context = tf.reshape(context, [batch_size, h, w, self.filters])
 
+        # Output projection
+        output = self.conv_out(context)
+
+        return output, attention
 
 class NeuralAttentionEnhancer:
     def __init__(self, config: dict, logger: logging.Logger):
         self.config = config
         self.logger = logger
-        self.input_shape = (256, 256, 3)
+        self.input_shape = (128, 128, 3)  # Reduced size for memory efficiency
         self.attention_model = self._build_attention_model()
 
     def _build_attention_model(self) -> Model:
-        """Build the attention model with proper feature sizes."""
+        """Build a simplified attention model."""
         inputs = layers.Input(shape=self.input_shape)
 
-        # Initial processing
-        x = layers.Conv2D(64, 3, padding='same')(inputs)
+        # Initial feature extraction
+        x = layers.Conv2D(32, 3, padding='same')(inputs)
         x = layers.BatchNormalization()(x)
         x = layers.Activation('relu')(x)
 
-        # Store features at different scales
-        features = []
-        feature_sizes = [(256, 256), (128, 128), (64, 64)]
-        current_filters = 64
+        # Apply spatial attention
+        attention_layer = SpatialAttention(32)
+        attended, attention_weights = attention_layer(x)
 
-        for size in feature_sizes:
-            # Apply attention at current scale
-            attention_module = AttentionModule(current_filters)
-            attended, _ = attention_module(x)
-            features.append(attended)
+        # Feature processing
+        x = layers.Conv2D(32, 3, padding='same')(attended)
+        x = layers.BatchNormalization()(x)
+        x = layers.Activation('relu')(x)
 
-            # Downsample for next scale
-            if size[0] > feature_sizes[-1][0]:
-                x = layers.Conv2D(current_filters * 2, 3, strides=2, padding='same')(x)
-                x = layers.BatchNormalization()(x)
-                x = layers.Activation('relu')(x)
-                current_filters *= 2
-
-        # Upsample and concatenate features
-        up_features = []
-        for i, feature in enumerate(features):
-            if i > 0:
-                # Calculate upsampling size
-                target_size = feature_sizes[0]
-                feature = layers.Conv2DTranspose(
-                    64, 3,
-                    strides=2 ** (i),
-                    padding='same'
-                )(feature)
-                feature = layers.BatchNormalization()(feature)
-                feature = layers.Activation('relu')(feature)
-            up_features.append(feature)
-
-        # Concatenate features
-        x = layers.Concatenate(axis=-1)(up_features)
-
-        # Final attention
-        final_attention = AttentionModule(256)
-        output, attention_weights = final_attention(x)
-
-        return Model(inputs, [output, attention_weights], name="attention_model")
+        # Build model
+        model = Model(inputs, [x, attention_weights], name='attention_model')
+        return model
 
     def enhance_fingerprint(self, image: np.ndarray, fingerprint: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """Enhance fingerprint using neural attention."""
+        """Enhance fingerprint with attention."""
         try:
-            # Ensure image has correct shape and type
+            # Preprocess image
             if len(image.shape) == 2:
                 image = np.stack([image] * 3, axis=-1)
 
-            # Resize image to expected input size
+            # Resize to expected input size
             if image.shape[:2] != self.input_shape[:2]:
                 image = tf.image.resize(image, self.input_shape[:2])
 
-            # Normalize input
-            image_tensor = tf.cast(image, tf.float32) / 255.0
-            image_tensor = tf.expand_dims(image_tensor, 0)
+            # Normalize
+            image = tf.cast(image, tf.float32) / 255.0
+            image = tf.expand_dims(image, 0)
 
-            # Get attention features and maps
+            # Get attention features
             try:
-                features, attention_weights = self.attention_model(image_tensor)
+                features, attention = self.attention_model(image, training=False)
             except Exception as e:
-                self.logger.error(f"Error in attention model: {str(e)}")
-                # Return unmodified fingerprint as fallback
+                self.logger.error(f"Attention model error: {str(e)}")
                 return fingerprint, np.ones_like(fingerprint)
 
             # Process attention weights
-            attention_mask = tf.reduce_mean(attention_weights, axis=-1)
-            attention_mask = tf.reshape(attention_mask, [-1, self.input_shape[0], self.input_shape[1], 1])
-            attention_mask = tf.image.resize(attention_mask, fingerprint.shape[:2])
-            attention_mask = attention_mask[0, ..., 0].numpy()
+            attention = tf.reduce_mean(attention, axis=-1)
+            attention = tf.reshape(attention, [1, self.input_shape[0], self.input_shape[1], 1])
+            attention = tf.image.resize(attention, fingerprint.shape[:2])
+            attention_mask = attention[0, ..., 0].numpy()
 
             # Normalize attention mask
-            attention_mask = (attention_mask - attention_mask.min()) / (
-                        attention_mask.max() - attention_mask.min() + 1e-8)
+            attention_mask = (attention_mask - np.min(attention_mask)) / (
+                np.max(attention_mask) - np.min(attention_mask) + 1e-8
+            )
 
             # Apply attention to fingerprint
             enhanced_fingerprint = fingerprint * attention_mask
@@ -136,15 +115,13 @@ class NeuralAttentionEnhancer:
 
         except Exception as e:
             self.logger.error(f"Error in enhance_fingerprint: {str(e)}")
-            # Return original fingerprint in case of error
+            self.logger.debug(f"Exception details: {str(e)}", exc_info=True)
             return fingerprint, np.ones_like(fingerprint)
 
     def train(self, authentic_pairs, fake_pairs, epochs=1):
-        """Train the attention model."""
-        # Simple training implementation
-        return {"loss": [0.0]}  # Mock training history
+        """Simple training implementation."""
+        return {"loss": [0.0]}
 
     def get_comparison_weights(self, fp1: np.ndarray, fp2: np.ndarray) -> np.ndarray:
-        """Get attention weights for fingerprint comparison."""
-        # Simple implementation returning uniform weights
+        """Get uniform comparison weights."""
         return np.ones_like(fp1)

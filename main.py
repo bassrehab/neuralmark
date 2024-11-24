@@ -15,7 +15,13 @@ def main():
                         default='test', help='Operation mode')
     parser.add_argument('--output', type=str, default='output',
                         help='Output directory for results')
+    parser.add_argument('--log-level', type=str,
+                        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+                        default='INFO', help='Set the logging level')
     args = parser.parse_args()
+
+    # Set logging level
+    logging.basicConfig(level=getattr(logging, args.log_level))
 
     # Create cleaner
     cleaner = DirectoryCleaner()
@@ -54,13 +60,12 @@ def main():
             print(f"Average Success Rate: {results['average_success_rate']:.2f}%")
             print(f"Standard Deviation: {results['std_success_rate']:.2f}%")
 
-            # Post-run cleanup
-            cleaner.cleanup(pre_run=False)
+        # Post-run cleanup
+        # cleaner.cleanup(pre_run=False)
 
     except Exception as e:
         logging.error(f"Error running program: {str(e)}")
         raise
-
 
 if __name__ == "__main__":
     main()
