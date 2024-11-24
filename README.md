@@ -1,67 +1,129 @@
-# Enhanced AlphaPunch: Advanced Image Fingerprinting Algorithm
+# AlphaPunch - Robust Image Fingerprinting System
 
 ## Overview
-
-Enhanced AlphaPunch is a state-of-the-art image fingerprinting algorithm designed for robust digital watermarking and image authentication. It utilizes advanced techniques in digital signal processing, machine learning, and cryptography to embed and verify unique fingerprints in images while maintaining high visual quality.
-
-## Key Components
-
-### 1. Adaptive Multi-Domain Fingerprinting (AMDF)
-
-AMDF is the core technology behind Enhanced AlphaPunch. It combines multiple domains (spatial, frequency, and feature) to create and embed fingerprints that are:
-
-- Robust against various image manipulations
-- Imperceptible to the human eye
-- Unique to each image
-
-AMDF was chosen for its ability to adapt to different image characteristics and its resilience against common image processing operations.
-
-### 2. Quantum-Inspired Fingerprint Generation
-
-The fingerprint generation process is inspired by quantum computing concepts, simulating quantum superposition to create highly unique and complex fingerprints.
-
-### 3. Wavelet Domain Embedding
-
-Fingerprints are embedded in the wavelet domain, providing a good balance between robustness and imperceptibility.
-
-### 4. Machine Learning-based Verification
-
-A neural network is trained to verify the authenticity of fingerprints, improving the algorithm's ability to distinguish between authentic and tampered images.
-
-## Design Flow
-
-1. **Fingerprint Generation**: Using image features and quantum-inspired algorithms to create a unique fingerprint.
-2. **Embedding**: The fingerprint is embedded into the wavelet coefficients of the image.
-3. **Extraction**: For verification, the algorithm extracts the embedded fingerprint from a given image.
-4. **Verification**: A trained neural network compares the extracted fingerprint with the original to determine authenticity.
+AlphaPunch is an advanced image fingerprinting system designed to verify image ownership and detect modifications. It embeds invisible digital fingerprints into images and can later verify these fingerprints to:
+- Authenticate image ownership
+- Detect unauthorized modifications
+- Track image manipulations (e.g., compression, rotation, cropping)
 
 ## Key Features
+- Multi-domain fingerprinting (spatial, frequency, and wavelet domains)
+- Robust against common image manipulations
+- Modification detection and classification
+- Comprehensive testing and validation framework
+- Performance monitoring and visualization
 
-- High PSNR and SSIM values, ensuring excellent image quality preservation
-- Robust against common image manipulations (compression, noise, rotation, scaling, cropping)
-- Adaptive thresholding for improved authentication accuracy
-- Configurable parameters for fine-tuning performance
+## System Architecture
+
+### Core Components
+
+1. **Enhanced Algorithm (`enhanced_algorithm.py`)**
+   - Main interface for fingerprinting operations
+   - Handles high-level fingerprint generation and verification
+   - Coordinates between different processing domains
+
+2. **Adaptive Multi-Domain Fingerprinting (`amdf.py`)**
+   - Implements core fingerprinting algorithms
+   - Manages multi-domain feature extraction
+   - Handles wavelet transformations and frequency analysis
+   - Provides robust fingerprint comparison methods
+
+3. **Fingerprint Core (`fingerprint_core.py`)**
+   - Low-level fingerprinting operations
+   - DCT and wavelet transformations
+   - Basic feature extraction and comparison
+
+4. **Image Author (`author.py`)**
+   - Manages image ownership and verification
+   - Maintains fingerprint database
+   - Handles fingerprint storage and retrieval
+
+### Testing and Utilities
+
+1. **Test Framework (`test_authorship.py`)**
+   - Comprehensive testing suite
+   - Performance benchmarking
+   - Cross-validation testing
+   - Report generation and visualization
+
+2. **Utilities (`utils.py`)**
+   - Configuration management
+   - Logging setup
+   - Test image acquisition
+   - Image manipulation utilities
+
+### Directory Structure
+```
+alphapunch/
+├── config.yaml              # Configuration settings
+├── main.py                 # Main entry point
+├── setup.py               # Installation setup
+├── requirements/          # Platform-specific requirements
+├── alphapunch/           # Core package
+│   ├── __init__.py
+│   ├── author.py
+│   ├── enhanced_algorithm.py
+│   └── core/
+│       ├── __init__.py
+│       ├── amdf.py
+│       └── fingerprint_core.py
+├── utils.py              # Utility functions
+├── test_authorship.py    # Testing framework
+└── output/              # Generated outputs
+    ├── reports/        # Test reports
+    ├── plots/         # Visualizations
+    └── fingerprints/  # Generated fingerprints
+```
+
+## How It Works
+
+1. **Fingerprint Generation**
+   - Extract features from multiple image domains
+   - Generate unique fingerprint using private key
+   - Embed fingerprint invisibly into image
+
+2. **Verification Process**
+   - Extract fingerprint from suspect image
+   - Compare with stored fingerprints
+   - Analyze similarities and detect modifications
+   - Generate verification report
+
+3. **Testing and Validation**
+   - Test against various image manipulations
+   - Cross-validate fingerprint robustness
+   - Generate performance metrics
+   - Visualize results
 
 ## Usage
 
-The algorithm is implemented in Python and can be easily integrated into existing image processing pipelines. Configuration is done via a YAML file, allowing easy customization of parameters.
+```python
+# Basic usage
+python main.py --mode test
 
-To run the tester:
+# Benchmark performance
+python main.py --mode benchmark
 
+# Cross-validation
+python main.py --mode cross_validation
 ```
-python enhanced_unsplash_tester.py --config config.yaml
-```
 
-## Performance
+## Key Technologies
+- TensorFlow for deep feature extraction
+- OpenCV for image processing
+- PyWavelets for wavelet transformations
+- NumPy for numerical operations
+- Matplotlib for visualization
 
-Recent tests show:
-- Average PSNR: 64.12 dB
-- Average SSIM: 0.9998
-- Authentication Accuracy: 50% (2 out of 4 images)
-- Average Similarity: 34.31%
+## Output and Reports
+- Detailed test reports in JSON format
+- Performance visualizations
+- Modification detection reports
+- Success rate analysis by scenario
 
-## Future Work
+The system is designed to be modular, extensible, and configurable through the `config.yaml` file, making it adaptable to different use cases and requirements.
 
-- Further improvements in robustness against geometric transformations
-- Enhanced machine learning models for verification
-- Integration with blockchain for secure fingerprint storage
+----
+
+See [USAGE.md](./USAGE.md) for various configurations and usage details
+
+**Author:** Subhadip Mitra

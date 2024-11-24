@@ -1,0 +1,3 @@
+-r requirements-base.txt
+tensorflow>=2.7.0
+pywin32>=228  # Windows-specific package

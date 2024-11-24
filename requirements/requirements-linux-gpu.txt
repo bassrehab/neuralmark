@@ -1,0 +1,5 @@
+# requirements-linux-gpu.txt
+-r requirements-base.txt
+tensorflow-gpu>=2.7.0
+nvidia-cuda-toolkit  # System package, install via apt
+nvidia-cudnn  # System package, install via apt

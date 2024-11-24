@@ -1,42 +1,158 @@
-# config.yaml
-
-private_key: "your-private-key-here"
-
+# Algorithm Configuration
 algorithm:
-  fingerprint_size: [64, 64]
-  embed_strength: 0.4  # Keep current as PSNR/SSIM are good
-  similarity_threshold: 0.38  # Set just below average similarity
-  train_test_split: 0.2
-  verification:
-    # Adjusted weights
-    ncc_weight: 0.7      # Increased primary metric weight
-    ssim_weight: 0.2     # Reduced
-    freq_weight: 0.05    # Minimal impact
-    edge_weight: 0.05    # Minimal impact
-    # Relaxed minimum scores
-    min_ncc_score: 0.35  # Lowered from 0.45
-    min_ssim_score: 0.30 # Lowered from 0.40
-    # Softer penalty
-    penalty_factor: 0.9  # Increased from 0.8
+  fingerprint_size: [128, 128]  # Increased for better detail
+  embed_strength: 0.6  # Increased for stronger fingerprint
+  similarity_threshold: 0.45  # Lowered to reduce false negatives
+  gaussian_kernel_size: 5  # Increased for better noise handling
+  gaussian_sigma: 0.8  # Adjusted for smoother filtering
+  feature_weights:
+    vgg: 0.3
+    wavelet: 0.4  # Increased wavelet weight
+    dct: 0.3  # Decreased DCT weight
+  dct:
+    block_size: 8
+    use_blocks: true
   error_correction:
-    gaussian_kernel_size: 3
-    gaussian_sigma: 0.5
+    enabled: true
+    gaussian_kernel_size: 5
+    gaussian_sigma: 0.8
+  scales: [1.0, 0.75, 0.5]
+  wavelet:
+    type: 'db1'
+    level: 4  # Increased for better decomposition
+  image_preprocessing:
+    normalize: true
+    enhance_contrast: true
+    denoise: true
 
+# Verification Configuration
+verification:
+  stage_weights: [0.3, 0.4, 0.2, 0.1]  # Adjusted weights
+  adaptive_threshold:
+    base: 0.45  # Lowered base threshold
+    complexity_weight: 0.3  # Increased complexity influence
+    noise_weight: 0.2
+  min_individual_score: 0.35  # Lowered minimum score
+  modifications_threshold:
+    jpeg: 0.5
+    geometric: 0.3
+    intensity: 0.2
+
+# Testing Configuration
 testing:
-  num_images: 50
-  min_test_images: 40
-  run_robustness: true
   random_seed: 42
+  num_original_images: 20
+  num_unrelated_images: 20
+  cross_validation:
+    enabled: true
+    folds: 5
+  edge_cases:
+    enabled: true
+    types:
+      - high_noise
+      - extreme_compression
+      - partial_image
+      - multiple_manipulations
+  benchmarking:
+    enabled: true
+    metrics:
+      - timing
+      - memory
+      - accuracy
+      - robustness
+      - precision_recall
+  manipulations:
+    blur_kernel: 5
+    jpeg_quality: 50
+    rotation_angle: 15
+    crop_percent: 10
+    resize_factor: 0.5
+    noise_std: 25
+    combined_manipulations: true
 
+# Directory Configuration
+directories:
+  output: "./output"
+  reports: "./reports"
+  plots: "./plots"
+  database: "./database"
+  download: "./download"
+  logs: "./logs"
+  cache: "./cache"
+
+# Logging Configuration
 logging:
   level: "INFO"
   format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file_format: "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s"
+  console_level: "INFO"
+  file_level: "DEBUG"
+  log_performance: true
+  log_memory: true
 
-directories:
-  download: "downloaded_images"
-  output: "output_images"
-  reports: "test_reports"
-  logs: "logs"
-
+# Unsplash API Configuration
 unsplash:
-  access_key: "gRMk05LDbP4KvDPQUk2fzf6R8VbCqlcZ_Kvk5TPbVJ0"
+  max_per_request: 30
+  rate_limit_delay: 1  # seconds between requests
+  min_width: 800
+  min_height: 600
+  orientation: "landscape"
+  content_filter: "high"  # Only high-quality images
+  categories:
+    - nature
+    - architecture
+    - technology
+
+# Security Configuration
+encryption:
+  enabled: true
+  algorithm: "AES-256"
+  key_derivation: "PBKDF2"
+  iterations: 100000
+  salt_size: 32
+
+# Performance Configuration
+performance:
+  batch_size: 32
+  num_workers: 4
+  use_gpu: true
+  memory_limit: 8192  # MB
+  optimization:
+    use_float16: false
+    use_cache: true
+    parallel_processing: true
+
+# Database Configuration
+database:
+  type: "json"  # or "sqlite"
+  backup:
+    enabled: true
+    interval: 24  # hours
+    keep_last: 7  # number of backups to keep
+  compression: true
+  validation: true
+
+# Visualization Configuration
+visualization:
+  dpi: 300
+  figure_size: [12, 8]
+  colors:
+    - "#1f77b4"
+    - "#ff7f0e"
+    - "#2ca02c"
+    - "#d62728"
+  output_formats:
+    - "png"
+    - "pdf"
+  interactive: true
+  show_grid: true
+  subplot_spacing: 0.3
+
+# Cache Configuration
+cache:
+  enabled: true
+  max_size: 1024  # MB
+  ttl: 3600  # seconds
+  cleanup_interval: 600  # seconds
+
+private_key: "alphapunch-test-key-2024"  # Default test key

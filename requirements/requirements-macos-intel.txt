@@ -1,0 +1,3 @@
+# requirements-macos-intel.txt
+-r requirements-base.txt
+tensorflow>=2.7.0
