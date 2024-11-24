@@ -1,6 +1,6 @@
 # test_setup.py
-import os
 import sys
+
 import tensorflow as tf
 from alphapunch.author import ImageAuthor
 from utils import load_config, setup_logger

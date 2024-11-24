@@ -1,9 +1,10 @@
 import argparse
 import logging
 from pathlib import Path
-from utils import load_config, setup_logger
-from test_authorship import AuthorshipTester
+
 from cleanup import DirectoryCleaner
+from test_authorship import AuthorshipTester
+from utils import load_config
 
 
 def main():

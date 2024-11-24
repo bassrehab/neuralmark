@@ -1,10 +1,7 @@
+import logging
 import os
 import shutil
-from pathlib import Path
-import logging
-from datetime import datetime, timedelta
-import json
-from typing import List, Set
+from typing import List
 
 
 class DirectoryCleaner:

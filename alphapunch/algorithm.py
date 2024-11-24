@@ -1,17 +1,13 @@
-import numpy as np
-import cv2
-import tensorflow as tf
-from tensorflow.keras.applications import VGG16
-from tensorflow.keras.applications.vgg16 import preprocess_input
 import logging
-from typing import Tuple, List, Optional
-from pathlib import Path
+from typing import Tuple, List
+
+import cv2
+import numpy as np
 import pywt
-from skimage.metrics import structural_similarity
 from .core.amdf import AdaptiveMultiDomainFingerprinting
 
 
-class EnhancedAlphaPunch:
+class AlphaPunch:
     def __init__(self, private_key: str, logger: logging.Logger, config: dict):
         """Initialize EnhancedAlphaPunch with configuration."""
         self.private_key = private_key

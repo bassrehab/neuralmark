@@ -1,17 +1,15 @@
+import logging
+import os
+import random
+from datetime import datetime, time
+from typing import List, Tuple
+
 import cv2
 import numpy as np
-import os
 import requests
-import logging
 import yaml
-import random
-import json
-from typing import List, Tuple, Optional, Dict, Any
-from datetime import datetime, time
-from pathlib import Path
-import sys
-import traceback
 from dotenv import load_dotenv
+
 
 def load_environment():
     """Load environment variables from .env file."""
@@ -36,6 +34,7 @@ def load_config(config_path: str = 'config.yaml') -> dict:
     config['private_key'] = env_vars['PRIVATE_KEY']
 
     return config
+
 
 def setup_logger(config: dict) -> logging.Logger:
     """Set up logging configuration."""

@@ -1,21 +1,16 @@
-import numpy as np
-import cv2
-import tensorflow as tf
-from scipy.fftpack import dct, idct
+from typing import Tuple, List
+
 from tensorflow.keras.applications import VGG16
 from tensorflow.keras.applications.vgg16 import preprocess_input
-from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, concatenate, Dropout
+from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, Dropout
 from tensorflow.keras.models import Model
-from scipy.signal import convolve2d
+
+import cv2
+import numpy as np
 import pywt
-from skimage.metrics import structural_similarity
-from typing import Tuple, List, Optional, Dict
-import logging
+import tensorflow as tf
 from scipy import stats
-import imagehash
-from PIL import Image
-from pathlib import Path
-import tensorflow.keras.backend as K
+from skimage.metrics import structural_similarity
 
 
 class AdaptiveMultiDomainFingerprinting:

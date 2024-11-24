@@ -1,10 +1,8 @@
-import logging
-import uuid
-
-import cv2
 import json
+import logging
 import os
 import time
+import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Any
@@ -13,6 +11,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import psutil
+import seaborn as sns
 from alphapunch.author import ImageAuthor
 from sklearn.model_selection import KFold
 from tqdm import tqdm
@@ -362,9 +361,9 @@ class AuthorshipTester:
                     false_negatives = data['false_negatives']
 
                     data['precision'] = true_positives / (true_positives + false_positives) if (
-                                                                                                           true_positives + false_positives) > 0 else 0
+                                                                                                       true_positives + false_positives) > 0 else 0
                     data['recall'] = true_positives / (true_positives + false_negatives) if (
-                                                                                                        true_positives + false_negatives) > 0 else 0
+                                                                                                    true_positives + false_negatives) > 0 else 0
 
                     # Calculate average processing time
                     if data['processing_times']:
@@ -619,6 +618,7 @@ class AuthorshipTester:
         except Exception as e:
             self.logger.error(f"Error saving report: {str(e)}")
             raise
+
 
 if __name__ == "__main__":
     # Create and run tester

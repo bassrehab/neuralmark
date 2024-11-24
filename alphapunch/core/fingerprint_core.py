@@ -1,14 +1,13 @@
 import hashlib
 import logging
-from typing import Tuple, Optional, List, Dict
+from typing import Tuple, List
 
 import cv2
 import numpy as np
 import pywt
+from scipy import stats
 from scipy.fftpack import dct
 from skimage.metrics import structural_similarity
-from scipy import stats
-import tensorflow as tf
 
 
 class FingerprintCore:

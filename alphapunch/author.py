@@ -1,14 +1,12 @@
+import json
+import logging
+from datetime import datetime
+from pathlib import Path
+from typing import Tuple, Optional, List
+
 import cv2
 import numpy as np
-import hashlib
-from datetime import datetime
-from typing import Tuple, Dict, Optional, List
-import logging
-import os
-from pathlib import Path
-import json
-
-from .enhanced_algorithm import EnhancedAlphaPunch
+from .algorithm import AlphaPunch
 
 
 class ImageAuthor:
@@ -19,7 +17,7 @@ class ImageAuthor:
         self.config = config
 
         # Initialize fingerprinter
-        self.fingerprinter = EnhancedAlphaPunch(
+        self.fingerprinter = AlphaPunch(
             private_key=private_key,
             logger=logger,
             config=config
@@ -151,10 +149,10 @@ class ImageAuthor:
 
             if is_owned:
                 self.logger.info(f"Match found: {best_match['original_path']}")
-                return (True, best_match['original_path'], highest_similarity, detected_modifications)
+                return True, best_match['original_path'], highest_similarity, detected_modifications
             else:
                 self.logger.info("No match found")
-                return (False, None, highest_similarity, detected_modifications)
+                return False, None, highest_similarity, detected_modifications
 
         except Exception as e:
             self.logger.error(f"Error verifying ownership: {str(e)}")
