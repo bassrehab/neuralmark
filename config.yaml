@@ -1,156 +1,155 @@
-# Algorithm Configuration
+# AlphaPunch Configuration File
+
+# Directory paths
+directories:
+  output: 'output'
+  database: 'database'
+  download: 'downloads'
+  plots: 'plots'
+  reports: 'reports'
+
+# Core algorithm parameters
 algorithm:
-  fingerprint_size: [128, 128]  # Increased for better detail
-  embed_strength: 0.6  # Increased for stronger fingerprint
-  similarity_threshold: 0.45  # Lowered to reduce false negatives
-  gaussian_kernel_size: 5  # Increased for better noise handling
-  gaussian_sigma: 0.8  # Adjusted for smoother filtering
+  fingerprint_size: [64, 64]
+  input_shape: [256, 256, 3]
+  embed_strength: 0.4
+  similarity_threshold: 0.65
+
+  # Feature weights for different domains
   feature_weights:
-    vgg: 0.3
-    wavelet: 0.4  # Increased wavelet weight
-    dct: 0.3  # Decreased DCT weight
-  dct:
-    block_size: 8
-    use_blocks: true
+    vgg: 0.4
+    wavelet: 0.3
+    dct: 0.3
+
+  # Wavelet configuration
+  wavelet:
+    type: 'db4'
+    level: 3
+    detail_weight: 0.5
+
+  # Error correction
   error_correction:
     enabled: true
-    gaussian_kernel_size: 5
-    gaussian_sigma: 0.8
-  scales: [1.0, 0.75, 0.5]
-  wavelet:
-    type: 'db1'
-    level: 4  # Increased for better decomposition
-  image_preprocessing:
-    normalize: true
-    enhance_contrast: true
-    denoise: true
+    gaussian_kernel_size: 3
+    gaussian_sigma: 0.5
 
-# Verification Configuration
+  # Neural attention parameters
+  neural_attention:
+    enabled: true
+    attention_layers: 3
+    base_filters: 64
+    attention_dropout: 0.1
+    feature_channels: 256
+    learning_rate: 0.001
+    batch_size: 32
+    training_epochs: 20
+    attention_weights:
+      spatial: 0.4
+      channel: 0.3
+      position: 0.3
+    post_processing:
+      enabled: true
+      clahe_clip_limit: 2.0
+      clahe_grid_size: [8, 8]
+
+# Verification parameters
 verification:
-  stage_weights: [0.3, 0.4, 0.2, 0.1]  # Adjusted weights
-  adaptive_threshold:
-    base: 0.45  # Lowered base threshold
-    complexity_weight: 0.3  # Increased complexity influence
-    noise_weight: 0.2
-  min_individual_score: 0.35  # Lowered minimum score
-  modifications_threshold:
-    jpeg: 0.5
-    geometric: 0.3
-    intensity: 0.2
+  stage_weights: [0.3, 0.3, 0.2, 0.2]
+  min_confidence: 0.75
+  modification_thresholds:
+    jpeg_quality: 0.4
+    geometric: 0.25
+    intensity: 0.15
 
-# Testing Configuration
+# Testing configuration
 testing:
   random_seed: 42
-  num_original_images: 20
+  num_original_images: 100
   num_unrelated_images: 20
   cross_validation:
     enabled: true
-    folds: 5
-  edge_cases:
-    enabled: true
-    types:
-      - high_noise
-      - extreme_compression
-      - partial_image
-      - multiple_manipulations
-  benchmarking:
-    enabled: true
-    metrics:
-      - timing
-      - memory
-      - accuracy
-      - robustness
-      - precision_recall
+    num_folds: 5
+    validation_split: 0.2
+
+  # Manipulation parameters for testing
   manipulations:
     blur_kernel: 5
-    jpeg_quality: 50
-    rotation_angle: 15
+    jpeg_quality: 75
+    rotation_angle: 5
     crop_percent: 10
     resize_factor: 0.5
-    noise_std: 25
-    combined_manipulations: true
+    noise_std: 10
 
-# Directory Configuration
-directories:
-  output: "./output"
-  reports: "./reports"
-  plots: "./plots"
-  database: "./database"
-  download: "./download"
-  logs: "./logs"
-  cache: "./cache"
-
-# Logging Configuration
-logging:
-  level: "INFO"
-  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-  file_format: "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s"
-  console_level: "INFO"
-  file_level: "DEBUG"
-  log_performance: true
-  log_memory: true
-
-# Unsplash API Configuration
-unsplash:
-  max_per_request: 30
-  rate_limit_delay: 1  # seconds between requests
-  min_width: 800
-  min_height: 600
-  orientation: "landscape"
-  content_filter: "high"  # Only high-quality images
-  categories:
-    - nature
-    - architecture
-    - technology
-
-# Security Configuration
-encryption:
-  enabled: true
-  algorithm: "AES-256"
-  key_derivation: "PBKDF2"
-  iterations: 100000
-  salt_size: 32
-
-# Performance Configuration
-performance:
+# Training parameters
+training:
   batch_size: 32
-  num_workers: 4
-  use_gpu: true
-  memory_limit: 8192  # MB
-  optimization:
-    use_float16: false
-    use_cache: true
-    parallel_processing: true
-
-# Database Configuration
-database:
-  type: "json"  # or "sqlite"
-  backup:
+  learning_rate: 0.001
+  epochs: 100
+  early_stopping:
     enabled: true
-    interval: 24  # hours
-    keep_last: 7  # number of backups to keep
-  compression: true
-  validation: true
+    patience: 10
+    min_delta: 0.001
+  optimizer:
+    type: 'adam'
+    beta1: 0.9
+    beta2: 0.999
+    epsilon: 1e-8
+  loss_weights:
+    embedding: 0.6
+    verification: 0.4
 
-# Visualization Configuration
+# Logging configuration
+logging:
+  level: 'INFO'
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  file_handler:
+    enabled: true
+    max_bytes: 10485760  # 10MB
+    backup_count: 5
+  console_handler:
+    enabled: true
+
+# Visualization settings
 visualization:
   dpi: 300
-  figure_size: [12, 8]
+  figure_size: [10, 6]
+  plot_formats: ['png', 'pdf']
   colors:
-    - "#1f77b4"
-    - "#ff7f0e"
-    - "#2ca02c"
-    - "#d62728"
-  output_formats:
-    - "png"
-    - "pdf"
-  interactive: true
-  show_grid: true
-  subplot_spacing: 0.3
+    success: '#2ecc71'
+    failure: '#e74c3c'
+    neutral: '#3498db'
+  attention_maps:
+    enabled: true
+    colormap: 'viridis'
+    alpha: 0.7
 
-# Cache Configuration
+# Performance monitoring
+performance:
+  memory_tracking: true
+  timing_enabled: true
+  profiling:
+    enabled: false
+    output_dir: 'profiling'
+
+# API settings (credentials loaded from .env)
+unsplash: {}  # Credentials loaded from environment variables
+
+# Security settings
+security:
+  hash_algorithm: 'sha256'
+  key_iterations: 100000
+  salt_size: 32
+
+# System resources
+resources:
+  num_workers: 4
+  gpu_memory_limit: 0.8  # 80% of available GPU memory
+  cpu_threads: -1  # Use all available threads
+  temp_dir: 'tmp'
+
+# Cache settings
 cache:
   enabled: true
   max_size: 1024  # MB
   ttl: 3600  # seconds
-  cleanup_interval: 600  # seconds
+  directory: 'cache'

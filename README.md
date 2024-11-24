@@ -5,9 +5,11 @@ AlphaPunch is an advanced image fingerprinting system designed to verify image o
 - Authenticate image ownership
 - Detect unauthorized modifications
 - Track image manipulations (e.g., compression, rotation, cropping)
+- Adapt to image content using neural attention
 
 ## Key Features
 - Multi-domain fingerprinting (spatial, frequency, and wavelet domains)
+- Neural attention-based adaptive embedding
 - Robust against common image manipulations
 - Modification detection and classification
 - Comprehensive testing and validation framework
@@ -17,84 +19,125 @@ AlphaPunch is an advanced image fingerprinting system designed to verify image o
 
 ### Core Components
 
-1. **Enhanced Algorithm (`enhanced_algorithm.py`)**
+1. **Algorithm (`algorithm.py`)**
    - Main interface for fingerprinting operations
+   - Neural attention integration
    - Handles high-level fingerprint generation and verification
    - Coordinates between different processing domains
 
-2. **Adaptive Multi-Domain Fingerprinting (`amdf.py`)**
+2. **Neural Attention (`neural_attention.py`)**
+   - Attention-based feature extraction
+   - Adaptive embedding strength
+   - Content-aware fingerprinting
+   - Multi-scale attention processing
+
+3. **Adaptive Multi-Domain Fingerprinting (`amdf.py`)**
    - Implements core fingerprinting algorithms
    - Manages multi-domain feature extraction
    - Handles wavelet transformations and frequency analysis
    - Provides robust fingerprint comparison methods
 
-3. **Fingerprint Core (`fingerprint_core.py`)**
+4. **Fingerprint Core (`fingerprint_core.py`)**
    - Low-level fingerprinting operations
    - DCT and wavelet transformations
    - Basic feature extraction and comparison
 
-4. **Image Author (`author.py`)**
+5. **Image Author (`author.py`)**
    - Manages image ownership and verification
    - Maintains fingerprint database
    - Handles fingerprint storage and retrieval
 
 ### Testing and Utilities
 
-1. **Test Framework (`test_authorship.py`)**
-   - Comprehensive testing suite
+1. **Test Framework**
+   - Base testing functionality (`test_base.py`)
+   - Core fingerprint tests (`test_core.py`)
+   - Neural attention tests (`test_neural_attention.py`)
+   - AMDF testing (`test_amdf.py`)
+   - Integration testing (`test_integration.py`)
    - Performance benchmarking
    - Cross-validation testing
-   - Report generation and visualization
 
 2. **Utilities (`utils.py`)**
    - Configuration management
    - Logging setup
    - Test image acquisition
    - Image manipulation utilities
+   - Attention visualization tools
 
 ### Directory Structure
 ```
 alphapunch/
 ├── config.yaml              # Configuration settings
 ├── main.py                 # Main entry point
+├── Makefile               # Build and test automation
 ├── setup.py               # Installation setup
-├── requirements/          # Platform-specific requirements
+├── requirements.txt       # Project dependencies
+├── .env                  # Environment variables (private)
+├── .env.example         # Environment template
 ├── alphapunch/           # Core package
 │   ├── __init__.py
 │   ├── author.py
-│   ├── enhanced_algorithm.py
+│   ├── algorithm.py
 │   └── core/
 │       ├── __init__.py
 │       ├── amdf.py
+│       ├── neural_attention.py
 │       └── fingerprint_core.py
+├── tests/               # Test suite
+│   ├── __init__.py
+│   ├── test_base.py
+│   ├── test_core.py
+│   ├── test_neural_attention.py
+│   ├── test_amdf.py
+│   └── test_integration.py
 ├── utils.py              # Utility functions
-├── test_authorship.py    # Testing framework
 └── output/              # Generated outputs
     ├── reports/        # Test reports
     ├── plots/         # Visualizations
     └── fingerprints/  # Generated fingerprints
 ```
 
-## How It Works
+## Installation and Setup
 
-1. **Fingerprint Generation**
-   - Extract features from multiple image domains
-   - Generate unique fingerprint using private key
-   - Embed fingerprint invisibly into image
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/alphapunch.git
+cd alphapunch
+```
 
-2. **Verification Process**
-   - Extract fingerprint from suspect image
-   - Compare with stored fingerprints
-   - Analyze similarities and detect modifications
-   - Generate verification report
+2. Install dependencies:
+```bash
+make install
+```
 
-3. **Testing and Validation**
-   - Test against various image manipulations
-   - Cross-validate fingerprint robustness
-   - Generate performance metrics
-   - Visualize results
+3. Create environment file:
+```bash
+cp .env.example .env
+# Edit .env with your credentials
+```
 
 ## Usage
+
+### Using Make Commands
+
+```bash
+# Install dependencies
+make install
+
+# Run tests
+make test
+
+# Clean generated files
+make clean
+
+# Run in different modes
+make run        # Normal test mode
+make benchmark  # Performance benchmark mode
+make crossval   # Cross-validation mode
+```
+
+### Using Python Directly
 
 ```python
 # Basic usage
@@ -107,8 +150,27 @@ python main.py --mode benchmark
 python main.py --mode cross_validation
 ```
 
+## Neural Attention Features
+
+The system now includes neural attention-based improvements:
+
+1. **Adaptive Embedding**
+   - Content-aware fingerprint embedding
+   - Multiple attention layers
+   - Automatic strength adjustment
+
+2. **Enhanced Robustness**
+   - Multi-scale feature extraction
+   - Attention-weighted verification
+   - Improved modification detection
+
+3. **Visual Analysis**
+   - Attention map visualization
+   - Feature importance analysis
+   - Modification localization
+
 ## Key Technologies
-- TensorFlow for deep feature extraction
+- TensorFlow for neural attention and deep feature extraction
 - OpenCV for image processing
 - PyWavelets for wavelet transformations
 - NumPy for numerical operations
@@ -119,11 +181,28 @@ python main.py --mode cross_validation
 - Performance visualizations
 - Modification detection reports
 - Success rate analysis by scenario
+- Attention map visualizations
+- Feature importance plots
 
 The system is designed to be modular, extensible, and configurable through the `config.yaml` file, making it adaptable to different use cases and requirements.
 
+## Environment Variables
+Required environment variables in `.env`:
+```
+UNSPLASH_ACCESS_KEY=your_unsplash_key
+PRIVATE_KEY=your_secure_private_key
+```
+
+## Contributing
+1. Fork the repository
+2. Create your feature branch
+3. Run tests: `make test`
+4. Commit changes
+5. Push to branch
+6. Create Pull Request
+
 ----
 
-See [USAGE.md](./USAGE.md) for various configurations and usage details
+See [USAGE.md](./USAGE.md) for detailed configuration and usage information.
 
 **Author:** Subhadip Mitra
