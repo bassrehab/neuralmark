@@ -3,132 +3,78 @@ import os
 import shutil
 from typing import List
 
+import os
+import shutil
+from pathlib import Path
+import logging
+
 
 class DirectoryCleaner:
-    def __init__(self, config_path: str = 'config.yaml'):
-        """Initialize directory cleaner with configuration."""
-        self.config = self._load_config(config_path)
-        self.logger = self._setup_logger()
+    """Manage test directories and cleanup."""
 
-        # Directories that should be cleaned but preserved
-        self.clean_dirs = {
-            'output',
-            'plots',
-            'reports',
-            'logs',
-            'cache'
+    def __init__(self):
+        self.logger = logging.getLogger('DirectoryCleaner')
+        self.preserved_extensions = {
+            'database': ['.json'],
+            'downloads': ['.jpg', '.jpeg', '.png']
         }
 
-        # Directories that should preserve some files
-        self.preserve_dirs = {
-            'database': ['.json'],  # preserve database files
-            'download': ['.jpg', '.jpeg', '.png']  # preserve downloaded images
-        }
+    def cleanup(self, pre_run: bool = True):
+        """Clean test directories while preserving specified files."""
+        self.logger.info("Starting %s cleanup...", "pre-run" if pre_run else "post-run")
 
-    def _load_config(self, config_path: str) -> dict:
-        """Load configuration from yaml file."""
-        import yaml
-        with open(config_path, 'r') as f:
-            return yaml.safe_load(f)
+        directories = ['output', 'plots', 'reports', 'fingerprinted', 'manipulated', 'test']
 
-    def _setup_logger(self) -> logging.Logger:
-        """Setup logging configuration."""
-        logger = logging.getLogger('DirectoryCleaner')
-        logger.setLevel(logging.INFO)
+        for dir_name in directories:
+            try:
+                if dir_name in self.preserved_extensions:
+                    self._clean_with_preservation(dir_name)
+                else:
+                    self._clean_directory(dir_name)
+                self.logger.info(f"Cleaned directory: {dir_name}")
+            except Exception as e:
+                self.logger.error(f"Error cleaning {dir_name}: {str(e)}")
 
-        # Console handler
-        ch = logging.StreamHandler()
-        ch.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-        logger.addHandler(ch)
+        self.logger.info("Cleanup completed successfully")
 
-        return logger
-
-    def cleanup(self, pre_run: bool = True) -> None:
-        """Clean directories based on configuration."""
-        try:
-            self.logger.info(f"Starting {'pre-run' if pre_run else 'post-run'} cleanup...")
-
-            # Clean directories that should be emptied
-            for dir_name in self.clean_dirs:
-                dir_path = self.config['directories'].get(dir_name)
-                if dir_path and os.path.exists(dir_path):
-                    self._clean_directory(dir_path)
-                    self.logger.info(f"Cleaned directory: {dir_path}")
-
-            # Clean directories with preserved files
-            for dir_name, extensions in self.preserve_dirs.items():
-                dir_path = self.config['directories'].get(dir_name)
-                if dir_path and os.path.exists(dir_path):
-                    self._clean_directory_preserve(dir_path, extensions)
-                    self.logger.info(f"Cleaned directory (preserving {extensions}): {dir_path}")
-
-            # Special handling for database backups
-            if not pre_run:
-                self._cleanup_database_backups()
-
-            self.logger.info("Cleanup completed successfully")
-
-        except Exception as e:
-            self.logger.error(f"Error during cleanup: {str(e)}")
-            raise
-
-    def _clean_directory(self, directory: str) -> None:
+    def _clean_directory(self, directory: str):
         """Remove all contents of a directory."""
-        try:
-            for item in os.listdir(directory):
-                item_path = os.path.join(directory, item)
-                try:
-                    if os.path.isfile(item_path):
-                        os.unlink(item_path)
-                    elif os.path.isdir(item_path):
-                        shutil.rmtree(item_path)
-                except Exception as e:
-                    self.logger.error(f"Error removing {item_path}: {str(e)}")
+        dir_path = Path(directory)
+        if dir_path.exists():
+            shutil.rmtree(dir_path)
+        dir_path.mkdir(exist_ok=True)
 
-        except Exception as e:
-            self.logger.error(f"Error cleaning directory {directory}: {str(e)}")
-            raise
+    def _clean_with_preservation(self, directory: str):
+        """Clean directory while preserving specified file types."""
+        dir_path = Path(directory)
+        if not dir_path.exists():
+            dir_path.mkdir()
+            return
 
-    def _clean_directory_preserve(self, directory: str, preserve_extensions: List[str]) -> None:
-        """Clean directory while preserving files with specific extensions."""
-        try:
-            for item in os.listdir(directory):
-                item_path = os.path.join(directory, item)
-                should_preserve = any(item.lower().endswith(ext) for ext in preserve_extensions)
+        preserved_files = []
+        preserved_exts = self.preserved_extensions.get(directory, [])
 
-                if os.path.isfile(item_path) and not should_preserve:
-                    os.unlink(item_path)
-                elif os.path.isdir(item_path):
-                    shutil.rmtree(item_path)
+        # Identify files to preserve
+        for ext in preserved_exts:
+            preserved_files.extend(dir_path.glob(f"*{ext}"))
 
-        except Exception as e:
-            self.logger.error(f"Error cleaning directory {directory}: {str(e)}")
-            raise
+        # Move preserved files to temporary location
+        temp_dir = dir_path.parent / f"temp_{directory}"
+        temp_dir.mkdir(exist_ok=True)
 
-    def _cleanup_database_backups(self) -> None:
-        """Cleanup old database backups based on configuration."""
-        try:
-            db_config = self.config.get('database', {}).get('backup', {})
-            if not db_config.get('enabled', False):
-                return
+        for file in preserved_files:
+            shutil.move(str(file), str(temp_dir / file.name))
 
-            db_dir = self.config['directories']['database']
-            keep_last = db_config.get('keep_last', 7)
+        # Clean directory
+        shutil.rmtree(dir_path)
+        dir_path.mkdir()
 
-            # Get all backup files
-            backup_files = [f for f in os.listdir(db_dir) if f.startswith('fingerprint_db_backup_')]
+        # Restore preserved files
+        for file in temp_dir.iterdir():
+            shutil.move(str(file), str(dir_path / file.name))
 
-            # Sort by date
-            backup_files.sort(reverse=True)
-
-            # Remove excess backups
-            for backup_file in backup_files[keep_last:]:
-                os.remove(os.path.join(db_dir, backup_file))
-                self.logger.info(f"Removed old backup: {backup_file}")
-
-        except Exception as e:
-            self.logger.error(f"Error cleaning database backups: {str(e)}")
-            raise
+        # Remove temporary directory
+        shutil.rmtree(temp_dir)
 
 
 # Command-line interface

@@ -34,24 +34,33 @@ class AlphaPunch:
         self.fingerprint_size = tuple(config['algorithm']['fingerprint_size'])
         self.embed_strength = config['algorithm']['embed_strength']
 
+    def _verify_dimensions(self, array: np.ndarray, target_shape: tuple, name: str = "array") -> np.ndarray:
+        """Verify and correct array dimensions if needed."""
+        if array.shape[:2] != target_shape[:2]:
+            self.logger.debug(f"Resizing {name} from {array.shape} to match {target_shape}")
+            return cv2.resize(array, (target_shape[1], target_shape[0]), interpolation=cv2.INTER_LINEAR)
+        return array
+
     def generate_fingerprint(self, image: np.ndarray) -> np.ndarray:
-        """Generate fingerprint for an image with optional neural attention enhancement."""
+        """Generate fingerprint for an image."""
         self.logger.debug("Generating fingerprint...")
 
         try:
-            # Generate base fingerprint using AMDF
-            fingerprint = self.amdf.generate_fingerprint(image)
-
             if self.use_attention:
-                # Enhance fingerprint using neural attention
-                self.logger.debug("Applying neural attention enhancement...")
-                enhanced_fingerprint, _ = self.attention_enhancer.enhance_fingerprint(
-                    image, fingerprint
-                )
-                self.logger.debug("Neural attention enhancement applied successfully")
-                return enhanced_fingerprint
+                # Get base fingerprint
+                fingerprint = self.amdf.generate_fingerprint(image)
 
-            return fingerprint
+                # Enhance with attention
+                enhanced_fp, _ = self.attention_enhancer.enhance_fingerprint(image, fingerprint)
+
+                # Ensure correct size
+                enhanced_fp = cv2.resize(enhanced_fp, self.fingerprint_size)
+                return enhanced_fp
+            else:
+                fingerprint = self.amdf.generate_fingerprint(image)
+                # Ensure correct size
+                fingerprint = cv2.resize(fingerprint, self.fingerprint_size)
+                return fingerprint
 
         except Exception as e:
             self.logger.error(f"Error generating fingerprint: {str(e)}")
@@ -127,32 +136,48 @@ class AlphaPunch:
             # Return uniform mask as fallback
             return np.ones((image.shape[0], image.shape[1]), dtype=np.float32)
 
-
-
     def embed_fingerprint(self, image: np.ndarray, fingerprint: np.ndarray) -> np.ndarray:
-        """Embed fingerprint into image with neural attention enhancement."""
+        """Embed fingerprint into image with proper size handling."""
         try:
             # Ensure image is uint8
             image = image.astype(np.uint8)
 
             # Convert fingerprint to proper range and type
-            fingerprint = (fingerprint * 255).astype(np.uint8)
+            fingerprint = cv2.normalize(fingerprint, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
 
             # Calculate embedding mask
             mask = self._calculate_embedding_mask(image)
 
-            # Prepare fingerprint
-            fingerprint_resized = cv2.resize(fingerprint, (image.shape[1], image.shape[0]))
+            # Get exact dimensions
+            h, w = image.shape[:2]
+
+            # Ensure fingerprint and mask match image dimensions exactly
+            fingerprint_resized = cv2.resize(fingerprint, (w, h), interpolation=cv2.INTER_LINEAR)
+            mask = cv2.resize(mask, (w, h), interpolation=cv2.INTER_LINEAR)
+
+            # Prepare fingerprint for embedding
             fp_prepared = fingerprint_resized * mask * self.embed_strength
 
-            # Embed in wavelet domain
+            # Ensure fp_prepared matches image channels
+            if len(image.shape) == 3 and len(fp_prepared.shape) == 2:
+                fp_prepared = np.stack([fp_prepared] * 3, axis=-1)
+
+            # Initialize output array with exact dimensions
             embedded = np.zeros_like(image, dtype=np.float32)
 
-            for i in range(3):
-                # Convert to float32 for wavelet transform
-                channel = image[:, :, i].astype(np.float32)
+            # Process each channel
+            channels = 3 if len(image.shape) == 3 else 1
+            for i in range(channels):
+                # Extract channel
+                channel = image[..., i] if channels == 3 else image
+                channel = channel.astype(np.float32)
+
+                # Apply wavelet transform
                 coeffs = pywt.wavedec2(channel, 'db1', level=3)
-                fp_coeffs = pywt.wavedec2(fp_prepared, 'db1', level=3)
+
+                # Get fingerprint coefficients
+                fp_channel = fp_prepared[..., i] if channels == 3 else fp_prepared
+                fp_coeffs = pywt.wavedec2(fp_channel, 'db1', level=3)
 
                 # Modify coefficients
                 modified_coeffs = list(coeffs)
@@ -161,24 +186,37 @@ class AlphaPunch:
                         c_shape = modified_coeffs[j].shape
                         fp_shape = fp_coeffs[j].shape
                         if c_shape != fp_shape:
+                            # Use exact resize to match shapes
                             fp_coeffs[j] = cv2.resize(fp_coeffs[j],
-                                                      (c_shape[1], c_shape[0]))
+                                                      (c_shape[1], c_shape[0]),
+                                                      interpolation=cv2.INTER_LINEAR)
                         modified_coeffs[j] = coeffs[j] + fp_coeffs[j]
                     else:  # Detail coefficients
                         modified_coeffs[j] = tuple(
-                            c + cv2.resize(f, (c.shape[1], c.shape[0])) * mask * 0.5
+                            c + cv2.resize(f, (c.shape[1], c.shape[0]),
+                                           interpolation=cv2.INTER_LINEAR) * 0.5
                             for c, f in zip(coeffs[j], fp_coeffs[j])
                         )
 
-                # Reconstruct
-                embedded[:, :, i] = pywt.waverec2(modified_coeffs, 'db1')
+                # Reconstruct with exact dimensions
+                reconstructed = pywt.waverec2(modified_coeffs, 'db1')
+
+                # Ensure reconstructed image matches original dimensions
+                if reconstructed.shape != (h, w):
+                    reconstructed = cv2.resize(reconstructed, (w, h), interpolation=cv2.INTER_LINEAR)
+
+                # Assign to output
+                if channels == 3:
+                    embedded[..., i] = reconstructed
+                else:
+                    embedded = reconstructed
 
             # Normalize and convert back to uint8
             embedded = np.clip(embedded, 0, 255).astype(np.uint8)
 
-            # Apply post-processing if neural attention is enabled
-            if self.use_attention:
-                embedded = self._post_process_embedded(embedded, image)
+            # Final size verification
+            if embedded.shape[:2] != image.shape[:2]:
+                embedded = cv2.resize(embedded, (w, h), interpolation=cv2.INTER_LINEAR)
 
             return embedded
 
