@@ -1,5 +1,5 @@
 import unittest
-from alphapunch.utils.config import load_environment, load_config
+from neuralmark.utils.config import load_environment, load_config
 import os
 
 

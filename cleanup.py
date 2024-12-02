@@ -2,7 +2,7 @@ import logging
 import shutil
 from pathlib import Path
 
-from alphapunch.utils import load_config
+from neuralmark.utils import load_config
 
 
 class DirectoryCleaner:

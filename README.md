@@ -103,7 +103,7 @@ alphapunch/
 1. Clone the repository:
 ```bash
 git clone https://github.com/yourusername/alphapunch.git
-cd alphapunch
+cd neuralmark
 ```
 
 2. Install dependencies:

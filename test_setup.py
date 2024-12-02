@@ -2,8 +2,8 @@
 import sys
 
 import tensorflow as tf
-from alphapunch.author import ImageAuthor
-from alphapunch.utils import load_config, setup_logger
+from neuralmark.author import ImageAuthor
+from neuralmark.utils import load_config, setup_logger
 
 
 def test_setup():

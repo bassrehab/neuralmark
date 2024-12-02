@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from alphapunch.core.amdf import AdaptiveMultiDomainFingerprinting
+from neuralmark.core.amdf import AdaptiveMultiDomainFingerprinting
 
 
 class TestAdaptiveMultiDomainFingerprinting(unittest.TestCase):

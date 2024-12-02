@@ -1,7 +1,7 @@
 import unittest
 
 from tests.test_base import AlphaPunchTestBase
-from alphapunch.author import ImageAuthor
+from neuralmark.author import ImageAuthor
 import numpy as np
 import cv2
 import os

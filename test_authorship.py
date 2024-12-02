@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
 
-from alphapunch.author import ImageAuthor
-from alphapunch.utils import load_config, setup_logger, get_test_images, ImageManipulator
+from neuralmark.author import ImageAuthor
+from neuralmark.utils import load_config, setup_logger, get_test_images, ImageManipulator
 
 
 class RunManager:

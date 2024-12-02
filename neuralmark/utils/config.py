@@ -8,7 +8,7 @@ def load_environment():
     load_dotenv()
     return {
         'UNSPLASH_ACCESS_KEY': os.getenv('UNSPLASH_ACCESS_KEY'),
-        'PRIVATE_KEY': os.getenv('PRIVATE_KEY', 'alphapunch-test-key-2024')
+        'PRIVATE_KEY': os.getenv('PRIVATE_KEY', 'neuralmark-test-key-2024')
     }
 
 

@@ -3,8 +3,8 @@ import numpy as np
 import cv2
 import os
 from pathlib import Path
-from alphapunch.utils.config import load_config
-from alphapunch.utils.logging import setup_logger
+from neuralmark.utils.config import load_config
+from neuralmark.utils.logging import setup_logger
 
 
 class AlphaPunchTestBase(unittest.TestCase):

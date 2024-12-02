@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import Mock
-from alphapunch.core.fingerprint_core import FingerprintCore
+from neuralmark.core.fingerprint_core import FingerprintCore
 
 
 class TestFingerprintCore(unittest.TestCase):

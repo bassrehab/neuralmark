@@ -4,7 +4,7 @@ from pathlib import Path
 
 from cleanup import DirectoryCleaner
 from test_authorship import AuthorshipTester
-from alphapunch.utils import load_config, setup_logger
+from neuralmark.utils import load_config, setup_logger
 
 def main():
     parser = argparse.ArgumentParser(description='AlphaPunch Image Fingerprinting System')
