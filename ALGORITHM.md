@@ -2,7 +2,8 @@
 
 ## Architecture design for the Cross Domain Hierarchical Attention (CDHA) 
 
-![cdha.drawio.png](assets%2Fcdha.drawio.png)
+![cdha.drawio.png](assets/cdha.drawio.png)
+
 
 
 **1. Domain-Specific Attention (DSA):**
