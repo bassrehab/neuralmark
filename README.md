@@ -1,7 +1,7 @@
-# AlphaPunch - Robust Image Fingerprinting System
+# NeuralMark - Robust Image Fingerprinting System
 
 ## Overview
-AlphaPunch is an advanced image fingerprinting system designed to verify image ownership and detect modifications. It embeds invisible digital fingerprints into images and can later verify these fingerprints to:
+NeuralMark is an advanced image fingerprinting system designed to verify image ownership and detect modifications. It embeds invisible digital fingerprints into images and can later verify these fingerprints to:
 - Authenticate image ownership
 - Detect unauthorized modifications
 - Track image manipulations (e.g., compression, rotation, cropping)
@@ -102,7 +102,7 @@ alphapunch/
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/alphapunch.git
+git clone https://HOST/yourusername/alphapunch.git
 cd neuralmark
 ```
 
