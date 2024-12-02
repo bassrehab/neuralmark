@@ -1,0 +1,2763 @@
+{
+  "summary": {
+    "total_tests": 230,
+    "successful_verifications": 177,
+    "false_positives": 5,
+    "false_negatives": 48
+  },
+  "by_scenario": {
+    "original": {
+      "total": 30,
+      "successful": 26,
+      "success_rate": 86.66666666666667,
+      "average_similarity": 0.41927344031109776,
+      "modifications": {
+        "Visual modification": 27,
+        "Frequency modification": 15
+      }
+    },
+    "manipulated_blur": {
+      "total": 30,
+      "successful": 28,
+      "success_rate": 93.33333333333333,
+      "average_similarity": 0.42182934801868355,
+      "modifications": {
+        "Visual modification": 27,
+        "Frequency modification": 14
+      }
+    },
+    "manipulated_compress": {
+      "total": 30,
+      "successful": 26,
+      "success_rate": 86.66666666666667,
+      "average_similarity": 0.41918319119448,
+      "modifications": {
+        "Visual modification": 28,
+        "Frequency modification": 15
+      }
+    },
+    "manipulated_rotate": {
+      "total": 30,
+      "successful": 21,
+      "success_rate": 70.0,
+      "average_similarity": 0.38426624091243544,
+      "modifications": {
+        "Frequency modification": 24,
+        "Visual modification": 29
+      }
+    },
+    "manipulated_crop": {
+      "total": 30,
+      "successful": 18,
+      "success_rate": 60.0,
+      "average_similarity": 0.35713873718304606,
+      "modifications": {
+        "Frequency modification": 28,
+        "Visual modification": 29
+      }
+    },
+    "manipulated_resize": {
+      "total": 30,
+      "successful": 26,
+      "success_rate": 86.66666666666667,
+      "average_similarity": 0.417642098623844,
+      "modifications": {
+        "Visual modification": 28,
+        "Frequency modification": 14
+      }
+    },
+    "manipulated_noise": {
+      "total": 30,
+      "successful": 17,
+      "success_rate": 56.666666666666664,
+      "average_similarity": 0.36465963196357515,
+      "modifications": {
+        "Visual modification": 30,
+        "Frequency modification": 27
+      }
+    },
+    "unrelated": {
+      "total": 20,
+      "successful": 15,
+      "success_rate": 75.0,
+      "average_similarity": 0.3129582986469065,
+      "modifications": {
+        "Visual modification": 20,
+        "Frequency modification": 20
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/5H7zhZbQ_VI.jpg",
+      "source_image": "downloads/5H7zhZbQ_VI.jpg",
+      "verified": true,
+      "similarity": 0.4711126952322074,
+      "modifications": [],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_5H7zhZbQ_VI.jpg",
+      "source_image": "downloads/5H7zhZbQ_VI.jpg",
+      "verified": true,
+      "similarity": 0.47641510423276395,
+      "modifications": [],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_5H7zhZbQ_VI.jpg",
+      "source_image": "downloads/5H7zhZbQ_VI.jpg",
+      "verified": true,
+      "similarity": 0.47170155036851763,
+      "modifications": [],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_5H7zhZbQ_VI.jpg",
+      "source_image": "downloads/5H7zhZbQ_VI.jpg",
+      "verified": true,
+      "similarity": 0.40303612561555385,
+      "modifications": [
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_5H7zhZbQ_VI.jpg",
+      "source_image": "downloads/5H7zhZbQ_VI.jpg",
+      "verified": true,
+      "similarity": 0.35344873248482617,
+      "modifications": [
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_5H7zhZbQ_VI.jpg",
+      "source_image": "downloads/5H7zhZbQ_VI.jpg",
+      "verified": true,
+      "similarity": 0.46632631147303155,
+      "modifications": [],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_5H7zhZbQ_VI.jpg",
+      "source_image": "downloads/5H7zhZbQ_VI.jpg",
+      "verified": false,
+      "similarity": 0.3339096012943363,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/1jHLgHgWeHA.jpg",
+      "source_image": "downloads/1jHLgHgWeHA.jpg",
+      "verified": true,
+      "similarity": 0.4579991718878252,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_1jHLgHgWeHA.jpg",
+      "source_image": "downloads/1jHLgHgWeHA.jpg",
+      "verified": true,
+      "similarity": 0.45182347028378494,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_1jHLgHgWeHA.jpg",
+      "source_image": "downloads/1jHLgHgWeHA.jpg",
+      "verified": true,
+      "similarity": 0.4530480476862736,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_1jHLgHgWeHA.jpg",
+      "source_image": "downloads/1jHLgHgWeHA.jpg",
+      "verified": true,
+      "similarity": 0.4151483909893223,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_1jHLgHgWeHA.jpg",
+      "source_image": "downloads/1jHLgHgWeHA.jpg",
+      "verified": true,
+      "similarity": 0.4001117175999733,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_1jHLgHgWeHA.jpg",
+      "source_image": "downloads/1jHLgHgWeHA.jpg",
+      "verified": true,
+      "similarity": 0.44521055470909887,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_1jHLgHgWeHA.jpg",
+      "source_image": "downloads/1jHLgHgWeHA.jpg",
+      "verified": true,
+      "similarity": 0.3553538460619092,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/1PvUgtURNeg.jpg",
+      "source_image": "downloads/1PvUgtURNeg.jpg",
+      "verified": true,
+      "similarity": 0.44509421785379066,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_1PvUgtURNeg.jpg",
+      "source_image": "downloads/1PvUgtURNeg.jpg",
+      "verified": true,
+      "similarity": 0.42358012575290477,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_1PvUgtURNeg.jpg",
+      "source_image": "downloads/1PvUgtURNeg.jpg",
+      "verified": true,
+      "similarity": 0.44204829258251305,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_1PvUgtURNeg.jpg",
+      "source_image": "downloads/1PvUgtURNeg.jpg",
+      "verified": true,
+      "similarity": 0.40867130516667327,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_1PvUgtURNeg.jpg",
+      "source_image": "downloads/1PvUgtURNeg.jpg",
+      "verified": true,
+      "similarity": 0.3906693560620452,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_1PvUgtURNeg.jpg",
+      "source_image": "downloads/1PvUgtURNeg.jpg",
+      "verified": true,
+      "similarity": 0.4315700321939415,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_1PvUgtURNeg.jpg",
+      "source_image": "downloads/1PvUgtURNeg.jpg",
+      "verified": true,
+      "similarity": 0.3634014588286268,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/5UcFfx3XYj4.jpg",
+      "source_image": "downloads/5UcFfx3XYj4.jpg",
+      "verified": true,
+      "similarity": 0.3872709666546854,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_5UcFfx3XYj4.jpg",
+      "source_image": "downloads/5UcFfx3XYj4.jpg",
+      "verified": true,
+      "similarity": 0.3745108922940742,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_5UcFfx3XYj4.jpg",
+      "source_image": "downloads/5UcFfx3XYj4.jpg",
+      "verified": true,
+      "similarity": 0.3749299698685796,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_5UcFfx3XYj4.jpg",
+      "source_image": "downloads/5UcFfx3XYj4.jpg",
+      "verified": false,
+      "similarity": 0.339856634723589,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_5UcFfx3XYj4.jpg",
+      "source_image": "downloads/5UcFfx3XYj4.jpg",
+      "verified": false,
+      "similarity": 0.3190221560882794,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_5UcFfx3XYj4.jpg",
+      "source_image": "downloads/5UcFfx3XYj4.jpg",
+      "verified": true,
+      "similarity": 0.37533222488153223,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_5UcFfx3XYj4.jpg",
+      "source_image": "downloads/5UcFfx3XYj4.jpg",
+      "verified": true,
+      "similarity": 0.35188400374355705,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/6bCBGPtNJU4.jpg",
+      "source_image": "downloads/6bCBGPtNJU4.jpg",
+      "verified": true,
+      "similarity": 0.3909523375993381,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_6bCBGPtNJU4.jpg",
+      "source_image": "downloads/6bCBGPtNJU4.jpg",
+      "verified": true,
+      "similarity": 0.41114640028913546,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_6bCBGPtNJU4.jpg",
+      "source_image": "downloads/6bCBGPtNJU4.jpg",
+      "verified": true,
+      "similarity": 0.39183598172748735,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_6bCBGPtNJU4.jpg",
+      "source_image": "downloads/6bCBGPtNJU4.jpg",
+      "verified": true,
+      "similarity": 0.37698165293932223,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_6bCBGPtNJU4.jpg",
+      "source_image": "downloads/6bCBGPtNJU4.jpg",
+      "verified": true,
+      "similarity": 0.36020313119496683,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_6bCBGPtNJU4.jpg",
+      "source_image": "downloads/6bCBGPtNJU4.jpg",
+      "verified": true,
+      "similarity": 0.4038479577569915,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_6bCBGPtNJU4.jpg",
+      "source_image": "downloads/6bCBGPtNJU4.jpg",
+      "verified": false,
+      "similarity": 0.3452024994048074,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/994Tf_UZmLI.jpg",
+      "source_image": "downloads/994Tf_UZmLI.jpg",
+      "verified": true,
+      "similarity": 0.4811904920761059,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_994Tf_UZmLI.jpg",
+      "source_image": "downloads/994Tf_UZmLI.jpg",
+      "verified": true,
+      "similarity": 0.47655950509288514,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_994Tf_UZmLI.jpg",
+      "source_image": "downloads/994Tf_UZmLI.jpg",
+      "verified": true,
+      "similarity": 0.49151557881552776,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_994Tf_UZmLI.jpg",
+      "source_image": "downloads/994Tf_UZmLI.jpg",
+      "verified": true,
+      "similarity": 0.43324148227025616,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_994Tf_UZmLI.jpg",
+      "source_image": "downloads/994Tf_UZmLI.jpg",
+      "verified": true,
+      "similarity": 0.4051615129247365,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_994Tf_UZmLI.jpg",
+      "source_image": "downloads/994Tf_UZmLI.jpg",
+      "verified": true,
+      "similarity": 0.48131848701767843,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_994Tf_UZmLI.jpg",
+      "source_image": "downloads/994Tf_UZmLI.jpg",
+      "verified": true,
+      "similarity": 0.38320338139062027,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/9ib-9KEX5o4.jpg",
+      "source_image": "downloads/9ib-9KEX5o4.jpg",
+      "verified": true,
+      "similarity": 0.351776107277539,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_9ib-9KEX5o4.jpg",
+      "source_image": "downloads/9ib-9KEX5o4.jpg",
+      "verified": true,
+      "similarity": 0.3546289219210434,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_9ib-9KEX5o4.jpg",
+      "source_image": "downloads/9ib-9KEX5o4.jpg",
+      "verified": false,
+      "similarity": 0.3498812609193908,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_9ib-9KEX5o4.jpg",
+      "source_image": "downloads/9ib-9KEX5o4.jpg",
+      "verified": false,
+      "similarity": 0.34294243741259717,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_9ib-9KEX5o4.jpg",
+      "source_image": "downloads/9ib-9KEX5o4.jpg",
+      "verified": false,
+      "similarity": 0.33847331690252497,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_9ib-9KEX5o4.jpg",
+      "source_image": "downloads/9ib-9KEX5o4.jpg",
+      "verified": true,
+      "similarity": 0.3551578530941106,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_9ib-9KEX5o4.jpg",
+      "source_image": "downloads/9ib-9KEX5o4.jpg",
+      "verified": false,
+      "similarity": 0.3411892782277089,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/F8c-KXMxnzk.jpg",
+      "source_image": "downloads/F8c-KXMxnzk.jpg",
+      "verified": true,
+      "similarity": 0.4848179716382703,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_F8c-KXMxnzk.jpg",
+      "source_image": "downloads/F8c-KXMxnzk.jpg",
+      "verified": true,
+      "similarity": 0.4899640239360344,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_F8c-KXMxnzk.jpg",
+      "source_image": "downloads/F8c-KXMxnzk.jpg",
+      "verified": true,
+      "similarity": 0.47780262598804757,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_F8c-KXMxnzk.jpg",
+      "source_image": "downloads/F8c-KXMxnzk.jpg",
+      "verified": true,
+      "similarity": 0.4278441185871577,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_F8c-KXMxnzk.jpg",
+      "source_image": "downloads/F8c-KXMxnzk.jpg",
+      "verified": true,
+      "similarity": 0.3737033293086405,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_F8c-KXMxnzk.jpg",
+      "source_image": "downloads/F8c-KXMxnzk.jpg",
+      "verified": true,
+      "similarity": 0.4837486976886274,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_F8c-KXMxnzk.jpg",
+      "source_image": "downloads/F8c-KXMxnzk.jpg",
+      "verified": true,
+      "similarity": 0.42153354306119595,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/FuUkr2JGfKk.jpg",
+      "source_image": "downloads/FuUkr2JGfKk.jpg",
+      "verified": true,
+      "similarity": 0.4483687071704652,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_FuUkr2JGfKk.jpg",
+      "source_image": "downloads/FuUkr2JGfKk.jpg",
+      "verified": true,
+      "similarity": 0.43845395300354023,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_FuUkr2JGfKk.jpg",
+      "source_image": "downloads/FuUkr2JGfKk.jpg",
+      "verified": true,
+      "similarity": 0.45444382245343046,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_FuUkr2JGfKk.jpg",
+      "source_image": "downloads/FuUkr2JGfKk.jpg",
+      "verified": true,
+      "similarity": 0.431859528976163,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_FuUkr2JGfKk.jpg",
+      "source_image": "downloads/FuUkr2JGfKk.jpg",
+      "verified": true,
+      "similarity": 0.42548621511640045,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_FuUkr2JGfKk.jpg",
+      "source_image": "downloads/FuUkr2JGfKk.jpg",
+      "verified": true,
+      "similarity": 0.44976662960204705,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_FuUkr2JGfKk.jpg",
+      "source_image": "downloads/FuUkr2JGfKk.jpg",
+      "verified": true,
+      "similarity": 0.3950596166667111,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/HCyqiQT9_xI.jpg",
+      "source_image": "downloads/HCyqiQT9_xI.jpg",
+      "verified": true,
+      "similarity": 0.7085389519360636,
+      "modifications": [],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_HCyqiQT9_xI.jpg",
+      "source_image": "downloads/HCyqiQT9_xI.jpg",
+      "verified": true,
+      "similarity": 0.7047306532751976,
+      "modifications": [],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_HCyqiQT9_xI.jpg",
+      "source_image": "downloads/HCyqiQT9_xI.jpg",
+      "verified": true,
+      "similarity": 0.7201011377353934,
+      "modifications": [],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_HCyqiQT9_xI.jpg",
+      "source_image": "downloads/HCyqiQT9_xI.jpg",
+      "verified": true,
+      "similarity": 0.5090437239839257,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_HCyqiQT9_xI.jpg",
+      "source_image": "downloads/HCyqiQT9_xI.jpg",
+      "verified": true,
+      "similarity": 0.41520089106535263,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_HCyqiQT9_xI.jpg",
+      "source_image": "downloads/HCyqiQT9_xI.jpg",
+      "verified": true,
+      "similarity": 0.6956767154039223,
+      "modifications": [],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_HCyqiQT9_xI.jpg",
+      "source_image": "downloads/HCyqiQT9_xI.jpg",
+      "verified": true,
+      "similarity": 0.4814773595196986,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/Jw0vl8gLrxM.jpg",
+      "source_image": "downloads/Jw0vl8gLrxM.jpg",
+      "verified": true,
+      "similarity": 0.36169874883434117,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_Jw0vl8gLrxM.jpg",
+      "source_image": "downloads/Jw0vl8gLrxM.jpg",
+      "verified": true,
+      "similarity": 0.3753858721144052,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_Jw0vl8gLrxM.jpg",
+      "source_image": "downloads/Jw0vl8gLrxM.jpg",
+      "verified": true,
+      "similarity": 0.3725983990814398,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_Jw0vl8gLrxM.jpg",
+      "source_image": "downloads/Jw0vl8gLrxM.jpg",
+      "verified": true,
+      "similarity": 0.3603666643866366,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_Jw0vl8gLrxM.jpg",
+      "source_image": "downloads/Jw0vl8gLrxM.jpg",
+      "verified": false,
+      "similarity": 0.3319550294213292,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_Jw0vl8gLrxM.jpg",
+      "source_image": "downloads/Jw0vl8gLrxM.jpg",
+      "verified": true,
+      "similarity": 0.36201951860779435,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_Jw0vl8gLrxM.jpg",
+      "source_image": "downloads/Jw0vl8gLrxM.jpg",
+      "verified": false,
+      "similarity": 0.31894892162100263,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/Fxagc_yHQNA.jpg",
+      "source_image": "downloads/Fxagc_yHQNA.jpg",
+      "verified": true,
+      "similarity": 0.5027663271892588,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_Fxagc_yHQNA.jpg",
+      "source_image": "downloads/Fxagc_yHQNA.jpg",
+      "verified": true,
+      "similarity": 0.5126769408417771,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_Fxagc_yHQNA.jpg",
+      "source_image": "downloads/Fxagc_yHQNA.jpg",
+      "verified": true,
+      "similarity": 0.4940546813975289,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_Fxagc_yHQNA.jpg",
+      "source_image": "downloads/Fxagc_yHQNA.jpg",
+      "verified": true,
+      "similarity": 0.47817818279318985,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_Fxagc_yHQNA.jpg",
+      "source_image": "downloads/Fxagc_yHQNA.jpg",
+      "verified": true,
+      "similarity": 0.40637159772835507,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_Fxagc_yHQNA.jpg",
+      "source_image": "downloads/Fxagc_yHQNA.jpg",
+      "verified": true,
+      "similarity": 0.5023592835197641,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_Fxagc_yHQNA.jpg",
+      "source_image": "downloads/Fxagc_yHQNA.jpg",
+      "verified": true,
+      "similarity": 0.40508310932372366,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/L-QMvBerBfo.jpg",
+      "source_image": "downloads/L-QMvBerBfo.jpg",
+      "verified": true,
+      "similarity": 0.3747230236158627,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_L-QMvBerBfo.jpg",
+      "source_image": "downloads/L-QMvBerBfo.jpg",
+      "verified": true,
+      "similarity": 0.3738792410508617,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_L-QMvBerBfo.jpg",
+      "source_image": "downloads/L-QMvBerBfo.jpg",
+      "verified": true,
+      "similarity": 0.3821865641570158,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_L-QMvBerBfo.jpg",
+      "source_image": "downloads/L-QMvBerBfo.jpg",
+      "verified": false,
+      "similarity": 0.3438524082665099,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_L-QMvBerBfo.jpg",
+      "source_image": "downloads/L-QMvBerBfo.jpg",
+      "verified": false,
+      "similarity": 0.30523233842851094,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_L-QMvBerBfo.jpg",
+      "source_image": "downloads/L-QMvBerBfo.jpg",
+      "verified": true,
+      "similarity": 0.3669791328118815,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_L-QMvBerBfo.jpg",
+      "source_image": "downloads/L-QMvBerBfo.jpg",
+      "verified": false,
+      "similarity": 0.3229172766586047,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/Nrwng9SNAdM.jpg",
+      "source_image": "downloads/Nrwng9SNAdM.jpg",
+      "verified": true,
+      "similarity": 0.3737085954274743,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_Nrwng9SNAdM.jpg",
+      "source_image": "downloads/Nrwng9SNAdM.jpg",
+      "verified": true,
+      "similarity": 0.37264553081160895,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_Nrwng9SNAdM.jpg",
+      "source_image": "downloads/Nrwng9SNAdM.jpg",
+      "verified": true,
+      "similarity": 0.3625374619098564,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_Nrwng9SNAdM.jpg",
+      "source_image": "downloads/Nrwng9SNAdM.jpg",
+      "verified": true,
+      "similarity": 0.35184903678927687,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_Nrwng9SNAdM.jpg",
+      "source_image": "downloads/Nrwng9SNAdM.jpg",
+      "verified": false,
+      "similarity": 0.335603427865886,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_Nrwng9SNAdM.jpg",
+      "source_image": "downloads/Nrwng9SNAdM.jpg",
+      "verified": true,
+      "similarity": 0.35610577631996443,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_Nrwng9SNAdM.jpg",
+      "source_image": "downloads/Nrwng9SNAdM.jpg",
+      "verified": false,
+      "similarity": 0.34746729512732066,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/L1y1yo1Q_ZQ.jpg",
+      "source_image": "downloads/L1y1yo1Q_ZQ.jpg",
+      "verified": true,
+      "similarity": 0.4257061961886502,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_L1y1yo1Q_ZQ.jpg",
+      "source_image": "downloads/L1y1yo1Q_ZQ.jpg",
+      "verified": true,
+      "similarity": 0.4197316211371471,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_L1y1yo1Q_ZQ.jpg",
+      "source_image": "downloads/L1y1yo1Q_ZQ.jpg",
+      "verified": true,
+      "similarity": 0.4217915496451706,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_L1y1yo1Q_ZQ.jpg",
+      "source_image": "downloads/L1y1yo1Q_ZQ.jpg",
+      "verified": true,
+      "similarity": 0.42380891001481025,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_L1y1yo1Q_ZQ.jpg",
+      "source_image": "downloads/L1y1yo1Q_ZQ.jpg",
+      "verified": true,
+      "similarity": 0.3827466368061033,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_L1y1yo1Q_ZQ.jpg",
+      "source_image": "downloads/L1y1yo1Q_ZQ.jpg",
+      "verified": true,
+      "similarity": 0.4327669154124404,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_L1y1yo1Q_ZQ.jpg",
+      "source_image": "downloads/L1y1yo1Q_ZQ.jpg",
+      "verified": true,
+      "similarity": 0.3599082228179593,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/M40_0QQMAe4.jpg",
+      "source_image": "downloads/M40_0QQMAe4.jpg",
+      "verified": true,
+      "similarity": 0.442302288628213,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_M40_0QQMAe4.jpg",
+      "source_image": "downloads/M40_0QQMAe4.jpg",
+      "verified": true,
+      "similarity": 0.4710279306454601,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_M40_0QQMAe4.jpg",
+      "source_image": "downloads/M40_0QQMAe4.jpg",
+      "verified": true,
+      "similarity": 0.4585384999379451,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_M40_0QQMAe4.jpg",
+      "source_image": "downloads/M40_0QQMAe4.jpg",
+      "verified": true,
+      "similarity": 0.42752359578625265,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_M40_0QQMAe4.jpg",
+      "source_image": "downloads/M40_0QQMAe4.jpg",
+      "verified": true,
+      "similarity": 0.39194296226853587,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_M40_0QQMAe4.jpg",
+      "source_image": "downloads/M40_0QQMAe4.jpg",
+      "verified": true,
+      "similarity": 0.46287350877845745,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_M40_0QQMAe4.jpg",
+      "source_image": "downloads/M40_0QQMAe4.jpg",
+      "verified": true,
+      "similarity": 0.35959275687012665,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/PcZIVLPzs4c.jpg",
+      "source_image": "downloads/PcZIVLPzs4c.jpg",
+      "verified": false,
+      "similarity": 0.3407162183773903,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_PcZIVLPzs4c.jpg",
+      "source_image": "downloads/PcZIVLPzs4c.jpg",
+      "verified": true,
+      "similarity": 0.3520201331035555,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_PcZIVLPzs4c.jpg",
+      "source_image": "downloads/PcZIVLPzs4c.jpg",
+      "verified": true,
+      "similarity": 0.3539123871215536,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_PcZIVLPzs4c.jpg",
+      "source_image": "downloads/PcZIVLPzs4c.jpg",
+      "verified": false,
+      "similarity": 0.32994784633184937,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_PcZIVLPzs4c.jpg",
+      "source_image": "downloads/PcZIVLPzs4c.jpg",
+      "verified": false,
+      "similarity": 0.3228448868372117,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_PcZIVLPzs4c.jpg",
+      "source_image": "downloads/PcZIVLPzs4c.jpg",
+      "verified": false,
+      "similarity": 0.34578542259611417,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_PcZIVLPzs4c.jpg",
+      "source_image": "downloads/PcZIVLPzs4c.jpg",
+      "verified": true,
+      "similarity": 0.37185219210723386,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/Qn2nubHzL7w.jpg",
+      "source_image": "downloads/Qn2nubHzL7w.jpg",
+      "verified": true,
+      "similarity": 0.4264940767798048,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_Qn2nubHzL7w.jpg",
+      "source_image": "downloads/Qn2nubHzL7w.jpg",
+      "verified": true,
+      "similarity": 0.49112362215738864,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_Qn2nubHzL7w.jpg",
+      "source_image": "downloads/Qn2nubHzL7w.jpg",
+      "verified": true,
+      "similarity": 0.45006781980327976,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_Qn2nubHzL7w.jpg",
+      "source_image": "downloads/Qn2nubHzL7w.jpg",
+      "verified": true,
+      "similarity": 0.4000863014652006,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_Qn2nubHzL7w.jpg",
+      "source_image": "downloads/Qn2nubHzL7w.jpg",
+      "verified": true,
+      "similarity": 0.3996175607847669,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_Qn2nubHzL7w.jpg",
+      "source_image": "downloads/Qn2nubHzL7w.jpg",
+      "verified": true,
+      "similarity": 0.42608378591671736,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_Qn2nubHzL7w.jpg",
+      "source_image": "downloads/Qn2nubHzL7w.jpg",
+      "verified": false,
+      "similarity": 0.3473264437720417,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/QsTVD1BVrcA.jpg",
+      "source_image": "downloads/QsTVD1BVrcA.jpg",
+      "verified": true,
+      "similarity": 0.4537161834101216,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_QsTVD1BVrcA.jpg",
+      "source_image": "downloads/QsTVD1BVrcA.jpg",
+      "verified": true,
+      "similarity": 0.489480455941646,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_QsTVD1BVrcA.jpg",
+      "source_image": "downloads/QsTVD1BVrcA.jpg",
+      "verified": true,
+      "similarity": 0.48589453624468765,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_QsTVD1BVrcA.jpg",
+      "source_image": "downloads/QsTVD1BVrcA.jpg",
+      "verified": true,
+      "similarity": 0.40481651156729437,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_QsTVD1BVrcA.jpg",
+      "source_image": "downloads/QsTVD1BVrcA.jpg",
+      "verified": true,
+      "similarity": 0.42778478441149825,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_QsTVD1BVrcA.jpg",
+      "source_image": "downloads/QsTVD1BVrcA.jpg",
+      "verified": true,
+      "similarity": 0.4521255718865809,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_QsTVD1BVrcA.jpg",
+      "source_image": "downloads/QsTVD1BVrcA.jpg",
+      "verified": true,
+      "similarity": 0.40581560991244714,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/Rf5u4gKbJ34.jpg",
+      "source_image": "downloads/Rf5u4gKbJ34.jpg",
+      "verified": true,
+      "similarity": 0.35450788282694373,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_Rf5u4gKbJ34.jpg",
+      "source_image": "downloads/Rf5u4gKbJ34.jpg",
+      "verified": true,
+      "similarity": 0.3610028231393647,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_Rf5u4gKbJ34.jpg",
+      "source_image": "downloads/Rf5u4gKbJ34.jpg",
+      "verified": true,
+      "similarity": 0.364381362277968,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_Rf5u4gKbJ34.jpg",
+      "source_image": "downloads/Rf5u4gKbJ34.jpg",
+      "verified": true,
+      "similarity": 0.36339476328753556,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_Rf5u4gKbJ34.jpg",
+      "source_image": "downloads/Rf5u4gKbJ34.jpg",
+      "verified": false,
+      "similarity": 0.32605078840642027,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_Rf5u4gKbJ34.jpg",
+      "source_image": "downloads/Rf5u4gKbJ34.jpg",
+      "verified": true,
+      "similarity": 0.363720742588413,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_Rf5u4gKbJ34.jpg",
+      "source_image": "downloads/Rf5u4gKbJ34.jpg",
+      "verified": false,
+      "similarity": 0.32796755614934203,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/TT6Vftu5NK0.jpg",
+      "source_image": "downloads/TT6Vftu5NK0.jpg",
+      "verified": true,
+      "similarity": 0.47204875359686826,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_TT6Vftu5NK0.jpg",
+      "source_image": "downloads/TT6Vftu5NK0.jpg",
+      "verified": true,
+      "similarity": 0.4563363722990964,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_TT6Vftu5NK0.jpg",
+      "source_image": "downloads/TT6Vftu5NK0.jpg",
+      "verified": true,
+      "similarity": 0.4662604428322798,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_TT6Vftu5NK0.jpg",
+      "source_image": "downloads/TT6Vftu5NK0.jpg",
+      "verified": true,
+      "similarity": 0.4154380893454469,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_TT6Vftu5NK0.jpg",
+      "source_image": "downloads/TT6Vftu5NK0.jpg",
+      "verified": true,
+      "similarity": 0.37317983401740085,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_TT6Vftu5NK0.jpg",
+      "source_image": "downloads/TT6Vftu5NK0.jpg",
+      "verified": true,
+      "similarity": 0.47774105110402304,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_TT6Vftu5NK0.jpg",
+      "source_image": "downloads/TT6Vftu5NK0.jpg",
+      "verified": true,
+      "similarity": 0.4099077925819562,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/Ucty8rpMwbM.jpg",
+      "source_image": "downloads/Ucty8rpMwbM.jpg",
+      "verified": true,
+      "similarity": 0.5556193251652519,
+      "modifications": [],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_Ucty8rpMwbM.jpg",
+      "source_image": "downloads/Ucty8rpMwbM.jpg",
+      "verified": true,
+      "similarity": 0.5203081392477305,
+      "modifications": [],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_Ucty8rpMwbM.jpg",
+      "source_image": "downloads/Ucty8rpMwbM.jpg",
+      "verified": true,
+      "similarity": 0.49226008648507713,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_Ucty8rpMwbM.jpg",
+      "source_image": "downloads/Ucty8rpMwbM.jpg",
+      "verified": true,
+      "similarity": 0.4499439084784389,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_Ucty8rpMwbM.jpg",
+      "source_image": "downloads/Ucty8rpMwbM.jpg",
+      "verified": true,
+      "similarity": 0.3852784897447525,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_Ucty8rpMwbM.jpg",
+      "source_image": "downloads/Ucty8rpMwbM.jpg",
+      "verified": true,
+      "similarity": 0.48141503499778926,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_Ucty8rpMwbM.jpg",
+      "source_image": "downloads/Ucty8rpMwbM.jpg",
+      "verified": true,
+      "similarity": 0.4247418122146044,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/VXF0cCYRdMg.jpg",
+      "source_image": "downloads/VXF0cCYRdMg.jpg",
+      "verified": true,
+      "similarity": 0.36061862207385187,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_VXF0cCYRdMg.jpg",
+      "source_image": "downloads/VXF0cCYRdMg.jpg",
+      "verified": true,
+      "similarity": 0.3772756476256436,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_VXF0cCYRdMg.jpg",
+      "source_image": "downloads/VXF0cCYRdMg.jpg",
+      "verified": true,
+      "similarity": 0.3550364097255061,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_VXF0cCYRdMg.jpg",
+      "source_image": "downloads/VXF0cCYRdMg.jpg",
+      "verified": true,
+      "similarity": 0.3671294761994255,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_VXF0cCYRdMg.jpg",
+      "source_image": "downloads/VXF0cCYRdMg.jpg",
+      "verified": true,
+      "similarity": 0.3680860857236374,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_VXF0cCYRdMg.jpg",
+      "source_image": "downloads/VXF0cCYRdMg.jpg",
+      "verified": true,
+      "similarity": 0.368038744621306,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_VXF0cCYRdMg.jpg",
+      "source_image": "downloads/VXF0cCYRdMg.jpg",
+      "verified": false,
+      "similarity": 0.3208686758007651,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/WycsmR_UB50.jpg",
+      "source_image": "downloads/WycsmR_UB50.jpg",
+      "verified": false,
+      "similarity": 0.26672887495843595,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_WycsmR_UB50.jpg",
+      "source_image": "downloads/WycsmR_UB50.jpg",
+      "verified": false,
+      "similarity": 0.26299127159268815,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_WycsmR_UB50.jpg",
+      "source_image": "downloads/WycsmR_UB50.jpg",
+      "verified": false,
+      "similarity": 0.26851019384551533,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_WycsmR_UB50.jpg",
+      "source_image": "downloads/WycsmR_UB50.jpg",
+      "verified": false,
+      "similarity": 0.2630916862461124,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_WycsmR_UB50.jpg",
+      "source_image": "downloads/WycsmR_UB50.jpg",
+      "verified": false,
+      "similarity": 0.20538154408764608,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_WycsmR_UB50.jpg",
+      "source_image": "downloads/WycsmR_UB50.jpg",
+      "verified": false,
+      "similarity": 0.2599865271334271,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_WycsmR_UB50.jpg",
+      "source_image": "downloads/WycsmR_UB50.jpg",
+      "verified": false,
+      "similarity": 0.34952035366696,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/Y950vg9rtkE.jpg",
+      "source_image": "downloads/Y950vg9rtkE.jpg",
+      "verified": true,
+      "similarity": 0.35327252584610436,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_Y950vg9rtkE.jpg",
+      "source_image": "downloads/Y950vg9rtkE.jpg",
+      "verified": true,
+      "similarity": 0.3580317493521499,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_Y950vg9rtkE.jpg",
+      "source_image": "downloads/Y950vg9rtkE.jpg",
+      "verified": true,
+      "similarity": 0.35956653242125014,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_Y950vg9rtkE.jpg",
+      "source_image": "downloads/Y950vg9rtkE.jpg",
+      "verified": false,
+      "similarity": 0.3434028357337094,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_Y950vg9rtkE.jpg",
+      "source_image": "downloads/Y950vg9rtkE.jpg",
+      "verified": false,
+      "similarity": 0.31805228173945516,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_Y950vg9rtkE.jpg",
+      "source_image": "downloads/Y950vg9rtkE.jpg",
+      "verified": true,
+      "similarity": 0.35764602589636507,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_Y950vg9rtkE.jpg",
+      "source_image": "downloads/Y950vg9rtkE.jpg",
+      "verified": false,
+      "similarity": 0.3265866358568365,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/dMVYJDwrBrU.jpg",
+      "source_image": "downloads/dMVYJDwrBrU.jpg",
+      "verified": true,
+      "similarity": 0.37015540156068155,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_dMVYJDwrBrU.jpg",
+      "source_image": "downloads/dMVYJDwrBrU.jpg",
+      "verified": true,
+      "similarity": 0.354791213080866,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_dMVYJDwrBrU.jpg",
+      "source_image": "downloads/dMVYJDwrBrU.jpg",
+      "verified": true,
+      "similarity": 0.35561393861028157,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_dMVYJDwrBrU.jpg",
+      "source_image": "downloads/dMVYJDwrBrU.jpg",
+      "verified": false,
+      "similarity": 0.3440942805980368,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_dMVYJDwrBrU.jpg",
+      "source_image": "downloads/dMVYJDwrBrU.jpg",
+      "verified": false,
+      "similarity": 0.33174526829411216,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_dMVYJDwrBrU.jpg",
+      "source_image": "downloads/dMVYJDwrBrU.jpg",
+      "verified": true,
+      "similarity": 0.36618763013043887,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_dMVYJDwrBrU.jpg",
+      "source_image": "downloads/dMVYJDwrBrU.jpg",
+      "verified": false,
+      "similarity": 0.31594729118039633,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/_bQQ7hFdjEI.jpg",
+      "source_image": "downloads/_bQQ7hFdjEI.jpg",
+      "verified": true,
+      "similarity": 0.37864635987659273,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur__bQQ7hFdjEI.jpg",
+      "source_image": "downloads/_bQQ7hFdjEI.jpg",
+      "verified": true,
+      "similarity": 0.3594333887979515,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress__bQQ7hFdjEI.jpg",
+      "source_image": "downloads/_bQQ7hFdjEI.jpg",
+      "verified": true,
+      "similarity": 0.36729026252661023,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate__bQQ7hFdjEI.jpg",
+      "source_image": "downloads/_bQQ7hFdjEI.jpg",
+      "verified": true,
+      "similarity": 0.3617309294243109,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop__bQQ7hFdjEI.jpg",
+      "source_image": "downloads/_bQQ7hFdjEI.jpg",
+      "verified": true,
+      "similarity": 0.3578481849947432,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize__bQQ7hFdjEI.jpg",
+      "source_image": "downloads/_bQQ7hFdjEI.jpg",
+      "verified": true,
+      "similarity": 0.38567484133360985,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise__bQQ7hFdjEI.jpg",
+      "source_image": "downloads/_bQQ7hFdjEI.jpg",
+      "verified": false,
+      "similarity": 0.3482132977198241,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/_uRpREEHC40.jpg",
+      "source_image": "downloads/_uRpREEHC40.jpg",
+      "verified": false,
+      "similarity": 0.3285264941476044,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur__uRpREEHC40.jpg",
+      "source_image": "downloads/_uRpREEHC40.jpg",
+      "verified": false,
+      "similarity": 0.30823735023538046,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress__uRpREEHC40.jpg",
+      "source_image": "downloads/_uRpREEHC40.jpg",
+      "verified": false,
+      "similarity": 0.3122105489912464,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate__uRpREEHC40.jpg",
+      "source_image": "downloads/_uRpREEHC40.jpg",
+      "verified": false,
+      "similarity": 0.30076533714954695,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop__uRpREEHC40.jpg",
+      "source_image": "downloads/_uRpREEHC40.jpg",
+      "verified": false,
+      "similarity": 0.27618089698125486,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize__uRpREEHC40.jpg",
+      "source_image": "downloads/_uRpREEHC40.jpg",
+      "verified": false,
+      "similarity": 0.34077243580687777,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise__uRpREEHC40.jpg",
+      "source_image": "downloads/_uRpREEHC40.jpg",
+      "verified": true,
+      "similarity": 0.3664135212753636,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/e2wtMsikYX4.jpg",
+      "source_image": "downloads/e2wtMsikYX4.jpg",
+      "verified": false,
+      "similarity": 0.31288459650180733,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_e2wtMsikYX4.jpg",
+      "source_image": "downloads/e2wtMsikYX4.jpg",
+      "verified": true,
+      "similarity": 0.3508179508624598,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_e2wtMsikYX4.jpg",
+      "source_image": "downloads/e2wtMsikYX4.jpg",
+      "verified": false,
+      "similarity": 0.3434930374554975,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_e2wtMsikYX4.jpg",
+      "source_image": "downloads/e2wtMsikYX4.jpg",
+      "verified": false,
+      "similarity": 0.3300367661192587,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_e2wtMsikYX4.jpg",
+      "source_image": "downloads/e2wtMsikYX4.jpg",
+      "verified": false,
+      "similarity": 0.3037183706488063,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_e2wtMsikYX4.jpg",
+      "source_image": "downloads/e2wtMsikYX4.jpg",
+      "verified": false,
+      "similarity": 0.3448790565061645,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_e2wtMsikYX4.jpg",
+      "source_image": "downloads/e2wtMsikYX4.jpg",
+      "verified": true,
+      "similarity": 0.3516594552592909,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_194434_250a68eb/e3Sj1Vx09N0.jpg",
+      "source_image": "downloads/e3Sj1Vx09N0.jpg",
+      "verified": true,
+      "similarity": 0.49624109500138547,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/blur_e3Sj1Vx09N0.jpg",
+      "source_image": "downloads/e3Sj1Vx09N0.jpg",
+      "verified": true,
+      "similarity": 0.4858701364419599,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/compress_e3Sj1Vx09N0.jpg",
+      "source_image": "downloads/e3Sj1Vx09N0.jpg",
+      "verified": true,
+      "similarity": 0.4819827532195314,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/rotate_e3Sj1Vx09N0.jpg",
+      "source_image": "downloads/e3Sj1Vx09N0.jpg",
+      "verified": true,
+      "similarity": 0.37990429672566145,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/crop_e3Sj1Vx09N0.jpg",
+      "source_image": "downloads/e3Sj1Vx09N0.jpg",
+      "verified": true,
+      "similarity": 0.3830607875532095,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/resize_e3Sj1Vx09N0.jpg",
+      "source_image": "downloads/e3Sj1Vx09N0.jpg",
+      "verified": true,
+      "similarity": 0.48814648892621154,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_194434_250a68eb/noise_e3Sj1Vx09N0.jpg",
+      "source_image": "downloads/e3Sj1Vx09N0.jpg",
+      "verified": true,
+      "similarity": 0.3868361507922804,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/h-m2Mj7j_a0.jpg",
+      "source_image": null,
+      "verified": false,
+      "similarity": 0.31778310506621643,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/eogcwoFLnKI.jpg",
+      "source_image": null,
+      "verified": false,
+      "similarity": 0.34360491521421366,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/iR6TsMMwSSs.jpg",
+      "source_image": null,
+      "verified": true,
+      "similarity": 0.3597009420553689,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/kwIYYoBAfDc.jpg",
+      "source_image": null,
+      "verified": false,
+      "similarity": 0.31190328938404605,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/rAtPI2oOTWk.jpg",
+      "source_image": null,
+      "verified": false,
+      "similarity": 0.29231040928010393,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/tJsVpUI8bjo.jpg",
+      "source_image": null,
+      "verified": false,
+      "similarity": 0.30698119707989907,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/qeOrjoEk0OQ.jpg",
+      "source_image": null,
+      "verified": false,
+      "similarity": 0.2959006390183806,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/m8Bxd5n4A8g.jpg",
+      "source_image": null,
+      "verified": false,
+      "similarity": 0.23491076407522646,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/tnfmwaj-nuo.jpg",
+      "source_image": null,
+      "verified": true,
+      "similarity": 0.3776681936794775,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/vBQ1icxQrdw.jpg",
+      "source_image": null,
+      "verified": false,
+      "similarity": 0.30811090388105306,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/vcYXSloKVmU.jpg",
+      "source_image": null,
+      "verified": false,
+      "similarity": 0.286473583703222,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/vUKbX-GnNh4.jpg",
+      "source_image": null,
+      "verified": false,
+      "similarity": 0.313992354356266,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/wRtiyaoyXWk.jpg",
+      "source_image": null,
+      "verified": false,
+      "similarity": 0.28416234631262366,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/vqFXKOaxg9k.jpg",
+      "source_image": null,
+      "verified": false,
+      "similarity": 0.26624420487503264,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/xfTsHZ1BXZ8.jpg",
+      "source_image": null,
+      "verified": false,
+      "similarity": 0.28973889951165765,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/xl1Sa0qgAew.jpg",
+      "source_image": null,
+      "verified": true,
+      "similarity": 0.360016711005358,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/zgQnXQRL1w0.jpg",
+      "source_image": null,
+      "verified": false,
+      "similarity": 0.24826575422761846,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/yVtQPJMGHjY.jpg",
+      "source_image": null,
+      "verified": true,
+      "similarity": 0.36972400327264465,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/zvNFoKGBOoI.jpg",
+      "source_image": null,
+      "verified": true,
+      "similarity": 0.37787804806910724,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/zz1cE2IoLPk.jpg",
+      "source_image": null,
+      "verified": false,
+      "similarity": 0.3137957088706138,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    }
+  ],
+  "timestamp": "2024-12-02T20:08:47.104006",
+  "run_id": "run_20241202_194434_250a68eb",
+  "performance": {
+    "execution_time": 1451.7250170707703,
+    "num_workers": 4
+  }
+}

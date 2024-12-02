@@ -1,0 +1,68 @@
+Test Run Summary
+===============
+Run ID: run_20241202_193604_c4cb1ddc
+Timestamp: 2024-12-02T19:36:37.705677
+
+Overall Statistics:
+Total Tests: 23
+Successful Verifications: 22
+False Positives: 0
+False Negatives: 1
+
+Results by Scenario:
+
+ORIGINAL:
+Success Rate: 100.00%
+Average Similarity: 50.49%
+Detected Modifications:
+  - Visual modification: 2
+  - Frequency modification: 1
+
+MANIPULATED_BLUR:
+Success Rate: 100.00%
+Average Similarity: 50.51%
+Detected Modifications:
+  - Visual modification: 2
+  - Frequency modification: 1
+
+MANIPULATED_COMPRESS:
+Success Rate: 100.00%
+Average Similarity: 49.75%
+Detected Modifications:
+  - Visual modification: 2
+  - Frequency modification: 1
+
+MANIPULATED_ROTATE:
+Success Rate: 100.00%
+Average Similarity: 47.90%
+Detected Modifications:
+  - Visual modification: 3
+  - Frequency modification: 2
+
+MANIPULATED_CROP:
+Success Rate: 100.00%
+Average Similarity: 42.73%
+Detected Modifications:
+  - Visual modification: 3
+  - Frequency modification: 2
+
+MANIPULATED_RESIZE:
+Success Rate: 100.00%
+Average Similarity: 50.08%
+Detected Modifications:
+  - Visual modification: 2
+  - Frequency modification: 1
+
+MANIPULATED_NOISE:
+Success Rate: 66.67%
+Average Similarity: 39.22%
+Detected Modifications:
+  - Visual modification: 3
+  - Frequency modification: 2
+
+UNRELATED:
+Success Rate: 100.00%
+Average Similarity: 23.07%
+Detected Modifications:
+  - Visual modification: 2
+  - Frequency modification: 2

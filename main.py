@@ -4,8 +4,7 @@ from pathlib import Path
 
 from cleanup import DirectoryCleaner
 from test_authorship import AuthorshipTester
-from utils import load_config
-
+from alphapunch.utils import load_config, setup_logger
 
 def main():
     parser = argparse.ArgumentParser(description='AlphaPunch Image Fingerprinting System')
@@ -49,7 +48,7 @@ def main():
             print(f"False Negatives: {results['summary']['false_negatives']}")
 
         elif args.mode == 'benchmark':
-            results = tester.run_authorship_tests()  # This includes performance metrics
+            results = tester.run_authorship_tests()
             print("\nBenchmark Results:")
             print(f"Average Processing Time: {results['performance_metrics']['execution_times']['mean']:.3f}s")
             print(f"Peak Memory Usage: {results['performance_metrics']['memory_usage']['peak']:.2f}MB")
@@ -66,6 +65,7 @@ def main():
     except Exception as e:
         logging.error(f"Error running program: {str(e)}")
         raise
+
 
 if __name__ == "__main__":
     main()

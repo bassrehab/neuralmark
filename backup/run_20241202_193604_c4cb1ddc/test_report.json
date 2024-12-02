@@ -1,0 +1,355 @@
+{
+  "summary": {
+    "total_tests": 23,
+    "successful_verifications": 22,
+    "false_positives": 0,
+    "false_negatives": 1
+  },
+  "by_scenario": {
+    "original": {
+      "total": 3,
+      "successful": 3,
+      "success_rate": 100.0,
+      "average_similarity": 0.504947865059072,
+      "modifications": {
+        "Visual modification": 2,
+        "Frequency modification": 1
+      }
+    },
+    "manipulated_blur": {
+      "total": 3,
+      "successful": 3,
+      "success_rate": 100.0,
+      "average_similarity": 0.5051247067437206,
+      "modifications": {
+        "Visual modification": 2,
+        "Frequency modification": 1
+      }
+    },
+    "manipulated_compress": {
+      "total": 3,
+      "successful": 3,
+      "success_rate": 100.0,
+      "average_similarity": 0.4974867201208182,
+      "modifications": {
+        "Visual modification": 2,
+        "Frequency modification": 1
+      }
+    },
+    "manipulated_rotate": {
+      "total": 3,
+      "successful": 3,
+      "success_rate": 100.0,
+      "average_similarity": 0.47896189178244414,
+      "modifications": {
+        "Visual modification": 3,
+        "Frequency modification": 2
+      }
+    },
+    "manipulated_crop": {
+      "total": 3,
+      "successful": 3,
+      "success_rate": 100.0,
+      "average_similarity": 0.42727055730579844,
+      "modifications": {
+        "Visual modification": 3,
+        "Frequency modification": 2
+      }
+    },
+    "manipulated_resize": {
+      "total": 3,
+      "successful": 3,
+      "success_rate": 100.0,
+      "average_similarity": 0.5007956382639714,
+      "modifications": {
+        "Visual modification": 2,
+        "Frequency modification": 1
+      }
+    },
+    "manipulated_noise": {
+      "total": 3,
+      "successful": 2,
+      "success_rate": 66.66666666666666,
+      "average_similarity": 0.3922244012253963,
+      "modifications": {
+        "Visual modification": 3,
+        "Frequency modification": 2
+      }
+    },
+    "unrelated": {
+      "total": 2,
+      "successful": 2,
+      "success_rate": 100.0,
+      "average_similarity": 0.23066446324953777,
+      "modifications": {
+        "Visual modification": 2,
+        "Frequency modification": 2
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_193604_c4cb1ddc/XUdtN5Zq0sA.jpg",
+      "source_image": "downloads/XUdtN5Zq0sA.jpg",
+      "verified": true,
+      "similarity": 0.44944499697879875,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/blur_XUdtN5Zq0sA.jpg",
+      "source_image": "downloads/XUdtN5Zq0sA.jpg",
+      "verified": true,
+      "similarity": 0.44259090518359284,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/compress_XUdtN5Zq0sA.jpg",
+      "source_image": "downloads/XUdtN5Zq0sA.jpg",
+      "verified": true,
+      "similarity": 0.42826123603962224,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/rotate_XUdtN5Zq0sA.jpg",
+      "source_image": "downloads/XUdtN5Zq0sA.jpg",
+      "verified": true,
+      "similarity": 0.4547677538887671,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/crop_XUdtN5Zq0sA.jpg",
+      "source_image": "downloads/XUdtN5Zq0sA.jpg",
+      "verified": true,
+      "similarity": 0.3827202055133119,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/resize_XUdtN5Zq0sA.jpg",
+      "source_image": "downloads/XUdtN5Zq0sA.jpg",
+      "verified": true,
+      "similarity": 0.4370360699678776,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/noise_XUdtN5Zq0sA.jpg",
+      "source_image": "downloads/XUdtN5Zq0sA.jpg",
+      "verified": false,
+      "similarity": 0.3382494612003155,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_193604_c4cb1ddc/e3kbIGL6U70.jpg",
+      "source_image": "downloads/e3kbIGL6U70.jpg",
+      "verified": true,
+      "similarity": 0.43937497224615274,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/blur_e3kbIGL6U70.jpg",
+      "source_image": "downloads/e3kbIGL6U70.jpg",
+      "verified": true,
+      "similarity": 0.43563840724078917,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/compress_e3kbIGL6U70.jpg",
+      "source_image": "downloads/e3kbIGL6U70.jpg",
+      "verified": true,
+      "similarity": 0.42775129930012257,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/rotate_e3kbIGL6U70.jpg",
+      "source_image": "downloads/e3kbIGL6U70.jpg",
+      "verified": true,
+      "similarity": 0.4194465392492354,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/crop_e3kbIGL6U70.jpg",
+      "source_image": "downloads/e3kbIGL6U70.jpg",
+      "verified": true,
+      "similarity": 0.41029552731530367,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/resize_e3kbIGL6U70.jpg",
+      "source_image": "downloads/e3kbIGL6U70.jpg",
+      "verified": true,
+      "similarity": 0.4274840332336065,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/noise_e3kbIGL6U70.jpg",
+      "source_image": "downloads/e3kbIGL6U70.jpg",
+      "verified": true,
+      "similarity": 0.369523799366759,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "original",
+      "test_image": "fingerprinted/run_20241202_193604_c4cb1ddc/YrHwQvdPiQo.jpg",
+      "source_image": "downloads/YrHwQvdPiQo.jpg",
+      "verified": true,
+      "similarity": 0.6260236259522646,
+      "modifications": [],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_blur",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/blur_YrHwQvdPiQo.jpg",
+      "source_image": "downloads/YrHwQvdPiQo.jpg",
+      "verified": true,
+      "similarity": 0.6371448078067796,
+      "modifications": [],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_compress",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/compress_YrHwQvdPiQo.jpg",
+      "source_image": "downloads/YrHwQvdPiQo.jpg",
+      "verified": true,
+      "similarity": 0.6364476250227098,
+      "modifications": [],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_rotate",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/rotate_YrHwQvdPiQo.jpg",
+      "source_image": "downloads/YrHwQvdPiQo.jpg",
+      "verified": true,
+      "similarity": 0.5626713822093298,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_crop",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/crop_YrHwQvdPiQo.jpg",
+      "source_image": "downloads/YrHwQvdPiQo.jpg",
+      "verified": true,
+      "similarity": 0.48879593908877983,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_resize",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/resize_YrHwQvdPiQo.jpg",
+      "source_image": "downloads/YrHwQvdPiQo.jpg",
+      "verified": true,
+      "similarity": 0.6378668115904301,
+      "modifications": [],
+      "expected": true
+    },
+    {
+      "scenario": "manipulated_noise",
+      "test_image": "manipulated/run_20241202_193604_c4cb1ddc/noise_YrHwQvdPiQo.jpg",
+      "source_image": "downloads/YrHwQvdPiQo.jpg",
+      "verified": true,
+      "similarity": 0.4688999431091142,
+      "modifications": [
+        "Visual modification"
+      ],
+      "expected": true
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/iB1V2C679Y0.jpg",
+      "source_image": null,
+      "verified": false,
+      "similarity": 0.19493248234817528,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    },
+    {
+      "scenario": "unrelated",
+      "test_image": "downloads/hhXZ1K8Y_hA.jpg",
+      "source_image": null,
+      "verified": false,
+      "similarity": 0.26639644415090025,
+      "modifications": [
+        "Visual modification",
+        "Frequency modification"
+      ],
+      "expected": false
+    }
+  ],
+  "timestamp": "2024-12-02T19:36:37.705677",
+  "run_id": "run_20241202_193604_c4cb1ddc",
+  "performance": {
+    "execution_time": 33.12468600273132,
+    "num_workers": 4
+  }
+}

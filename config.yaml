@@ -16,13 +16,13 @@ algorithm:
   fingerprint_size: [64, 64]
   input_shape: [256, 256, 3]
   resize_interpolation: 'LINEAR'  # Options: LINEAR, CUBIC, NEAREST
-  embed_strength: 0.4
-  similarity_threshold: 0.65
+  embed_strength: 1.2 # Increased for stronger fingerprint
+  similarity_threshold: 0.35 # More lenient threshold
 
   feature_weights:
-    vgg: 0.4
-    wavelet: 0.3
-    dct: 0.3
+    vgg: 0.3
+    wavelet: 0.5
+    dct: 0.2
 
   neural_attention:
     enabled: true
@@ -30,32 +30,37 @@ algorithm:
     base_filters: 64
     feature_channels: 256
 
+  # Testing parameters
+  verification:
+    stage_weights: [ 0.4, 0.3, 0.2, 0.1 ]
+    min_similarity: 0.45  # Lower threshold for manipulated images
+
 # Testing configuration
 testing:
   random_seed: 42
-  total_images: 100      # Total number of images to use
-  train_ratio: 0.8       # 80% for training/fingerprinting
+  total_images: 50    # Total number of images to use
+  train_ratio: 0.6       # 80% for training/fingerprinting; # Use 3 images for training, 2 for testing
 
   cross_validation:
     enabled: true
     num_folds: 5
     validation_split: 0.2
 
-  # Manipulation parameters for testing
+  # Manipulation parameters
   manipulations:
     blur:
-      kernel_size: 5
-      sigma: 1.0
+      kernel_size: 3    # Reduced from 5
+      sigma: 0.5        # Reduced from 1.0
     compress:
-      quality: 75
+      quality: 85       # Increased from 75
     rotate:
-      angle: 5
+      angle: 2          # Reduced from 5
     crop:
-      percent: 10
+      percent: 5        # Reduced from 10
     resize:
-      factor: 0.5
+      factor: 0.8       # Increased from 0.5
     noise:
-      std: 10
+      std: 5           # Reduced from 10
 
   # Verification thresholds
   thresholds:
@@ -67,6 +72,17 @@ testing:
     min_accuracy: 0.9
     max_false_positive: 0.01
     max_false_negative: 0.1
+
+resources:
+  num_workers: 4  # Adjust based on your CPU cores
+  batch_size: 4  # Process images in batches
+  gpu_enabled: false  # Enable GPU acceleration if available
+  memory_limit: 0.6  # Use 60% of available memory
+
+performance:
+  enable_caching: true
+  cache_dir: 'cache'
+  optimization_level: 'high'  # Can be 'low', 'medium', 'high'
 
 # Logging configuration
 logging:

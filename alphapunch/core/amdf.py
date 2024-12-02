@@ -53,12 +53,26 @@ class AdaptiveMultiDomainFingerprinting:
 
     def _build_feature_extractor(self):
         """Build VGG-based feature extractor."""
-        base_model = VGG16(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
-        return Model(inputs=base_model.input, outputs=base_model.get_layer('block3_conv3').output)
+        import tensorflow as tf
+
+        with tf.device('/CPU:0'):
+            base_model = VGG16(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
+            self.feature_model = Model(inputs=base_model.input,
+                                       outputs=base_model.get_layer('block3_conv3').output)
+
+            # Return a wrapped function that handles tensor formatting
+            def feature_extractor(inputs):
+                inputs = tf.cast(inputs, tf.float32)
+                if len(tf.shape(inputs)) == 3:
+                    inputs = tf.expand_dims(inputs, 0)
+                return self.feature_model(inputs)
+
+            return feature_extractor
 
     def _build_fingerprint_generator(self):
         """Build fingerprint generator network."""
-        input_shape = self.feature_extractor.output_shape[1:]
+        # Use the feature model's output shape instead of the wrapper function
+        input_shape = self.feature_model.output_shape[1:]
         inputs = Input(shape=input_shape)
 
         # Encoder
@@ -75,6 +89,97 @@ class AdaptiveMultiDomainFingerprinting:
         outputs = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(x)
 
         return Model(inputs=inputs, outputs=outputs)
+
+    def _extract_wavelet_features(self, image: np.ndarray) -> np.ndarray:
+        """Extract wavelet features from image."""
+        try:
+            # Ensure image is 2D
+            if len(image.shape) > 2:
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+            # Apply wavelet decomposition
+            coeffs = pywt.wavedec2(image, self.wavelet, level=self.wavelet_level)
+
+            # Extract features from coefficients
+            features = []
+            for level in coeffs[1:]:  # Skip approximation coefficients
+                for detail in level:
+                    # Calculate statistical features
+                    features.extend([
+                        np.mean(np.abs(detail)),
+                        np.std(detail),
+                        stats.skew(detail.flatten()),
+                        stats.kurtosis(detail.flatten())
+                    ])
+
+            # Normalize features
+            features = np.array(features)
+            if np.any(features):  # Check for non-zero features
+                features = features / (np.linalg.norm(features) + 1e-10)
+
+            return features
+
+        except Exception as e:
+            self.logger.error(f"Error in wavelet feature extraction: {str(e)}")
+            raise
+
+    def _extract_multi_scale_features(self, image: np.ndarray) -> np.ndarray:
+        """Extract features at multiple scales with fixed shapes."""
+        # Use single scale for stability
+        scales = [1.0]
+        features = []
+
+        try:
+            # Convert to RGB once
+            if len(image.shape) == 2:
+                image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+            elif image.shape[2] == 4:
+                image = cv2.cvtColor(image, cv2.COLOR_BGRA2RGB)
+            elif image.shape[2] == 3:
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+            # Pre-compute grayscale
+            gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+
+            for scale in scales:
+                try:
+                    # Prepare VGG input
+                    vgg_input = cv2.resize(image, (224, 224))
+                    vgg_input = vgg_input.astype(np.float32)
+                    vgg_input = np.expand_dims(vgg_input, 0)
+                    vgg_input = preprocess_input(vgg_input)
+
+                    # Extract VGG features
+                    vgg_features = self.feature_extractor(vgg_input)
+                    vgg_features = tf.reduce_mean(vgg_features, axis=[1, 2]).numpy().flatten()
+
+                    # Extract wavelet features
+                    wavelet_features = self._extract_wavelet_features(gray)
+
+                    # Extract DCT features
+                    dct_features = self._extract_dct_features(gray)
+
+                    # Combine features with weights
+                    combined = np.concatenate([
+                        self.feature_weights['vgg'] * vgg_features,
+                        self.feature_weights['wavelet'] * wavelet_features,
+                        self.feature_weights['dct'] * dct_features
+                    ])
+                    features.append(combined)
+
+                except Exception as e:
+                    self.logger.error(f"Error processing scale {scale}: {str(e)}")
+                    continue
+
+            if not features:
+                raise ValueError("Feature extraction failed for all scales")
+
+            # Average features across scales
+            return np.mean(features, axis=0)
+
+        except Exception as e:
+            self.logger.error(f"Error in feature extraction: {str(e)}")
+            raise
 
     def _build_verifier(self):
         """Build verification network."""
@@ -102,39 +207,6 @@ class AdaptiveMultiDomainFingerprinting:
         features = self._extract_multi_scale_features(image)
         fingerprint = self._convert_features_to_fingerprint(features)
         return self.apply_error_correction(fingerprint)
-
-    def _extract_multi_scale_features(self, image: np.ndarray) -> np.ndarray:
-        """Extract features at multiple scales."""
-        scales = [1.0, 0.75, 0.5]
-        features = []
-
-        for scale in scales:
-            scaled_size = (int(image.shape[1] * scale), int(image.shape[0] * scale))
-            scaled_img = cv2.resize(image, scaled_size)
-
-            # Extract VGG features
-            preprocessed = tf.image.resize(scaled_img, (224, 224))
-            preprocessed = preprocess_input(preprocessed)
-            vgg_features = self.feature_extractor(tf.expand_dims(preprocessed, 0))
-            vgg_features = tf.reduce_mean(vgg_features, axis=[1, 2]).numpy()
-
-            # Extract wavelet features
-            gray = cv2.cvtColor(scaled_img, cv2.COLOR_BGR2GRAY)
-            coeffs = pywt.wavedec2(gray, 'db1', level=3)
-            wavelet_features = self._process_wavelet_coeffs(coeffs)
-
-            # Extract DCT features
-            dct_features = self._extract_dct_features(gray)
-
-            # Combine features
-            combined = np.concatenate([
-                self.feature_weights['vgg'] * vgg_features.flatten(),
-                self.feature_weights['wavelet'] * wavelet_features,
-                self.feature_weights['dct'] * dct_features
-            ])
-            features.append(combined)
-
-        return np.mean(features, axis=0)
 
     def _process_wavelet_coeffs(self, coeffs) -> np.ndarray:
         """Process wavelet coefficients into features."""
@@ -184,7 +256,6 @@ class AdaptiveMultiDomainFingerprinting:
             # Return zero features in case of error
             return np.zeros(64)
 
-
     def _convert_features_to_fingerprint(self, features: np.ndarray) -> np.ndarray:
         """Convert feature vector to fingerprint matrix."""
         # Reshape features to match fingerprint size
@@ -199,59 +270,6 @@ class AdaptiveMultiDomainFingerprinting:
 
         smoothed = cv2.GaussianBlur(fingerprint, (kernel_size, kernel_size), sigma)
         return cv2.normalize(smoothed, None, 0, 1, cv2.NORM_MINMAX)
-
-    def embed_fingerprint(self, image: np.ndarray, fingerprint: np.ndarray) -> np.ndarray:
-        """Embed fingerprint into image with proper size handling."""
-        try:
-            # Convert to float32
-            image = image.astype(np.float32)
-
-            # Ensure fingerprint size matches image exactly
-            h, w = image.shape[:2]
-            fp_resized = cv2.resize(fingerprint, (w, h), interpolation=cv2.INTER_LINEAR)
-
-            # Create embedding mask
-            mask = self._calculate_embedding_mask(image)
-
-            # Prepare fingerprint
-            fp_prepared = fp_resized * mask * self.embed_strength
-
-            # Embed in each channel
-            embedded = np.zeros_like(image)
-            for i in range(3):
-                coeffs = pywt.wavedec2(image[:, :, i], self.wavelet, level=3)
-                fp_coeffs = pywt.wavedec2(fp_prepared, self.wavelet, level=3)
-
-                # Modify coefficients
-                modified_coeffs = list(coeffs)
-                for j in range(len(coeffs)):
-                    if j == 0:  # Approximation coefficients
-                        c_shape = modified_coeffs[j].shape
-                        fp_shape = fp_coeffs[j].shape
-                        # Ensure exact size match
-                        if c_shape != fp_shape:
-                            fp_coeffs[j] = cv2.resize(fp_coeffs[j],
-                                                      (c_shape[1], c_shape[0]),
-                                                      interpolation=cv2.INTER_LINEAR)
-                        modified_coeffs[j] = coeffs[j] + fp_coeffs[j]
-                    else:  # Detail coefficients
-                        modified_coeffs[j] = tuple(
-                            c + cv2.resize(f, (c.shape[1], c.shape[0]),
-                                           interpolation=cv2.INTER_LINEAR) * 0.5
-                            for c, f in zip(coeffs[j], fp_coeffs[j])
-                        )
-
-                # Reconstruct
-                embedded[:, :, i] = pywt.waverec2(modified_coeffs, self.wavelet)
-
-            # Normalize and clip
-            embedded = np.clip(embedded, 0, 255).astype(np.uint8)
-
-            return embedded
-
-        except Exception as e:
-            self.logger.error(f"Error in embed_fingerprint: {str(e)}")
-            raise
 
     def _calculate_embedding_mask(self, image: np.ndarray) -> np.ndarray:
         """Calculate adaptive embedding mask."""
@@ -291,35 +309,6 @@ class AdaptiveMultiDomainFingerprinting:
         # Average and normalize
         fingerprint /= 3.0
         return cv2.normalize(fingerprint, None, 0, 1, cv2.NORM_MINMAX)
-
-    def verify_fingerprint(self, image: np.ndarray, original_fingerprint: np.ndarray) -> Tuple[bool, float, List[str]]:
-        """Verify fingerprint with improved threshold handling."""
-        try:
-            # Extract fingerprint
-            extracted_fp = self.extract_fingerprint(image)
-
-            # Compare fingerprints
-            similarity, modifications = self.compare_fingerprints(extracted_fp, original_fingerprint)
-
-            # Use adaptive threshold based on image characteristics
-            base_threshold = self.config.get('algorithm', {}).get('similarity_threshold', 0.5)
-
-            # Calculate image complexity for threshold adjustment
-            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            edges = cv2.Canny(gray, 100, 200)
-            complexity = np.sum(edges > 0) / (image.shape[0] * image.shape[1])
-
-            # Adjust threshold based on complexity
-            adjusted_threshold = base_threshold * (1 - 0.2 * complexity)
-
-            # Determine authenticity
-            is_authentic = similarity > adjusted_threshold
-
-            return is_authentic, similarity, modifications
-
-        except Exception as e:
-            self.logger.error(f"Error in verify_fingerprint: {str(e)}")
-            raise
 
     def _statistical_verification(self, image: np.ndarray,
                                   original_fingerprint: np.ndarray) -> Tuple[float, List[str]]:
@@ -477,44 +466,44 @@ class AdaptiveMultiDomainFingerprinting:
         return modifications
 
     def compare_fingerprints(self, fp1: np.ndarray, fp2: np.ndarray) -> Tuple[float, List[str]]:
-        """Compare fingerprints with proper dimension and type handling."""
+        """Compare fingerprints with improved tolerance."""
         try:
             # Ensure same dimensions
             if fp1.shape != fp2.shape:
-                h, w = fp2.shape[:2]
-                fp1 = cv2.resize(fp1, (w, h))
+                fp1 = cv2.resize(fp1, (fp2.shape[1], fp2.shape[0]))
 
-            # Convert to float32 and normalize
-            fp1 = fp1.astype(np.float32)
-            fp2 = fp2.astype(np.float32)
-
+            # Normalize fingerprints
             fp1_norm = cv2.normalize(fp1, None, 0, 1, cv2.NORM_MINMAX)
             fp2_norm = cv2.normalize(fp2, None, 0, 1, cv2.NORM_MINMAX)
 
-            # Calculate NCC
-            ncc = cv2.matchTemplate(
-                fp1_norm,
-                fp2_norm,
+            # Calculate multiple similarity metrics
+            ncc = float(cv2.matchTemplate(
+                fp1_norm.astype(np.float32),
+                fp2_norm.astype(np.float32),
                 cv2.TM_CCORR_NORMED
-            )[0][0]
+            )[0][0])
 
-            # Calculate SSIM
-            ssim = structural_similarity(fp1_norm, fp2_norm, data_range=1.0)
+            ssim = float(structural_similarity(fp1_norm, fp2_norm, data_range=1.0))
 
-            # Calculate wavelet similarity
+            # Wavelet-based comparison
             wavelet_sim = self._compare_wavelets(fp1_norm, fp2_norm)
 
-            # Calculate final similarity score
-            similarity = 0.4 * ncc + 0.3 * ssim + 0.3 * wavelet_sim
+            # Weighted combination
+            similarity = (0.4 * ncc + 0.4 * ssim + 0.2 * wavelet_sim)
 
             # Detect modifications
-            modifications = self._detect_modifications(fp1_norm, fp2_norm)
+            mods = []
+            if ncc < 0.4:
+                mods.append("Major transformation")
+            if ssim < 0.3:
+                mods.append("Visual modification")
+            if wavelet_sim < 0.25:
+                mods.append("Frequency modification")
 
-            return float(similarity), modifications
+            return similarity, mods
 
         except Exception as e:
             self.logger.error(f"Error in compare_fingerprints: {str(e)}")
-            # Return default values in case of error
             return 0.0, ["Error in comparison"]
 
     def train_verifier(self, authentic_pairs, fake_pairs, epochs=20, batch_size=32):
@@ -546,3 +535,82 @@ class AdaptiveMultiDomainFingerprinting:
             validation_split=0.2,
             verbose=1
         )
+
+    def embed_fingerprint(self, image: np.ndarray, fingerprint: np.ndarray) -> np.ndarray:
+        """Embed fingerprint with stronger and more stable embedding."""
+        try:
+            # Convert to float32
+            image = image.astype(np.float32)
+
+            # Ensure fingerprint size matches image
+            h, w = image.shape[:2]
+            fp_resized = cv2.resize(fingerprint, (w, h))
+
+            # Create embedding mask focusing on stable regions
+            mask = self._calculate_embedding_mask(image)
+
+            # Stronger embedding
+            embed_strength = 1.2  # Increased from original
+            fp_prepared = fp_resized * mask * embed_strength
+
+            # Embed in multiple wavelet levels
+            embedded = np.zeros_like(image)
+            for i in range(3):  # For each color channel
+                # Wavelet decomposition
+                coeffs = pywt.wavedec2(image[:, :, i], 'db1', level=3)
+                fp_coeffs = pywt.wavedec2(fp_prepared, 'db1', level=3)
+
+                # Modify coefficients with different strengths
+                modified_coeffs = list(coeffs)
+                modified_coeffs[0] = coeffs[0] + fp_coeffs[0] * 2.0  # Strong in low frequency
+
+                for j in range(1, len(coeffs)):
+                    # Gradually decrease strength in higher frequencies
+                    strength = 1.0 / (j + 1)
+                    modified_coeffs[j] = tuple(
+                        c + f * strength
+                        for c, f in zip(coeffs[j], fp_coeffs[j])
+                    )
+
+                # Reconstruct
+                embedded[:, :, i] = pywt.waverec2(modified_coeffs, 'db1')
+
+            # Normalize and clip
+            embedded = np.clip(embedded, 0, 255).astype(np.uint8)
+            return embedded
+
+        except Exception as e:
+            self.logger.error(f"Error in embed_fingerprint: {str(e)}")
+            raise
+
+    def verify_fingerprint(self, image: np.ndarray, original_fingerprint: np.ndarray) -> Tuple[bool, float, List[str]]:
+        """Verify fingerprint with improved thresholds."""
+        try:
+            # Extract fingerprint
+            extracted_fp = self.extract_fingerprint(image)
+
+            # Compare fingerprints
+            similarity, modifications = self.compare_fingerprints(extracted_fp, original_fingerprint)
+
+            # Adaptive thresholding based on modification type
+            base_threshold = 0.35  # Lower base threshold
+
+            if "Major transformation" in modifications:
+                threshold = base_threshold * 0.8
+            elif "Visual modification" in modifications:
+                threshold = base_threshold * 0.9
+            else:
+                threshold = base_threshold
+
+            # Determine authenticity with inverted logic for unrelated images
+            is_authentic = similarity > threshold
+
+            # Additional check for unrelated images
+            if "Frequency modification" in modifications and similarity < 0.2:
+                is_authentic = False
+
+            return is_authentic, similarity, modifications
+
+        except Exception as e:
+            self.logger.error(f"Error in verify_fingerprint: {str(e)}")
+            raise

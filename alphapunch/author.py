@@ -113,10 +113,7 @@ class ImageAuthor:
             raise
 
     def verify_ownership(self, suspect_image_path: str) -> Tuple[bool, Optional[str], float, List[str]]:
-        """
-        Verify if a suspect image is derived from any of author's original images.
-        Returns: (is_owned, original_path, similarity_score, modifications)
-        """
+        """Verify if a suspect image is derived from any of author's original images."""
         self.logger.info(f"Verifying ownership of: {suspect_image_path}")
 
         try:
@@ -131,8 +128,11 @@ class ImageAuthor:
             # Extract fingerprint from suspect image
             extracted_fp = self.fingerprinter.extract_fingerprint(suspect_img)
 
+            # Create a copy of the database items to prevent modification during iteration
+            database_items = list(self.fingerprint_database.items())
+
             # Compare with all stored fingerprints
-            for img_hash, data in self.fingerprint_database.items():
+            for img_hash, data in database_items:
                 is_authentic, similarity, mods = self.fingerprinter.verify_fingerprint(
                     suspect_img,
                     data['fingerprint']

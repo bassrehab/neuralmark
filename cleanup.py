@@ -1,23 +1,24 @@
 import logging
-import os
-import shutil
-from typing import List
-
-import os
 import shutil
 from pathlib import Path
-import logging
+
+from alphapunch.utils import load_config
 
 
 class DirectoryCleaner:
     """Manage test directories and cleanup."""
 
-    def __init__(self):
+    def __init__(self, config_path: str = None):
         self.logger = logging.getLogger('DirectoryCleaner')
         self.preserved_extensions = {
             'database': ['.json'],
             'downloads': ['.jpg', '.jpeg', '.png']
         }
+
+        if config_path:
+            # Load config and update settings if needed
+            self.config = load_config(config_path)
+            # Could update preserved_extensions or other settings from config
 
     def cleanup(self, pre_run: bool = True):
         """Clean test directories while preserving specified files."""

@@ -218,7 +218,16 @@ class FingerprintCore:
         return enhanced
 
     def compare_fingerprints(self, fp1: np.ndarray, fp2: np.ndarray) -> Tuple[float, List[str]]:
-        """Compare fingerprints with comprehensive similarity metrics."""
+        """
+        Compare fingerprints with comprehensive similarity metrics.
+
+        Args:
+            fp1: First fingerprint
+            fp2: Second fingerprint
+
+        Returns:
+            Tuple[float, List[str]]: Similarity score and list of detected modifications
+        """
         modifications = []
 
         try:
@@ -227,14 +236,14 @@ class FingerprintCore:
             fp2_norm = cv2.normalize(fp2, None, 0, 1, cv2.NORM_MINMAX)
 
             # Calculate NCC
-            ncc = cv2.matchTemplate(
+            ncc = float(cv2.matchTemplate(
                 fp1_norm.astype(np.float32),
                 fp2_norm.astype(np.float32),
                 cv2.TM_CCORR_NORMED
-            )[0][0]
+            )[0][0])  # Convert numpy.float32 to float
 
             # Calculate SSIM
-            ssim = structural_similarity(fp1_norm, fp2_norm, data_range=1.0)
+            ssim = float(structural_similarity(fp1_norm, fp2_norm, data_range=1.0))
 
             # Frequency domain comparison
             f1 = np.fft.fft2(fp1_norm)
@@ -250,10 +259,10 @@ class FingerprintCore:
                 modifications.append("Intensity modification")
 
             # Calculate wavelet similarity
-            wavelet_sim = self._compare_wavelets(fp1_norm, fp2_norm)
+            wavelet_sim = float(self._compare_wavelets(fp1_norm, fp2_norm))  # Convert to float
 
             # Combine similarities with weights
-            similarity = (0.4 * ncc + 0.3 * ssim + 0.3 * wavelet_sim)
+            similarity = float(0.4 * ncc + 0.3 * ssim + 0.3 * wavelet_sim)  # Ensure float output
 
             return similarity, modifications
 

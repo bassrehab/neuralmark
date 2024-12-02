@@ -1,20 +1,19 @@
 import json
-import logging
-import os
+import multiprocessing
 import time
 import uuid
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any, Tuple
-
-import cv2
+from typing import List, Dict, Any
 import numpy as np
+import cv2
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
 
 from alphapunch.author import ImageAuthor
-from utils import load_config, setup_logger, get_test_images, ImageManipulator
+from alphapunch.utils import load_config, setup_logger, get_test_images, ImageManipulator
 
 
 class RunManager:
@@ -56,71 +55,62 @@ class AuthorshipTester:
 
         self.manipulator = ImageManipulator(self.config, self.logger)
 
-    def run_authorship_tests(self) -> Dict[str, Any]:
-        """Run complete authorship verification test suite."""
-        self.logger.info(f"{__name__}.run_authorship_tests - Starting authorship verification tests...")
+        self.max_workers = self.config.get('resources', {}).get('num_workers',
+                                                                multiprocessing.cpu_count())
 
+    def process_image_batch(self, image_paths: List[str], process_func) -> List[Dict]:
+        """Process images in parallel."""
+        results = []
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            future_to_path = {executor.submit(process_func, path): path
+                              for path in image_paths}
+
+            for future in tqdm(as_completed(future_to_path),
+                               total=len(image_paths),
+                               desc="Processing images"):
+                path = future_to_path[future]
+                try:
+                    result = future.result()
+                    results.extend(result if isinstance(result, list) else [result])
+                except Exception as e:
+                    self.logger.error(f"Error processing {path}: {str(e)}")
+
+        return results
+
+    def run_authorship_tests(self) -> Dict[str, Any]:
+        """Run complete test suite with parallel processing."""
         test_cases = []
         start_time = time.time()
 
         try:
-            # 1. Get test dataset
+            # Get and split dataset
             total_images = self.config['testing']['total_images']
             train_ratio = self.config['testing']['train_ratio']
             train_size = int(total_images * train_ratio)
-            test_size = total_images - train_size
 
             all_images = get_test_images(total_images, self.config, self.logger)
             train_images = all_images[:train_size]
             test_images = all_images[train_size:]
 
-            # 2. Process training images
-            self.logger.info("Testing with original images...")
-            fingerprinted_pairs = []
+            # Process training images in parallel
+            self.logger.info("Processing training images...")
+            test_cases.extend(self.process_image_batch(
+                train_images,
+                self._process_training_image
+            ))
 
-            for img_path in tqdm(train_images, desc="Testing originals"):
-                try:
-                    # Fingerprint and save
-                    fp_path = str(self.run_manager.run_paths['fingerprinted'] / Path(img_path).name)
-                    fingerprinted_img, fingerprint = self.author.fingerprint_image(img_path, fp_path)
-                    fingerprinted_pairs.append((img_path, fp_path))
+            # Process test images in parallel
+            self.logger.info("Processing test images...")
+            test_cases.extend(self.process_image_batch(
+                test_images,
+                self._process_test_image
+            ))
 
-                    # Test original fingerprinted image
-                    result = self._test_original_image(fp_path, img_path)
-                    test_cases.extend(result)
-
-                except Exception as e:
-                    self.logger.error(f"Error testing original image {img_path}: {str(e)}")
-                    continue
-
-            # 3. Test manipulated versions
-            self.logger.info("Testing with manipulated images...")
-            manipulated_results = []
-
-            for orig_path, fp_path in fingerprinted_pairs:
-                try:
-                    results = self._test_manipulated_images(fp_path, orig_path)
-                    manipulated_results.extend(results)
-                except Exception as e:
-                    self.logger.error(f"Error testing manipulated image {fp_path}: {str(e)}")
-                    continue
-
-            test_cases.extend(manipulated_results)
-
-            # 4. Test unrelated images
-            self.logger.info("Testing with unrelated images...")
-            unrelated_results = self._test_unrelated_images(test_images)
-            test_cases.extend(unrelated_results)
-
-            # 5. Generate and save report
+            # Generate report
             report = self._generate_report(test_cases)
             report['performance'] = {
                 'execution_time': time.time() - start_time,
-                'dataset': {
-                    'total_images': total_images,
-                    'train_images': train_size,
-                    'test_images': test_size
-                }
+                'num_workers': self.max_workers
             }
 
             self._save_report(report)
@@ -132,24 +122,170 @@ class AuthorshipTester:
             self.logger.error(f"Error during authorship tests: {str(e)}")
             raise
 
-    def _test_original_image(self, fp_path: str, orig_path: str) -> List[Dict]:
+    def run_cross_validation(self) -> Dict[str, Any]:
+        """
+        Run k-fold cross-validation on the test suite.
+
+        Returns:
+            Dict[str, Any]: Cross-validation results including success rates and statistics
+        """
+        try:
+            # Get dataset
+            total_images = self.config['testing']['total_images']
+            k_folds = self.config['testing'].get('k_folds', 5)
+
+            # Get all images
+            all_images = get_test_images(total_images, self.config, self.logger)
+
+            # Initialize results storage
+            fold_results = []
+            fold_size = len(all_images) // k_folds
+
+            self.logger.info(f"Starting {k_folds}-fold cross-validation")
+
+            # Run k-fold cross validation
+            for fold in range(k_folds):
+                self.logger.info(f"Processing fold {fold + 1}/{k_folds}")
+
+                # Split data for this fold
+                start_idx = fold * fold_size
+                end_idx = start_idx + fold_size
+
+                # Use current fold as test set, rest as training set
+                test_images = all_images[start_idx:end_idx]
+                train_images = all_images[:start_idx] + all_images[end_idx:]
+
+                # Process training images
+                train_results = self.process_image_batch(
+                    train_images,
+                    self._process_training_image
+                )
+
+                # Process test images
+                test_results = self.process_image_batch(
+                    test_images,
+                    self._process_test_image
+                )
+
+                # Generate report for this fold
+                fold_report = self._generate_report(train_results + test_results)
+                fold_results.append(fold_report['summary']['successful_verifications'] /
+                                    fold_report['summary']['total_tests'] * 100)
+
+            # Calculate cross-validation statistics
+            success_rates = np.array(fold_results)
+            cv_results = {
+                'fold_success_rates': fold_results,
+                'average_success_rate': float(np.mean(success_rates)),
+                'std_success_rate': float(np.std(success_rates)),
+                'min_success_rate': float(np.min(success_rates)),
+                'max_success_rate': float(np.max(success_rates)),
+                'k_folds': k_folds,
+                'timestamp': datetime.now().isoformat(),
+                'run_id': self.run_manager.run_id
+            }
+
+            # Save cross-validation results
+            cv_path = self.run_manager.run_paths['reports'] / 'cross_validation_results.json'
+            with open(cv_path, 'w') as f:
+                json.dump(cv_results, f, indent=2)
+
+            self.logger.info(f"Cross-validation complete. Results saved to {cv_path}")
+            return cv_results
+
+        except Exception as e:
+            self.logger.error(f"Error during cross-validation: {str(e)}")
+            raise
+
+    def _process_training_image(self, img_path: str) -> List[Dict]:
+        """
+        Process a single training image through fingerprinting and testing.
+
+        Args:
+            img_path: Path to the source image
+
+        Returns:
+            List[Dict]: List of test results for original and manipulated versions
+        """
+        if not Path(img_path).exists():
+            self.logger.error(f"Image path does not exist: {img_path}")
+            return []
+
+        # Define fp_path outside try block
+        fp_path = str(self.run_manager.run_paths['fingerprinted'] / Path(img_path).name)
+
+        try:
+            # Create fingerprinted version
+            fingerprinted_img, fingerprint = self.author.fingerprint_image(img_path, fp_path)
+
+            if fingerprinted_img is None:
+                self.logger.error(f"Failed to fingerprint image: {img_path}")
+                return []
+
+            # Process original and manipulated versions
+            results = []
+
+            # Test original
+            original_result = self._test_original_image(fp_path, img_path)
+            if original_result:
+                results.append(original_result)
+
+            # Test manipulated versions
+            manipulated_results = self._test_manipulated_images(fp_path, img_path)
+            results.extend(manipulated_results)
+
+            return results
+
+        except Exception as e:
+            self.logger.error(f"Error processing training image {img_path}: {str(e)}")
+            # Clean up any partial files
+            if Path(fp_path).exists():
+                Path(fp_path).unlink()
+            return []
+
+    def _process_test_image(self, img_path: str) -> Dict:
+        """
+        Process a single test image.
+
+        Args:
+            img_path: Path to the test image
+
+        Returns:
+            Dict: Test results dictionary. Returns error info if processing fails.
+        """
+        try:
+            return self._test_unrelated_image(img_path)
+        except Exception as e:
+            self.logger.error(f"Error processing test image {img_path}: {str(e)}")
+            return {
+                'scenario': 'unrelated',
+                'test_image': img_path,
+                'source_image': None,
+                'verified': False,
+                'similarity': 0.0,
+                'modifications': [],
+                'expected': False,
+                'error': str(e)
+            }
+
+    def _test_original_image(self, fp_path: str, orig_path: str) -> Dict:
         """Test an original fingerprinted image."""
-        results = []
+        try:
+            # Verify ownership
+            is_owned, orig_path_verified, similarity, mods = self.author.verify_ownership(fp_path)
 
-        # Verify ownership
-        is_owned, orig_path, similarity, mods = self.author.verify_ownership(fp_path)
-
-        results.append({
-            'scenario': 'original',
-            'test_image': fp_path,
-            'source_image': orig_path,
-            'verified': is_owned,
-            'similarity': similarity,
-            'modifications': mods,
-            'expected': True
-        })
-
-        return results
+            return {
+                'scenario': 'original',
+                'test_image': fp_path,
+                'source_image': orig_path,
+                'verified': is_owned,
+                'similarity': similarity,
+                'modifications': mods,
+                'expected': True
+            }
+        except Exception as e:
+            self.logger.error(f"Error testing original image {fp_path}: {str(e)}")
+            raise
 
     def _test_manipulated_images(self, fp_path: str, orig_path: str) -> List[Dict]:
         """Test manipulated versions of a fingerprinted image."""
@@ -160,14 +296,13 @@ class AuthorshipTester:
             if fp_img is None:
                 raise ValueError(f"Could not read fingerprinted image: {fp_path}")
 
-            # Apply each manipulation and test
+            # Test each manipulation type
             for manip_name in self.config['testing']['manipulations']:
-                # Create manipulated version
                 manipulated_img = self.manipulator.apply_manipulation(fp_img, manip_name)
                 manip_path = str(self.run_manager.run_paths['manipulated'] / f"{manip_name}_{Path(fp_path).name}")
                 cv2.imwrite(manip_path, manipulated_img)
 
-                # Verify ownership
+                # Verify ownership of manipulated version
                 is_owned, orig_path_found, similarity, mods = self.author.verify_ownership(manip_path)
 
                 results.append({
@@ -187,29 +322,101 @@ class AuthorshipTester:
         return results
 
     def _test_unrelated_images(self, test_images: List[str]) -> List[Dict]:
-        """Test unrelated images (should not be recognized)."""
+        """
+        Test unrelated images (should not be identified as fingerprinted).
+
+        Args:
+            test_images: List of paths to test images
+
+        Returns:
+            List[Dict]: List of test results for each image
+        """
         results = []
 
         for img_path in tqdm(test_images, desc="Testing unrelated"):
-            try:
-                # Verify ownership (should fail)
-                is_owned, orig_path, similarity, mods = self.author.verify_ownership(img_path)
-
+            if not Path(img_path).exists():
+                self.logger.error(f"Image path does not exist: {img_path}")
                 results.append({
                     'scenario': 'unrelated',
                     'test_image': img_path,
                     'source_image': None,
-                    'verified': is_owned,
-                    'similarity': similarity,
-                    'modifications': mods,
-                    'expected': False
+                    'verified': False,
+                    'similarity': 0.0,
+                    'modifications': [],
+                    'expected': False,
+                    'error': 'Image file not found'
                 })
-
-            except Exception as e:
-                self.logger.error(f"Error testing unrelated image {img_path}: {str(e)}")
                 continue
 
+            try:
+                result = self._test_unrelated_image(img_path)
+                results.append(result)
+            except Exception as e:
+                self.logger.error(f"Error testing unrelated image {img_path}: {str(e)}")
+                results.append({
+                    'scenario': 'unrelated',
+                    'test_image': img_path,
+                    'source_image': None,
+                    'verified': False,
+                    'similarity': 0.0,
+                    'modifications': [],
+                    'expected': False,
+                    'error': str(e)
+                })
+
         return results
+
+    def _test_unrelated_image(self, img_path: str) -> Dict:
+        """
+        Test a single unrelated image.
+
+        Args:
+            img_path: Path to the test image
+
+        Returns:
+            Dict: Test results dictionary
+        """
+        if not Path(img_path).exists():
+            error_msg = f"Image file not found: {img_path}"
+            self.logger.error(error_msg)
+            return {
+                'scenario': 'unrelated',
+                'test_image': img_path,
+                'source_image': None,
+                'verified': False,
+                'similarity': 0.0,
+                'modifications': [],
+                'expected': False,
+                'error': error_msg
+            }
+
+        try:
+            # Verify ownership (should return False)
+            is_owned, orig_path, similarity, mods = self.author.verify_ownership(img_path)
+
+            return {
+                'scenario': 'unrelated',
+                'test_image': img_path,
+                'source_image': None,
+                'verified': is_owned,
+                'similarity': similarity,
+                'modifications': mods,
+                'expected': False
+            }
+
+        except Exception as e:
+            error_msg = f"Error testing unrelated image: {str(e)}"
+            self.logger.error(error_msg)
+            return {
+                'scenario': 'unrelated',
+                'test_image': img_path,
+                'source_image': None,
+                'verified': False,
+                'similarity': 0.0,
+                'modifications': [],
+                'expected': False,
+                'error': error_msg
+            }
 
     def _generate_report(self, test_cases: List[Dict]) -> Dict[str, Any]:
         """Generate comprehensive test report."""
@@ -297,17 +504,76 @@ class AuthorshipTester:
         """Generate visualization plots for test results."""
         plots_dir = self.run_manager.run_paths['plots']
 
-        # Set style
-        plt.style.use('seaborn')
+        # Set style with default matplotlib instead of seaborn
+        plt.style.use('default')
+        # Set custom style parameters
+        plt.rcParams['figure.figsize'] = (12, 8)
+        plt.rcParams['axes.grid'] = True
+        plt.rcParams['grid.alpha'] = 0.3
+        plt.rcParams['axes.spines.top'] = False
+        plt.rcParams['axes.spines.right'] = False
+        plt.rcParams['figure.facecolor'] = 'white'
+        plt.rcParams['axes.facecolor'] = 'white'
 
         # 1. Success rates by scenario
-        self._plot_success_rates(report, plots_dir)
+        plt.figure(figsize=(12, 6))
+        scenarios = list(report['by_scenario'].keys())
+        success_rates = [data['success_rate'] for data in report['by_scenario'].values()]
+
+        plt.bar(scenarios, success_rates, color='royalblue', alpha=0.7)
+        plt.title('Success Rates by Scenario', pad=20)
+        plt.xticks(rotation=45, ha='right')
+        plt.ylabel('Success Rate (%)')
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(plots_dir / 'success_rates.png')
+        plt.close()
 
         # 2. Similarity distributions
-        self._plot_similarity_distributions(report, plots_dir)
+        plt.figure(figsize=(12, 6))
+        similarities = [case['similarity'] for case in report['test_cases']]
+        plt.hist(similarities, bins=30, color='royalblue', alpha=0.7, edgecolor='black')
+        plt.title('Distribution of Similarity Scores', pad=20)
+        plt.xlabel('Similarity Score')
+        plt.ylabel('Count')
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(plots_dir / 'similarity_distribution.png')
+        plt.close()
 
         # 3. Modification types
-        self._plot_modification_types(report, plots_dir)
+        all_mods = {}
+        for case in report['test_cases']:
+            for mod in case.get('modifications', []):
+                all_mods[mod] = all_mods.get(mod, 0) + 1
+
+        if all_mods:
+            plt.figure(figsize=(12, 6))
+            mods = list(all_mods.keys())
+            counts = list(all_mods.values())
+
+            plt.bar(mods, counts, color='royalblue', alpha=0.7)
+            plt.title('Types of Detected Modifications', pad=20)
+            plt.xticks(rotation=45, ha='right')
+            plt.ylabel('Count')
+            plt.grid(True, alpha=0.3)
+            plt.tight_layout()
+            plt.savefig(plots_dir / 'modification_types.png')
+            plt.close()
+
+        # 4. Error timeline
+        plt.figure(figsize=(12, 6))
+        test_indices = range(len(report['test_cases']))
+        errors = [1 if case['verified'] != case['expected'] else 0
+                  for case in report['test_cases']]
+        plt.plot(test_indices, errors, 'r.', markersize=10, alpha=0.7)
+        plt.title('Errors Over Time', pad=20)
+        plt.xlabel('Test Case Index')
+        plt.ylabel('Error (0=correct, 1=error)')
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(plots_dir / 'error_timeline.png')
+        plt.close()
 
         self.logger.info(f"Generated visualizations in {plots_dir}")
 

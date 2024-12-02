@@ -3,7 +3,8 @@ import numpy as np
 import cv2
 import os
 from pathlib import Path
-from utils import load_config, setup_logger
+from alphapunch.utils.config import load_config
+from alphapunch.utils.logging import setup_logger
 
 
 class AlphaPunchTestBase(unittest.TestCase):
@@ -77,4 +78,3 @@ class AlphaPunchTestBase(unittest.TestCase):
                 for item in directory.iterdir():
                     if item.is_file():
                         item.unlink()
-

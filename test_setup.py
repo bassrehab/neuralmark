@@ -3,7 +3,7 @@ import sys
 
 import tensorflow as tf
 from alphapunch.author import ImageAuthor
-from utils import load_config, setup_logger
+from alphapunch.utils import load_config, setup_logger
 
 
 def test_setup():
