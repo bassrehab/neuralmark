@@ -314,9 +314,7 @@ python -m pytest --cov=neuralmark
 6. Create Pull Request
 
 ## License
-
-[Insert License Information]
+TODO
 
 ## Authors
-
-[Insert Author Information]
+Subhadip Mitra
