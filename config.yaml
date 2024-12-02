@@ -7,14 +7,17 @@ algorithm_selection:
 
 # Directory paths
 directories:
-  output: 'output'
-  database: 'database'
-  download: 'downloads'
-  plots: 'plots'
-  reports: 'reports'
-  fingerprinted: 'fingerprinted'
-  manipulated: 'manipulated'
-  test: 'test'
+  base_output: 'output'  # Base directory for all run outputs
+  downloads: 'downloads' # Stays at base
+  logs: 'logs'          # Stays at base
+  database: 'database'  # Stays at base if it's not run-specific
+
+# Cleanup configuration
+cleanup:
+  enabled: true        # Whether to run cleanup at all
+  pre_run: true       # Whether to cleanup before run
+  post_run: false     # Whether to cleanup after run
+  preserve_runs: 5    # Number of previous runs to preserve
 
 # Core algorithm parameters
 algorithm:

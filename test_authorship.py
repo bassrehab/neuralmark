@@ -8,18 +8,27 @@ from pathlib import Path
 from typing import List, Dict, Any
 import numpy as np
 import cv2
-import matplotlib.pyplot as plt
-import seaborn as sns
 from tqdm import tqdm
 
+from neuralmark.algorithm import create_neural_mark
 from neuralmark.author import ImageAuthor
-from neuralmark.utils import load_config, setup_logger, get_test_images, ImageManipulator
+from neuralmark.utils import (
+    load_config,
+    setup_logger,
+    get_test_images,
+    ImageManipulator,
+    visualize_attention_maps,
+    plot_test_results,
+    create_comparison_grid
+)
 
 
 class RunManager:
     def __init__(self, config: dict):
         self.config = config
         self.run_id = self._generate_run_id()
+        self.base_output = Path(config['directories']['base_output'])
+        self.run_dir = self.base_output / self.run_id
         self.run_paths = self._setup_run_paths()
 
     def _generate_run_id(self) -> str:
@@ -28,12 +37,24 @@ class RunManager:
         return f"run_{timestamp}_{unique_id}"
 
     def _setup_run_paths(self) -> dict:
+        """Setup run-specific directory structure."""
+        # Create run directory
+        self.run_dir.mkdir(parents=True, exist_ok=True)
+
         paths = {}
-        for dir_type in ['output', 'plots', 'reports', 'fingerprinted', 'manipulated', 'test']:
-            base_path = Path(self.config['directories'].get(dir_type, dir_type))
-            run_path = base_path / self.run_id
-            run_path.mkdir(parents=True, exist_ok=True)
-            paths[dir_type] = run_path
+        # Run-specific directories
+        subdirs = ['fingerprinted', 'manipulated', 'plots', 'reports', 'test']
+
+        for dir_name in subdirs:
+            dir_path = self.run_dir / dir_name
+            dir_path.mkdir(parents=True, exist_ok=True)
+            paths[dir_name] = dir_path
+
+            # Create algorithm-specific subdirectories if comparison mode is enabled
+            if self.config['algorithm_selection'].get('enable_comparison', False):
+                (dir_path / 'amdf').mkdir(exist_ok=True)
+                (dir_path / 'cdha').mkdir(exist_ok=True)
+
         return paths
 
 
@@ -46,17 +67,70 @@ class AuthorshipTester:
         self.run_manager = RunManager(self.config)
         self.logger.info(f"{__name__}.__init__ - Started new test run with ID: {self.run_manager.run_id}")
 
+        # Update config with run ID
+        self.config['run_id'] = self.run_manager.run_id
+
+        # Initialize test paths
+        self._setup_paths()
+
         # Initialize system components
-        self.author = ImageAuthor(
+        self._init_authors()
+        self.manipulator = ImageManipulator(self.config, self.logger)
+        self.max_workers = self.config.get('resources', {}).get('num_workers',
+                                                                multiprocessing.cpu_count())
+
+    def _setup_paths(self):
+        """Setup all necessary paths for the test run."""
+        # Update config with run-specific paths
+        self.config['directories'].update({
+            'fingerprinted': str(self.run_manager.run_paths['fingerprinted']),
+            'manipulated': str(self.run_manager.run_paths['manipulated']),
+            'plots': str(self.run_manager.run_paths['plots']),
+            'reports': str(self.run_manager.run_paths['reports']),
+            'test': str(self.run_manager.run_paths['test'])
+        })
+
+        # Log directory setup
+        self.logger.info(f"Test run directory: {self.run_manager.run_dir}")
+        for name, path in self.run_manager.run_paths.items():
+            self.logger.debug(f"Created {name} directory: {path}")
+
+    def _init_authors(self):
+        """Initialize authors for selected algorithms."""
+        self.authors = {}
+
+        # Create primary author
+        primary_algo = self.config['algorithm_selection']['type']
+        self.authors[primary_algo] = ImageAuthor(
             private_key=self.config['private_key'],
             logger=self.logger,
             config=self.config
         )
 
-        self.manipulator = ImageManipulator(self.config, self.logger)
+        # Create comparison author if enabled
+        if self.config['algorithm_selection'].get('enable_comparison', False):
+            comparison_algo = 'amdf' if primary_algo == 'cdha' else 'cdha'
+            comparison_config = self.config.copy()
+            comparison_config['algorithm_selection']['type'] = comparison_algo
+            self.authors[comparison_algo] = ImageAuthor(
+                private_key=self.config['private_key'],
+                logger=self.logger,
+                config=comparison_config
+            )
 
-        self.max_workers = self.config.get('resources', {}).get('num_workers',
-                                                                multiprocessing.cpu_count())
+    def _save_test_metadata(self):
+        """Save test run metadata."""
+        metadata = {
+            'run_id': self.run_manager.run_id,
+            'timestamp': datetime.now().isoformat(),
+            'config': self.config,
+            'algorithm': self.config['algorithm_selection']['type'],
+            'comparison_enabled': self.config['algorithm_selection'].get('enable_comparison', False)
+        }
+
+        metadata_path = self.run_manager.run_paths['reports'] / 'run_metadata.json'
+        with open(metadata_path, 'w') as f:
+            json.dump(metadata, f, indent=2)
 
     def process_image_batch(self, image_paths: List[str], process_func) -> List[Dict]:
         """Process images in parallel."""
@@ -77,6 +151,64 @@ class AuthorshipTester:
 
         return results
 
+    def _generate_comparison_report(self, algorithm_reports: Dict) -> Dict:
+        """Generate comparison report between algorithms."""
+        comparison = {
+            'timestamp': datetime.now().isoformat(),
+            'run_id': self.run_manager.run_id,
+            'comparisons': {}
+        }
+
+        metrics = ['success_rate', 'false_positives', 'false_negatives', 'execution_time']
+
+        for metric in metrics:
+            comparison['comparisons'][metric] = {
+                algo: report['summary'].get(metric, 0)
+                for algo, report in algorithm_reports.items()
+            }
+
+        # Calculate relative performance
+        for metric in metrics:
+            values = [v for v in comparison['comparisons'][metric].values()]
+            if values:
+                best = max(values)
+                for algo in comparison['comparisons'][metric]:
+                    current = comparison['comparisons'][metric][algo]
+                    comparison['comparisons'][metric][f'{algo}_relative'] = current / best
+
+        return comparison
+
+    def _save_comparison_report(self, report: Dict):
+        """Save comparison report to file."""
+        report_dir = self.run_manager.run_paths['reports']
+
+        # Save JSON report
+        report_path = report_dir / 'algorithm_comparison.json'
+        with open(report_path, 'w') as f:
+            json.dump(report, f, indent=2)
+
+        # Generate comparison visualizations
+        self._generate_comparison_visualizations(report)
+
+    def _generate_comparison_visualizations(self, report: Dict):
+        """Generate visualizations comparing algorithm performance."""
+        plots_dir = self.run_manager.run_paths['plots']
+
+        metrics = ['success_rate', 'false_positives', 'false_negatives', 'execution_time']
+
+        for metric in metrics:
+            plt.figure(figsize=(10, 6))
+            algorithms = list(report['comparisons'][metric].keys())
+            values = [report['comparisons'][metric][algo] for algo in algorithms]
+
+            plt.bar(algorithms, values)
+            plt.title(f'Algorithm Comparison: {metric.replace("_", " ").title()}')
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+
+            plt.savefig(plots_dir / f'comparison_{metric}.png')
+            plt.close()
+
     def run_authorship_tests(self) -> Dict[str, Any]:
         """Run complete test suite with parallel processing."""
         test_cases = []
@@ -92,187 +224,166 @@ class AuthorshipTester:
             train_images = all_images[:train_size]
             test_images = all_images[train_size:]
 
-            # Process training images in parallel
+            # Process training images
             self.logger.info("Processing training images...")
             test_cases.extend(self.process_image_batch(
                 train_images,
                 self._process_training_image
             ))
 
-            # Process test images in parallel
+            # Process test images
             self.logger.info("Processing test images...")
             test_cases.extend(self.process_image_batch(
                 test_images,
                 self._process_test_image
             ))
 
-            # Generate report
-            report = self._generate_report(test_cases)
-            report['performance'] = {
-                'execution_time': time.time() - start_time,
-                'num_workers': self.max_workers
-            }
+            # Generate reports for each algorithm
+            reports = {}
+            for algo in self.authors.keys():
+                algo_cases = [case for case in test_cases if case.get('algorithm') == algo]
+                if algo_cases:
+                    reports[algo] = self._generate_report(algo_cases)
+                    reports[algo]['performance'] = {
+                        'execution_time': time.time() - start_time,
+                        'num_workers': self.max_workers
+                    }
+                    self._save_report(reports[algo], algo)
 
-            self._save_report(report)
-            self._generate_visualizations(report)
+            # Generate comparison report if needed
+            if len(self.authors) > 1:
+                comparison_report = self._generate_comparison_report(reports)
+                self._save_comparison_report(comparison_report)
 
-            return report
+            # Save test metadata
+            self._save_test_metadata()
+
+            return reports
 
         except Exception as e:
             self.logger.error(f"Error during authorship tests: {str(e)}")
             raise
 
     def run_cross_validation(self) -> Dict[str, Any]:
-        """
-        Run k-fold cross-validation on the test suite.
+        """Run k-fold cross-validation for each algorithm."""
+        results = {}
 
-        Returns:
-            Dict[str, Any]: Cross-validation results including success rates and statistics
-        """
-        try:
-            # Get dataset
-            total_images = self.config['testing']['total_images']
-            k_folds = self.config['testing'].get('k_folds', 5)
+        for algo, author in self.authors.items():
+            self.logger.info(f"Running cross-validation for {algo}")
+            results[algo] = self._run_single_algorithm_cross_validation(algo)
 
-            # Get all images
-            all_images = get_test_images(total_images, self.config, self.logger)
+        # Generate comparison if multiple algorithms
+        if len(self.authors) > 1:
+            results['comparison'] = self._compare_cross_validation_results(results)
 
-            # Initialize results storage
-            fold_results = []
-            fold_size = len(all_images) // k_folds
+        return results
 
-            self.logger.info(f"Starting {k_folds}-fold cross-validation")
+    def _run_single_algorithm_cross_validation(self, algorithm: str) -> Dict[str, Any]:
+        """Run cross-validation for a single algorithm."""
+        k_folds = self.config['testing'].get('k_folds', 5)
+        total_images = self.config['testing']['total_images']
 
-            # Run k-fold cross validation
-            for fold in range(k_folds):
-                self.logger.info(f"Processing fold {fold + 1}/{k_folds}")
+        all_images = get_test_images(total_images, self.config, self.logger)
+        fold_size = len(all_images) // k_folds
+        fold_results = []
 
-                # Split data for this fold
-                start_idx = fold * fold_size
-                end_idx = start_idx + fold_size
+        for fold in range(k_folds):
+            test_indices = slice(fold * fold_size, (fold + 1) * fold_size)
+            test_images = all_images[test_indices]
+            train_images = all_images[:fold * fold_size] + all_images[(fold + 1) * fold_size:]
 
-                # Use current fold as test set, rest as training set
-                test_images = all_images[start_idx:end_idx]
-                train_images = all_images[:start_idx] + all_images[end_idx:]
+            # Process fold
+            train_results = self.process_image_batch(
+                train_images,
+                lambda x: self._process_training_image(x, algorithm)
+            )
+            test_results = self.process_image_batch(
+                test_images,
+                lambda x: self._process_test_image(x, algorithm)
+            )
 
-                # Process training images
-                train_results = self.process_image_batch(
-                    train_images,
-                    self._process_training_image
-                )
+            # Generate fold report
+            fold_report = self._generate_report(train_results + test_results, algorithm)
+            fold_results.append(fold_report['summary']['success_rate'])
 
-                # Process test images
-                test_results = self.process_image_batch(
-                    test_images,
-                    self._process_test_image
-                )
+        # Calculate statistics
+        cv_results = {
+            'fold_success_rates': fold_results,
+            'average_success_rate': float(np.mean(fold_results)),
+            'std_success_rate': float(np.std(fold_results)),
+            'min_success_rate': float(np.min(fold_results)),
+            'max_success_rate': float(np.max(fold_results)),
+            'k_folds': k_folds,
+            'algorithm': algorithm,
+            'timestamp': datetime.now().isoformat()
+        }
 
-                # Generate report for this fold
-                fold_report = self._generate_report(train_results + test_results)
-                fold_results.append(fold_report['summary']['successful_verifications'] /
-                                    fold_report['summary']['total_tests'] * 100)
-
-            # Calculate cross-validation statistics
-            success_rates = np.array(fold_results)
-            cv_results = {
-                'fold_success_rates': fold_results,
-                'average_success_rate': float(np.mean(success_rates)),
-                'std_success_rate': float(np.std(success_rates)),
-                'min_success_rate': float(np.min(success_rates)),
-                'max_success_rate': float(np.max(success_rates)),
-                'k_folds': k_folds,
-                'timestamp': datetime.now().isoformat(),
-                'run_id': self.run_manager.run_id
-            }
-
-            # Save cross-validation results
-            cv_path = self.run_manager.run_paths['reports'] / 'cross_validation_results.json'
-            with open(cv_path, 'w') as f:
-                json.dump(cv_results, f, indent=2)
-
-            self.logger.info(f"Cross-validation complete. Results saved to {cv_path}")
-            return cv_results
-
-        except Exception as e:
-            self.logger.error(f"Error during cross-validation: {str(e)}")
-            raise
+        return cv_results
 
     def _process_training_image(self, img_path: str) -> List[Dict]:
-        """
-        Process a single training image through fingerprinting and testing.
+        """Process a single training image."""
+        results = []
+        for algo, author in self.authors.items():
+            try:
+                # Define paths
+                fp_path = str(self.run_manager.run_paths['fingerprinted'] / algo / Path(img_path).name)
 
-        Args:
-            img_path: Path to the source image
+                # Generate fingerprint
+                fingerprinted_img, fingerprint = author.fingerprint_image(img_path, fp_path)
 
-        Returns:
-            List[Dict]: List of test results for original and manipulated versions
-        """
-        if not Path(img_path).exists():
-            self.logger.error(f"Image path does not exist: {img_path}")
-            return []
+                # Test original
+                results.append(self._test_original_image(fp_path, img_path, algo))
 
-        # Define fp_path outside try block
-        fp_path = str(self.run_manager.run_paths['fingerprinted'] / Path(img_path).name)
+                # Test manipulated versions
+                results.extend(self._test_manipulated_images(fp_path, img_path, algo))
 
-        try:
-            # Create fingerprinted version
-            fingerprinted_img, fingerprint = self.author.fingerprint_image(img_path, fp_path)
+            except Exception as e:
+                self.logger.error(f"Error processing {algo} training image {img_path}: {str(e)}")
 
-            if fingerprinted_img is None:
-                self.logger.error(f"Failed to fingerprint image: {img_path}")
-                return []
-
-            # Process original and manipulated versions
-            results = []
-
-            # Test original
-            original_result = self._test_original_image(fp_path, img_path)
-            if original_result:
-                results.append(original_result)
-
-            # Test manipulated versions
-            manipulated_results = self._test_manipulated_images(fp_path, img_path)
-            results.extend(manipulated_results)
-
-            return results
-
-        except Exception as e:
-            self.logger.error(f"Error processing training image {img_path}: {str(e)}")
-            # Clean up any partial files
-            if Path(fp_path).exists():
-                Path(fp_path).unlink()
-            return []
+        return results
 
     def _process_test_image(self, img_path: str) -> Dict:
-        """
-        Process a single test image.
+        """Process a single test image."""
+        results = []
 
-        Args:
-            img_path: Path to the test image
+        for algo, author in self.authors.items():
+            try:
+                # Verify ownership (should return False)
+                is_owned, orig_path, similarity, mods = author.verify_ownership(img_path)
 
-        Returns:
-            Dict: Test results dictionary. Returns error info if processing fails.
-        """
-        try:
-            return self._test_unrelated_image(img_path)
-        except Exception as e:
-            self.logger.error(f"Error processing test image {img_path}: {str(e)}")
-            return {
-                'scenario': 'unrelated',
-                'test_image': img_path,
-                'source_image': None,
-                'verified': False,
-                'similarity': 0.0,
-                'modifications': [],
-                'expected': False,
-                'error': str(e)
-            }
+                results.append({
+                    'scenario': 'unrelated',
+                    'test_image': img_path,
+                    'source_image': None,
+                    'verified': is_owned,
+                    'similarity': similarity,
+                    'modifications': mods,
+                    'expected': False,
+                    'algorithm': algo
+                })
 
-    def _test_original_image(self, fp_path: str, orig_path: str) -> Dict:
+            except Exception as e:
+                self.logger.error(f"Error testing unrelated image with {algo}: {str(e)}")
+                results.append({
+                    'scenario': 'unrelated',
+                    'test_image': img_path,
+                    'source_image': None,
+                    'verified': False,
+                    'similarity': 0.0,
+                    'modifications': [],
+                    'expected': False,
+                    'algorithm': algo,
+                    'error': str(e)
+                })
+
+        return results
+
+    def _test_original_image(self, fp_path: str, orig_path: str, algorithm: str) -> Dict:
         """Test an original fingerprinted image."""
         try:
-            # Verify ownership
-            is_owned, orig_path_verified, similarity, mods = self.author.verify_ownership(fp_path)
+            # Verify ownership using appropriate author
+            author = self.authors[algorithm]
+            is_owned, orig_path_verified, similarity, mods = author.verify_ownership(fp_path)
 
             return {
                 'scenario': 'original',
@@ -281,13 +392,14 @@ class AuthorshipTester:
                 'verified': is_owned,
                 'similarity': similarity,
                 'modifications': mods,
-                'expected': True
+                'expected': True,
+                'algorithm': algorithm
             }
         except Exception as e:
             self.logger.error(f"Error testing original image {fp_path}: {str(e)}")
             raise
 
-    def _test_manipulated_images(self, fp_path: str, orig_path: str) -> List[Dict]:
+    def _test_manipulated_images(self, fp_path: str, orig_path: str, algorithm: str) -> List[Dict]:
         """Test manipulated versions of a fingerprinted image."""
         results = []
         try:
@@ -296,14 +408,19 @@ class AuthorshipTester:
             if fp_img is None:
                 raise ValueError(f"Could not read fingerprinted image: {fp_path}")
 
+            author = self.authors[algorithm]
+
             # Test each manipulation type
             for manip_name in self.config['testing']['manipulations']:
                 manipulated_img = self.manipulator.apply_manipulation(fp_img, manip_name)
-                manip_path = str(self.run_manager.run_paths['manipulated'] / f"{manip_name}_{Path(fp_path).name}")
+
+                # Save manipulated image in algorithm-specific directory
+                manip_path = str(self.run_manager.run_paths['manipulated'] / algorithm /
+                                 f"{manip_name}_{Path(fp_path).name}")
                 cv2.imwrite(manip_path, manipulated_img)
 
                 # Verify ownership of manipulated version
-                is_owned, orig_path_found, similarity, mods = self.author.verify_ownership(manip_path)
+                is_owned, orig_path_found, similarity, mods = author.verify_ownership(manip_path)
 
                 results.append({
                     'scenario': f'manipulated_{manip_name}',
@@ -312,12 +429,49 @@ class AuthorshipTester:
                     'verified': is_owned,
                     'similarity': similarity,
                     'modifications': mods,
-                    'expected': True
+                    'expected': True,
+                    'algorithm': algorithm
                 })
 
         except Exception as e:
             self.logger.error(f"Error in manipulation test: {str(e)}")
             raise
+
+        return results
+
+    def _test_unrelated_image(self, img_path: str) -> Dict:
+        """Test a single unrelated image with all algorithms."""
+        results = []
+
+        for algo, author in self.authors.items():
+            try:
+                # Verify ownership (should return False)
+                is_owned, orig_path, similarity, mods = author.verify_ownership(img_path)
+
+                results.append({
+                    'scenario': 'unrelated',
+                    'test_image': img_path,
+                    'source_image': None,
+                    'verified': is_owned,
+                    'similarity': similarity,
+                    'modifications': mods,
+                    'expected': False,
+                    'algorithm': algo
+                })
+
+            except Exception as e:
+                self.logger.error(f"Error testing unrelated image with {algo}: {str(e)}")
+                results.append({
+                    'scenario': 'unrelated',
+                    'test_image': img_path,
+                    'source_image': None,
+                    'verified': False,
+                    'similarity': 0.0,
+                    'modifications': [],
+                    'expected': False,
+                    'algorithm': algo,
+                    'error': str(e)
+                })
 
         return results
 
@@ -366,60 +520,11 @@ class AuthorshipTester:
 
         return results
 
-    def _test_unrelated_image(self, img_path: str) -> Dict:
-        """
-        Test a single unrelated image.
-
-        Args:
-            img_path: Path to the test image
-
-        Returns:
-            Dict: Test results dictionary
-        """
-        if not Path(img_path).exists():
-            error_msg = f"Image file not found: {img_path}"
-            self.logger.error(error_msg)
-            return {
-                'scenario': 'unrelated',
-                'test_image': img_path,
-                'source_image': None,
-                'verified': False,
-                'similarity': 0.0,
-                'modifications': [],
-                'expected': False,
-                'error': error_msg
-            }
-
-        try:
-            # Verify ownership (should return False)
-            is_owned, orig_path, similarity, mods = self.author.verify_ownership(img_path)
-
-            return {
-                'scenario': 'unrelated',
-                'test_image': img_path,
-                'source_image': None,
-                'verified': is_owned,
-                'similarity': similarity,
-                'modifications': mods,
-                'expected': False
-            }
-
-        except Exception as e:
-            error_msg = f"Error testing unrelated image: {str(e)}"
-            self.logger.error(error_msg)
-            return {
-                'scenario': 'unrelated',
-                'test_image': img_path,
-                'source_image': None,
-                'verified': False,
-                'similarity': 0.0,
-                'modifications': [],
-                'expected': False,
-                'error': error_msg
-            }
-
-    def _generate_report(self, test_cases: List[Dict]) -> Dict[str, Any]:
+    def _generate_report(self, test_cases: List[Dict], algorithm: str = None) -> Dict[str, Any]:
         """Generate comprehensive test report."""
+        if algorithm:
+            test_cases = [case for case in test_cases if case.get('algorithm') == algorithm]
+
         report = {
             'summary': {
                 'total_tests': len(test_cases),
@@ -430,8 +535,16 @@ class AuthorshipTester:
             'by_scenario': {},
             'test_cases': test_cases,
             'timestamp': datetime.now().isoformat(),
-            'run_id': self.run_manager.run_id
+            'run_id': self.run_manager.run_id,
+            'algorithm': algorithm
         }
+
+        # Calculate success rate
+        if report['summary']['total_tests'] > 0:
+            report['summary']['success_rate'] = (
+                    report['summary']['successful_verifications'] /
+                    report['summary']['total_tests'] * 100
+            )
 
         # Group results by scenario
         for case in test_cases:
@@ -454,7 +567,7 @@ class AuthorshipTester:
             for mod in case.get('modifications', []):
                 scenario_data['modifications'][mod] = scenario_data['modifications'].get(mod, 0) + 1
 
-        # Calculate averages
+        # Calculate averages for each scenario
         for data in report['by_scenario'].values():
             if data['total'] > 0:
                 data['success_rate'] = (data['successful'] / data['total']) * 100
@@ -462,11 +575,12 @@ class AuthorshipTester:
 
         return report
 
-    def _save_report(self, report: Dict[str, Any]) -> None:
-        """Save test report to files."""
-        report_dir = self.run_manager.run_paths['reports']
+    def _save_algorithm_specific_report(self, report: Dict[str, Any], algorithm: str):
+        """Save algorithm-specific report and visualizations."""
+        report_dir = self.run_manager.run_paths['reports'] / algorithm
+        report_dir.mkdir(parents=True, exist_ok=True)
 
-        # Save detailed JSON report
+        # Save JSON report
         report_path = report_dir / 'test_report.json'
         with open(report_path, 'w') as f:
             json.dump(report, f, indent=2)
@@ -476,8 +590,29 @@ class AuthorshipTester:
         with open(summary_path, 'w') as f:
             self._write_summary(f, report)
 
+        # Generate visualizations
+        plots_dir = self.run_manager.run_paths['plots'] / algorithm
+        plots_dir.mkdir(parents=True, exist_ok=True)
+        self._generate_visualizations(report, plots_dir)
+
+        self.logger.info(f"Saved {algorithm} test report to {report_dir}")
+
+    def _save_report(self, report: Dict[str, Any], algorithm: str):
+        """Save test report to files."""
+        report_dir = self.run_manager.run_paths['reports']
+        if algorithm:
+            report_dir = report_dir / algorithm
+            report_dir.mkdir(parents=True, exist_ok=True)
+
+        # Save JSON report
+        report_path = report_dir / 'test_report.json'
+        with open(report_path, 'w') as f:
+            json.dump(report, f, indent=2)
+
+        # Generate visualizations
+        plot_test_results(report, self.run_manager.run_dir, self.logger)
+
         self.logger.info(f"Saved test report to {report_path}")
-        self.logger.info(f"Saved summary to {summary_path}")
 
     def _write_summary(self, file, report: Dict[str, Any]) -> None:
         """Write formatted summary to file."""

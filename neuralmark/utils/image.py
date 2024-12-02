@@ -1,3 +1,6 @@
+import shutil
+from pathlib import Path
+
 import cv2
 import numpy as np
 import requests
@@ -99,38 +102,32 @@ class ImageManipulator:
 
 
 def get_test_images(num_images: int, config: dict, logger: logging.Logger) -> List[str]:
-    """
-    Get test images with improved error handling and retry logic.
-
-    Args:
-        num_images: Number of images to retrieve
-        config: Configuration dictionary containing API and directory settings
-        logger: Logger instance for recording events
-
-    Returns:
-        List[str]: List of paths to test images
-    """
-    download_dir = config['directories']['download']
+    """Get test images with improved error handling and retry logic."""
+    download_dir = Path(config['directories']['downloads'])
+    test_dir = Path(config['directories']['test'])
     max_retries = 3
-    retry_delay = 2  # seconds
+    retry_delay = 2
 
-    # Create directory if it doesn't exist
-    if not os.path.exists(download_dir):
-        os.makedirs(download_dir)
-        logger.info(f"Created download directory: {download_dir}")
+    # Create directories if they don't exist
+    download_dir.mkdir(parents=True, exist_ok=True)
+    test_dir.mkdir(parents=True, exist_ok=True)
 
-    # Get existing images
+    # Get existing images from both directories
     existing_images = [
-        os.path.join(download_dir, f)
-        for f in os.listdir(download_dir)
-        if f.lower().endswith(('.png', '.jpg', '.jpeg'))
+        str(f) for f in download_dir.glob('*.[jp][pn][g]')
     ]
 
+    # Copy needed images to test directory
     if len(existing_images) >= num_images:
-        logger.info(f"Using {num_images} existing images from {download_dir}")
-        return sorted(existing_images)[:num_images]
+        selected_images = existing_images[:num_images]
+        for img_path in selected_images:
+            dest_path = test_dir / Path(img_path).name
+            if not dest_path.exists():
+                shutil.copy2(img_path, dest_path)
+        logger.info(f"Copied {num_images} images to test directory")
+        return [str(f) for f in test_dir.glob('*.[jp][pn][g]')][:num_images]
 
-    # Need to download more images
+    # Download more images if needed
     images_needed = num_images - len(existing_images)
     logger.info(f"Downloading {images_needed} new images...")
 

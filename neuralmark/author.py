@@ -6,7 +6,7 @@ from typing import Tuple, Optional, List
 
 import cv2
 import numpy as np
-from .algorithm import AlphaPunch
+from .algorithm import create_neural_mark
 
 
 class ImageAuthor:
@@ -16,8 +16,19 @@ class ImageAuthor:
         self.logger = logger
         self.config = config
 
-        # Initialize fingerprinter
-        self.fingerprinter = AlphaPunch(
+        # Set up database path - this can be global or run-specific
+        if self.config.get('database', {}).get('run_specific', False):
+            self.db_path = Path(self.config['directories']['base_output']) / \
+                           self.config.get('run_id', 'default') / 'database'
+        else:
+            self.db_path = Path(self.config['directories']['database'])
+
+        self.db_path.mkdir(parents=True, exist_ok=True)
+
+        # Initialize fingerprinter based on selected algorithm
+        algorithm_type = config['algorithm_selection']['type']
+        self.fingerprinter = create_neural_mark(
+            algorithm_type=algorithm_type,
             private_key=private_key,
             logger=logger,
             config=config
@@ -27,21 +38,19 @@ class ImageAuthor:
         self.fingerprint_database = {}
         self._load_database()
 
-        self.logger.info("ImageAuthor initialized successfully")
-
     def _load_database(self):
         """Load fingerprint database from file if it exists."""
-        db_path = Path(self.config['directories']['database']) / 'fingerprint_db.json'
-        if db_path.exists():
+        db_file = self.db_path / 'fingerprint_db.json'
+        if db_file.exists():
             try:
-                with open(db_path, 'r') as f:
+                with open(db_file, 'r') as f:
                     db_data = json.load(f)
-                    # Convert string keys back to proper format
                     self.fingerprint_database = {
                         k: {
                             'fingerprint': np.array(v['fingerprint']),
                             'original_path': v['original_path'],
-                            'timestamp': v['timestamp']
+                            'timestamp': v['timestamp'],
+                            'algorithm': v.get('algorithm', self.config['algorithm_selection']['type'])
                         }
                         for k, v in db_data.items()
                     }
@@ -52,22 +61,22 @@ class ImageAuthor:
 
     def _save_database(self):
         """Save fingerprint database to file."""
-        db_path = Path(self.config['directories']['database']) / 'fingerprint_db.json'
+        db_file = self.db_path / 'fingerprint_db.json'
         try:
             # Create directory if it doesn't exist
-            db_path.parent.mkdir(parents=True, exist_ok=True)
+            db_file.parent.mkdir(parents=True, exist_ok=True)
 
-            # Convert numpy arrays to lists for JSON serialization
             db_data = {
                 k: {
                     'fingerprint': v['fingerprint'].tolist(),
                     'original_path': v['original_path'],
-                    'timestamp': v['timestamp']
+                    'timestamp': v['timestamp'],
+                    'algorithm': v.get('algorithm', self.config['algorithm_selection']['type'])
                 }
                 for k, v in self.fingerprint_database.items()
             }
 
-            with open(db_path, 'w') as f:
+            with open(db_file, 'w') as f:
                 json.dump(db_data, f)
 
             self.logger.debug("Fingerprint database saved successfully")
@@ -75,10 +84,7 @@ class ImageAuthor:
             self.logger.error(f"Error saving fingerprint database: {str(e)}")
 
     def fingerprint_image(self, image_path: str, output_path: str) -> Tuple[np.ndarray, np.ndarray]:
-        """
-        Fingerprint an image and store its fingerprint.
-        Returns: (fingerprinted_image, fingerprint)
-        """
+        """Fingerprint an image and store its fingerprint."""
         self.logger.info(f"Fingerprinting image: {image_path}")
 
         try:
@@ -91,21 +97,36 @@ class ImageAuthor:
             fingerprint = self.fingerprinter.generate_fingerprint(img)
             fingerprinted_img = self.fingerprinter.embed_fingerprint(img, fingerprint)
 
+            # Generate comparison fingerprint if enabled
+            comparison_results = None
+            if self.comparison_mode:
+                comparison_fp = self.comparison_fingerprinter.generate_fingerprint(img)
+                comparison_img = self.comparison_fingerprinter.embed_fingerprint(img, comparison_fp)
+                comparison_results = (comparison_img, comparison_fp)
+
             # Store fingerprint
             img_hash = self._compute_image_hash(img)
             self.fingerprint_database[img_hash] = {
                 'fingerprint': fingerprint,
                 'original_path': image_path,
-                'timestamp': datetime.now().isoformat()
+                'timestamp': datetime.now().isoformat(),
+                'algorithm': self.config['algorithm_selection']['type']
             }
 
             # Save fingerprinted image
             cv2.imwrite(output_path, fingerprinted_img)
 
+            # Save comparison image if available
+            if comparison_results:
+                comparison_path = str(Path(output_path).parent / f"comparison_{Path(output_path).name}")
+                cv2.imwrite(comparison_path, comparison_results[0])
+
             # Update database file
             self._save_database()
 
             self.logger.info("Image fingerprinted successfully")
+            if comparison_results:
+                return (fingerprinted_img, fingerprint), comparison_results
             return fingerprinted_img, fingerprint
 
         except Exception as e:
@@ -124,16 +145,19 @@ class ImageAuthor:
             best_match = None
             highest_similarity = 0
             detected_modifications = []
+            used_algorithm = None
 
             # Extract fingerprint from suspect image
             extracted_fp = self.fingerprinter.extract_fingerprint(suspect_img)
 
-            # Create a copy of the database items to prevent modification during iteration
-            database_items = list(self.fingerprint_database.items())
-
             # Compare with all stored fingerprints
-            for img_hash, data in database_items:
-                is_authentic, similarity, mods = self.fingerprinter.verify_fingerprint(
+            for img_hash, data in self.fingerprint_database.items():
+                # Use appropriate algorithm for verification
+                current_algorithm = data.get('algorithm', self.config['algorithm_selection']['type'])
+                verifier = self.fingerprinter if current_algorithm == self.config['algorithm_selection'][
+                    'type'] else self.comparison_fingerprinter
+
+                is_authentic, similarity, mods = verifier.verify_fingerprint(
                     suspect_img,
                     data['fingerprint']
                 )
@@ -142,13 +166,14 @@ class ImageAuthor:
                     highest_similarity = similarity
                     best_match = data
                     detected_modifications = mods
+                    used_algorithm = current_algorithm
 
             # Check if it's a match
             threshold = self.config['algorithm']['similarity_threshold']
             is_owned = highest_similarity > threshold
 
             if is_owned:
-                self.logger.info(f"Match found: {best_match['original_path']}")
+                self.logger.info(f"Match found using {used_algorithm}: {best_match['original_path']}")
                 return True, best_match['original_path'], highest_similarity, detected_modifications
             else:
                 self.logger.info("No match found")

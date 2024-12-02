@@ -1,4 +1,2 @@
-# requirements-macos-arm.txt (M1/M2)
--r requirements-base.txt
-tensorflow-macos==2.16.2
-tensorflow-metal==1.1.0
+tensorflow-macos>=2.10.0
+tensorflow-metal>=0.6.0

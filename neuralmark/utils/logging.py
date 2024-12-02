@@ -5,25 +5,20 @@ from pathlib import Path
 
 
 def setup_logger(config: dict) -> logging.Logger:
-    """
-    Set up logging configuration with file and console handlers.
-
-    Args:
-        config: Configuration dictionary containing logging settings
-
-    Returns:
-        Logger: Configured logger instance
-    """
+    """Set up logging configuration with file and console handlers."""
     # Create logs directory if it doesn't exist
-    logs_dir = Path(os.getcwd()) / 'logs'
+    logs_dir = Path(config['directories']['logs'])
     logs_dir.mkdir(parents=True, exist_ok=True)
 
     # Create timestamp for log file
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_filename = logs_dir / f'alphapunch_run_{timestamp}.log'
+
+    # If we have a run_id, use it in the log filename
+    run_id = config.get('run_id', '')
+    log_filename = logs_dir / f'neuralmark_{run_id}_{timestamp}.log'
 
     # Configure logger
-    logger = logging.getLogger('AlphaPunch')
+    logger = logging.getLogger('NeuralMark')
     logger.setLevel(config['logging']['level'])
 
     # Remove existing handlers
@@ -31,12 +26,14 @@ def setup_logger(config: dict) -> logging.Logger:
 
     # File handler
     file_handler = logging.FileHandler(str(log_filename))
-    file_handler.setFormatter(logging.Formatter(config['logging']['format']))
+    file_formatter = logging.Formatter(config['logging']['format'])
+    file_handler.setFormatter(file_formatter)
     logger.addHandler(file_handler)
 
     # Console handler
     console_handler = logging.StreamHandler()
-    console_handler.setFormatter(logging.Formatter(config['logging']['format']))
+    console_formatter = logging.Formatter(config['logging']['format'])
+    console_handler.setFormatter(console_formatter)
     logger.addHandler(console_handler)
 
     # Log initial setup
@@ -44,7 +41,6 @@ def setup_logger(config: dict) -> logging.Logger:
     logger.debug(f"Log level set to: {config['logging']['level']}")
 
     return logger
-
 
 def get_module_logger(module_name: str) -> logging.Logger:
     """

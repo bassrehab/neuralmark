@@ -46,3 +46,5 @@ tensorboard>=2.7.0
 # Project Setup
 setuptools>=57.0.0
 wheel>=0.37.0
+
+pytest
