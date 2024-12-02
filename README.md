@@ -3,6 +3,7 @@
 NeuralMark is an advanced image fingerprinting system that uses neural attention and multi-domain processing to embed and verify robust digital fingerprints in images.
 
 ## Features
+Refer to [ALGORITHM.md](./algorithm.md) for more
 
 - **Multiple Fingerprinting Algorithms:**
   - AMDF (Adaptive Multi-Domain Fingerprinting)
