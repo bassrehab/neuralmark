@@ -1,108 +1,74 @@
 # NeuralMark - Robust Image Fingerprinting System
 
 ## Overview
-NeuralMark is an advanced image fingerprinting system designed to verify image ownership and detect modifications. It embeds invisible digital fingerprints into images and can later verify these fingerprints to:
-- Authenticate image ownership
-- Detect unauthorized modifications
-- Track image manipulations (e.g., compression, rotation, cropping)
-- Adapt to image content using neural attention
+NeuralMark is an advanced image fingerprinting system that verifies image ownership and detects modifications through invisible digital fingerprints. The system:
+- Authenticates image ownership
+- Detects unauthorized modifications
+- Tracks image manipulations (compression, rotation, cropping)
+- Uses neural attention for content-adaptive fingerprinting
 
 ## Key Features
-- Multi-domain fingerprinting (spatial, frequency, and wavelet domains)
+- Multi-domain fingerprinting (spatial, frequency, wavelet)
 - Neural attention-based adaptive embedding
 - Robust against common image manipulations
 - Modification detection and classification
-- Comprehensive testing and validation framework
+- Comprehensive testing framework
 - Performance monitoring and visualization
 
 ## System Architecture
 
-### Core Components
+### Core Components (`core/`)
+- **AMDF** (`amdf.py`): Core fingerprinting algorithms, multi-domain feature extraction
+- **Neural Attention** (`neural_attention.py`): Attention-based feature extraction and adaptive embedding
+- **Fingerprint Core** (`fingerprint_core.py`): Low-level fingerprinting operations
+- **Cache Utils** (`cache_utils.py`): Caching functionality for performance optimization
 
-1. **Algorithm (`algorithm.py`)**
-   - Main interface for fingerprinting operations
-   - Neural attention integration
-   - Handles high-level fingerprint generation and verification
-   - Coordinates between different processing domains
+### Utilities (`utils/`)
+- **Config** (`config.py`): Configuration management
+- **Image** (`image.py`): Image processing utilities
+- **Logging** (`logging.py`): Logging setup and management
+- **Visualization** (`visualization.py`): Result visualization tools
 
-2. **Neural Attention (`neural_attention.py`)**
-   - Attention-based feature extraction
-   - Adaptive embedding strength
-   - Content-aware fingerprinting
-   - Multi-scale attention processing
+### Base Files
+- **Algorithm** (`algorithm.py`): Main fingerprinting interface
+- **Author** (`author.py`): Image ownership management
+- **Main** (`main.py`): Program entry point
+- **Config** (`config.yaml`): System configuration
+- **Setup** (`setup.py`): Installation configuration
+- **Cleanup** (`cleanup.py`): Directory maintenance
+- **TF Config** (`tf_config.py`): TensorFlow configuration
 
-3. **Adaptive Multi-Domain Fingerprinting (`amdf.py`)**
-   - Implements core fingerprinting algorithms
-   - Manages multi-domain feature extraction
-   - Handles wavelet transformations and frequency analysis
-   - Provides robust fingerprint comparison methods
-
-4. **Fingerprint Core (`fingerprint_core.py`)**
-   - Low-level fingerprinting operations
-   - DCT and wavelet transformations
-   - Basic feature extraction and comparison
-
-5. **Image Author (`author.py`)**
-   - Manages image ownership and verification
-   - Maintains fingerprint database
-   - Handles fingerprint storage and retrieval
-
-### Testing and Utilities
-
-1. **Test Framework**
-   - Base testing functionality (`test_base.py`)
-   - Core fingerprint tests (`test_core.py`)
-   - Neural attention tests (`test_neural_attention.py`)
-   - AMDF testing (`test_amdf.py`)
-   - Integration testing (`test_integration.py`)
-   - Performance benchmarking
-   - Cross-validation testing
-
-2. **Utilities (`utils.py`)**
-   - Configuration management
-   - Logging setup
-   - Test image acquisition
-   - Image manipulation utilities
-   - Attention visualization tools
-
-### Directory Structure
+## Directory Structure
 ```
-alphapunch/
-├── config.yaml              # Configuration settings
-├── main.py                 # Main entry point
-├── Makefile               # Build and test automation
-├── setup.py               # Installation setup
-├── requirements.txt       # Project dependencies
-├── .env                  # Environment variables (private)
-├── .env.example         # Environment template
-├── alphapunch/           # Core package
+neuralmark/
+├── core/
 │   ├── __init__.py
-│   ├── author.py
-│   ├── algorithm.py
-│   └── core/
-│       ├── __init__.py
-│       ├── amdf.py
-│       ├── neural_attention.py
-│       └── fingerprint_core.py
-├── tests/               # Test suite
+│   ├── amdf.py
+│   ├── cache_utils.py
+│   ├── fingerprint_core.py
+│   └── neural_attention.py
+│
+├── utils/
 │   ├── __init__.py
-│   ├── test_base.py
-│   ├── test_core.py
-│   ├── test_neural_attention.py
-│   ├── test_amdf.py
-│   └── test_integration.py
-├── utils.py              # Utility functions
-└── output/              # Generated outputs
-    ├── reports/        # Test reports
-    ├── plots/         # Visualizations
-    └── fingerprints/  # Generated fingerprints
+│   ├── config.py
+│   ├── image.py
+│   ├── logging.py
+│   └── visualization.py
+│
+├── cleanup.py
+├── config.yaml
+├── main.py
+├── Makefile
+├── setup.py
+├── test_authorship.py
+└── tf_config.py
 ```
 
-## Installation and Setup
+## Installation
 
 1. Clone the repository:
 ```bash
-git clone https://HOST/yourusername/alphapunch.git
+git clone https://github.com/yourusername/neuralmark.git
 cd neuralmark
 ```
 
@@ -111,98 +77,53 @@ cd neuralmark
 make install
 ```
 
-3. Create environment file:
-```bash
-cp .env.example .env
-# Edit .env with your credentials
-```
-
 ## Usage
 
 ### Using Make Commands
-
 ```bash
-# Install dependencies
-make install
-
-# Run tests
-make test
-
-# Clean generated files
-make clean
-
-# Run in different modes
-make run        # Normal test mode
-make benchmark  # Performance benchmark mode
-make crossval   # Cross-validation mode
+make install    # Install dependencies
+make test      # Run tests
+make clean     # Clean generated files
+make run       # Test mode
+make debug     # Debug mode
+make benchmark # Performance benchmark
+make crossval  # Cross-validation
 ```
 
 ### Using Python Directly
-
-```python
-# Basic usage
+```bash
 python main.py --mode test
-
-# Benchmark performance
 python main.py --mode benchmark
-
-# Cross-validation
 python main.py --mode cross_validation
+python main.py --log-level DEBUG
 ```
 
-## Neural Attention Features
-
-The system now includes neural attention-based improvements:
-
-1. **Adaptive Embedding**
-   - Content-aware fingerprint embedding
-   - Multiple attention layers
-   - Automatic strength adjustment
-
-2. **Enhanced Robustness**
-   - Multi-scale feature extraction
-   - Attention-weighted verification
-   - Improved modification detection
-
-3. **Visual Analysis**
-   - Attention map visualization
-   - Feature importance analysis
-   - Modification localization
+## Configuration
+The system is configured through `config.yaml`, which includes:
+- Directory paths
+- Algorithm parameters
+- Testing configuration
+- Resource allocation
+- Logging settings
 
 ## Key Technologies
-- TensorFlow for neural attention and deep feature extraction
-- OpenCV for image processing
-- PyWavelets for wavelet transformations
-- NumPy for numerical operations
-- Matplotlib for visualization
+- TensorFlow
+- OpenCV
+- PyWavelets
+- NumPy
+- Matplotlib
 
-## Output and Reports
-- Detailed test reports in JSON format
+## Output
+The system generates:
+- Test reports (JSON)
 - Performance visualizations
-- Modification detection reports
-- Success rate analysis by scenario
+- Success rate analysis
 - Attention map visualizations
 - Feature importance plots
 
-The system is designed to be modular, extensible, and configurable through the `config.yaml` file, making it adaptable to different use cases and requirements.
-
 ## Environment Variables
-Required environment variables in `.env`:
+Required in `.env`:
 ```
 UNSPLASH_ACCESS_KEY=your_unsplash_key
 PRIVATE_KEY=your_secure_private_key
 ```
-
-## Contributing
-1. Fork the repository
-2. Create your feature branch
-3. Run tests: `make test`
-4. Commit changes
-5. Push to branch
-6. Create Pull Request
-
-----
-
-See [USAGE.md](./USAGE.md) for detailed configuration and usage information.
-
-**Author:** Subhadip Mitra
