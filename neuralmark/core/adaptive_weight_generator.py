@@ -120,6 +120,22 @@ class WeightOptimizer(layers.Layer):
         self.feedback_dense = layers.Dense(feature_dim // 2)
         self.feedback_gate = layers.Dense(1, activation='sigmoid')
 
+    def build(self, input_shape):
+        # Initialize the optimization layers
+        self.weight_dense1 = layers.Dense(self.feature_dim, activation='relu')
+        self.weight_dense2 = layers.Dense(self.feature_dim // 2, activation='relu')
+        self.weight_output = layers.Dense(self.feature_dim // 4)
+
+        # Multi-objective optimization
+        self.objective_dense = layers.Dense(self.feature_dim, activation='relu')
+        self.objective_attention = layers.MultiHeadAttention(num_heads=4, key_dim=32)
+
+        # Feedback processing
+        self.feedback_dense = layers.Dense(self.feature_dim // 2)
+        self.feedback_gate = layers.Dense(1, activation='sigmoid')
+
+        super().build(input_shape)
+
     def call(self, content_features, attack_features, feedback=None):
         # Generate initial weights
         combined_features = tf.concat([

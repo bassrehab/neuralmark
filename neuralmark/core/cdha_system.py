@@ -6,7 +6,7 @@ from .domain_attention import DomainSpecificAttention
 from .cross_domain_bridge import CrossDomainBridge
 from .hierarchical_fusion import HierarchicalFusion
 from .adaptive_weight_generator import AdaptiveWeightGenerator
-
+from neuralmark.utils.tf_config import configure_tensorflow
 
 class CrossDomainHierarchicalAttention(Model):
     """Complete CDHA system integrating all components."""
@@ -101,6 +101,9 @@ class CDHAFingerprinter:
     def __init__(self, config: dict, logger=None):
         self.config = config
         self.logger = logger
+
+        # Configure TensorFlow
+        configure_tensorflow(logger)
 
         # Initialize CDHA model
         self.cdha = CrossDomainHierarchicalAttention(config)

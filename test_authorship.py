@@ -76,8 +76,8 @@ class AuthorshipTester:
         # Initialize system components
         self._init_authors()
         self.manipulator = ImageManipulator(self.config, self.logger)
-        self.max_workers = self.config.get('resources', {}).get('num_workers',
-                                                                multiprocessing.cpu_count())
+        self.max_workers = 1 if not self.config['resources'].get('parallel_processing', False) else self.config[
+            'resources'].get('num_workers', multiprocessing.cpu_count())
 
     def _setup_paths(self):
         """Setup all necessary paths for the test run."""

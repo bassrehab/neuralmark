@@ -1,17 +1,47 @@
 import os
 import logging
+import platform
 from typing import Optional
 import tensorflow as tf
 
-# Set environment variables
+# Force CPU on Apple Silicon
+if platform.system() == 'Darwin' and platform.processor() == 'arm':
+    os.environ['DISABLE_METAL_PLUGIN'] = '1'
+    os.environ['DEVICE'] = 'CPU'
+
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
 
 def configure_tensorflow(config: Optional[dict] = None, logger: Optional[logging.Logger] = None):
     """Configure TensorFlow based on config settings."""
+    # Limit memory growth
+    try:
+        gpumem = tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024)
+        tf.config.experimental.set_virtual_device_configuration(
+            tf.config.list_physical_devices('CPU')[0],
+            [gpumem]
+        )
+    except:
+        pass
+
     try:
         if config is None:
             config = {'resources': {'gpu_enabled': False}}
+
+        # Memory configuration
+        if 'memory_limit' in config['resources']:
+            memory_limit = int(config['resources']['memory_limit'] * 1024)  # Convert to MB
+            tf.config.set_logical_device_configuration(
+                tf.config.list_physical_devices('CPU')[0],
+                [tf.config.LogicalDeviceConfiguration(memory_limit=memory_limit)]
+            )
+
+        # Force CPU on Apple Silicon
+        if platform.system() == 'Darwin' and platform.processor() == 'arm':
+            tf.config.set_visible_devices([], 'GPU')
+            if logger:
+                logger.info("Using CPU on Apple Silicon")
+            return
 
         # GPU configuration
         if not config['resources'].get('gpu_enabled', False):
@@ -50,14 +80,6 @@ def configure_tensorflow(config: Optional[dict] = None, logger: Optional[logging
                 tf.keras.mixed_precision.set_global_policy('mixed_float16')
                 if logger:
                     logger.info("Enabled mixed precision for CDHA on GPU")
-
-        # Memory configuration
-        if 'memory_limit' in config['resources']:
-            memory_limit = int(config['resources']['memory_limit'] * 1024)  # Convert to MB
-            tf.config.set_logical_device_configuration(
-                tf.config.list_physical_devices('CPU')[0],
-                [tf.config.LogicalDeviceConfiguration(memory_limit=memory_limit)]
-            )
 
         # Deterministic operations for testing
         if config.get('testing', {}).get('deterministic', False):

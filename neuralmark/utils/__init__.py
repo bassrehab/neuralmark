@@ -6,6 +6,7 @@ from .visualization import (
     plot_test_results,
     create_comparison_grid
 )
+from .gpu_utils import GPUManager
 
 __all__ = [
     # Logging
@@ -25,5 +26,8 @@ __all__ = [
     # Visualization
     'visualize_attention_maps',
     'plot_test_results',
-    'create_comparison_grid'
+    'create_comparison_grid',
+
+    # GPU Management
+    'GPUManager'
 ]

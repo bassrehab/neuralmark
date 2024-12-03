@@ -14,8 +14,8 @@ directories:
 
 # Cleanup configuration
 cleanup:
-  enabled: true        # Whether to run cleanup at all
-  pre_run: true       # Whether to cleanup before run
+  enabled: false       # Whether to run cleanup at all
+  pre_run: false       # Whether to cleanup before run
   post_run: false     # Whether to cleanup after run
   preserve_runs: 5    # Number of previous runs to preserve
 
@@ -39,6 +39,13 @@ algorithm:
       attention_layers: 3
       base_filters: 64
       feature_channels: 256
+
+  # Neural attention settings
+  neural_attention:
+    enabled: true
+    feature_channels: 256
+    num_heads: 8
+    num_attack_types: 5
 
   # CDHA specific parameters
   cdha:
@@ -94,10 +101,11 @@ testing:
     max_false_negative: 0.1
 
 resources:
-  num_workers: 4
-  batch_size: 4
+  num_workers: 1 # Set to 1 for sequential processing
+  batch_size: 1
   gpu_enabled: false
-  memory_limit: 0.6
+  memory_limit: 0.4
+  parallel_processing: false  # Add flag to control parallelism
 
 performance:
   enable_caching: true

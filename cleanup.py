@@ -90,4 +90,42 @@ class DirectoryCleaner:
                         shutil.rmtree(item)
                 except Exception as e:
                     self.logger.error(f"Error cleaning {item}: {str(e)}")
-                    
+
+    def _clean_with_preservation(self, directory: str):
+        """Clean directory while preserving specified file types."""
+        dir_path = Path(directory)
+        if not dir_path.exists():
+            dir_path.mkdir()
+            return
+
+        preserved_files = []
+        preserved_exts = self.preserved_extensions.get(directory, [])
+
+        # Identify files to preserve
+        for ext in preserved_exts:
+            preserved_files.extend(dir_path.glob(f"**/*{ext}"))
+
+        # Move preserved files to temporary location
+        temp_dir = dir_path.parent / f"temp_{directory}"
+        temp_dir.mkdir(exist_ok=True)
+
+        for file in preserved_files:
+            relative_path = file.relative_to(dir_path)
+            temp_file_path = temp_dir / relative_path
+            temp_file_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(file), str(temp_file_path))
+
+        # Clean directory
+        shutil.rmtree(dir_path)
+        dir_path.mkdir()
+
+        # Restore preserved files
+        for temp_file in temp_dir.glob("**/*"):
+            if temp_file.is_file():
+                relative_path = temp_file.relative_to(temp_dir)
+                target_path = dir_path / relative_path
+                target_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(temp_file), str(target_path))
+
+        # Remove temporary directory
+        shutil.rmtree(temp_dir)
