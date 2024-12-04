@@ -99,17 +99,33 @@ class CDHAFingerprinter:
     """Main interface for using CDHA in fingerprinting applications."""
 
     def __init__(self, config: dict, logger=None):
-        self.config = config
-        self.logger = logger
+        """Initialize CDHA Fingerprinter.
 
-        # Configure TensorFlow
-        configure_tensorflow(logger)
+        Args:
+            config: Configuration dictionary containing model and processing parameters
+            logger: Optional logger instance for tracking operations
+        """
+        try:
+            # Store configuration and logger
+            self.config = config
+            self.logger = logger
 
-        # Initialize CDHA model
-        self.cdha = CrossDomainHierarchicalAttention(config)
+            # Configure TensorFlow with both config and logger
+            configure_tensorflow(config=config, logger=logger)
 
-        # Set up image preprocessing
-        self.target_size = tuple(config['algorithm']['input_shape'][:2])
+            # Initialize CDHA model
+            self.cdha = CrossDomainHierarchicalAttention(config)
+
+            # Set up image preprocessing
+            self.target_size = tuple(config['algorithm']['input_shape'][:2])
+
+            if self.logger:
+                self.logger.debug("CDHAFingerprinter initialized successfully")
+
+        except Exception as e:
+            if self.logger:
+                self.logger.error(f"Error initializing CDHAFingerprinter: {str(e)}")
+            raise
 
     def generate_fingerprint(self, image: np.ndarray) -> np.ndarray:
         """Generate fingerprint using CDHA."""

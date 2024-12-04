@@ -28,13 +28,17 @@ def configure_tensorflow(config: Optional[dict] = None, logger: Optional[logging
         if config is None:
             config = {'resources': {'gpu_enabled': False}}
 
-        # Memory configuration
-        if 'memory_limit' in config['resources']:
-            memory_limit = int(config['resources']['memory_limit'] * 1024)  # Convert to MB
-            tf.config.set_logical_device_configuration(
-                tf.config.list_physical_devices('CPU')[0],
-                [tf.config.LogicalDeviceConfiguration(memory_limit=memory_limit)]
-            )
+        # Memory configuration first
+        if 'resources' in config and 'memory_limit' in config['resources']:
+            memory_limit = int(config['resources']['memory_limit'] * 1024)
+            try:
+                tf.config.set_logical_device_configuration(
+                    tf.config.list_physical_devices('CPU')[0],
+                    [tf.config.LogicalDeviceConfiguration(memory_limit=memory_limit)]
+                )
+            except:
+                if logger:
+                    logger.warning("Could not set memory limit")
 
         # Force CPU on Apple Silicon
         if platform.system() == 'Darwin' and platform.processor() == 'arm':
