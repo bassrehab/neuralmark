@@ -8,6 +8,7 @@ from .hierarchical_fusion import HierarchicalFusion
 from .adaptive_weight_generator import AdaptiveWeightGenerator
 from neuralmark.utils.tf_config import configure_tensorflow
 
+
 class CrossDomainHierarchicalAttention(Model):
     """Complete CDHA system integrating all components."""
 
@@ -130,6 +131,9 @@ class CDHAFingerprinter:
     def generate_fingerprint(self, image: np.ndarray) -> np.ndarray:
         """Generate fingerprint using CDHA."""
         try:
+            # Clear TF memory before processing
+            tf.keras.backend.clear_session()
+
             # Preprocess image
             processed_image = self._preprocess_image(image)
 
@@ -141,6 +145,10 @@ class CDHAFingerprinter:
 
             if self.logger:
                 self.logger.debug("Fingerprint generated successfully")
+
+            # Force garbage collection
+            import gc
+            gc.collect()
 
             return final_fingerprint
 

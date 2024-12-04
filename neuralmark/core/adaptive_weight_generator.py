@@ -106,6 +106,7 @@ class WeightOptimizer(layers.Layer):
 
     def __init__(self, feature_dim=128):
         super(WeightOptimizer, self).__init__()
+        self.feature_dim = feature_dim  # Add this line
 
         # Dynamic weight generation
         self.weight_dense1 = layers.Dense(feature_dim, activation='relu')
@@ -173,11 +174,12 @@ class AdaptiveWeightGenerator(Model):
 
     def __init__(self, feature_dim=128, num_attack_types=5):
         super(AdaptiveWeightGenerator, self).__init__()
+        self.feature_dim = feature_dim
 
         # Initialize components
         self.content_analyzer = ContentAnalyzer(feature_dim)
         self.attack_predictor = AttackPredictor(num_attack_types)
-        self.weight_optimizer = WeightOptimizer(feature_dim)
+        self.weight_optimizer = WeightOptimizer(feature_dim)  # Pass feature_dim here
 
         # Additional processing
         self.refinement_dense = layers.Dense(feature_dim)

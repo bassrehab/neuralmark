@@ -133,21 +133,25 @@ class AuthorshipTester:
             json.dump(metadata, f, indent=2)
 
     def process_image_batch(self, image_paths: List[str], process_func) -> List[Dict]:
-        """Process images in parallel."""
+        """Process images in batches with memory clearing."""
         results = []
-        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-            future_to_path = {executor.submit(process_func, path): path
-                              for path in image_paths}
+        batch_size = self.config['resources'].get('batch_size', 1)
 
-            for future in tqdm(as_completed(future_to_path),
-                               total=len(image_paths),
-                               desc="Processing images"):
-                path = future_to_path[future]
-                try:
-                    result = future.result()
+        for i in range(0, len(image_paths), batch_size):
+            batch_paths = image_paths[i:i + batch_size]
+            try:
+                # Process batch
+                for path in tqdm(batch_paths, desc=f"Processing batch {i // batch_size + 1}"):
+                    result = process_func(path)
                     results.extend(result if isinstance(result, list) else [result])
-                except Exception as e:
-                    self.logger.error(f"Error processing {path}: {str(e)}")
+
+                # Clear memory after each batch
+                tf.keras.backend.clear_session()
+                import gc
+                gc.collect()
+
+            except Exception as e:
+                self.logger.error(f"Error processing batch: {str(e)}")
 
         return results
 

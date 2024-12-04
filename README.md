@@ -275,6 +275,124 @@ The system is configured through `config.yaml`, which includes:
 - Resource allocation
 - Logging preferences
 
+## Configuration Parameters
+
+The `config.yaml` file controls all aspects of NeuralMark's behavior. Here's a detailed explanation of each section:
+
+### Algorithm Selection
+```yaml
+algorithm_selection:
+  type: 'cdha'           # Algorithm type: 'amdf' or 'cdha'
+  enable_comparison: false  # Enable comparison between both algorithms
+```
+
+### Core Algorithm Parameters
+```yaml
+algorithm:
+  fingerprint_size: [64, 64]      # Size of generated fingerprints
+  input_shape: [256, 256, 3]      # Input image dimensions
+  embed_strength: 1.2             # Fingerprint embedding strength
+  similarity_threshold: 0.35      # Threshold for verification
+
+  # Neural attention settings
+  neural_attention:
+    enabled: true                 # Enable neural attention
+    feature_channels: 256         # Number of feature channels
+    num_heads: 8                  # Number of attention heads
+    num_attack_types: 5          # Number of attack types to detect
+
+  # CDHA specific parameters
+  cdha:
+    feature_weights:
+      spatial: 0.4               # Weight for spatial features
+      frequency: 0.3             # Weight for frequency domain
+      wavelet: 0.3               # Weight for wavelet features
+```
+
+### Directory Structure
+```yaml
+directories:
+  base_output: 'output'          # Base directory for all outputs
+  database: 'database'           # Fingerprint database location
+  download: 'downloads'          # Test image download location
+  logs: 'logs'                   # Log file location
+```
+
+### Resource Management
+```yaml
+resources:
+  gpu_enabled: false             # Enable GPU acceleration
+  num_workers: 1                 # Number of parallel workers
+  memory_limit: 0.3             # Memory limit as fraction of total
+  batch_size: 1                 # Batch size for processing
+  parallel_processing: false     # Enable parallel processing
+```
+
+### Testing Configuration
+```yaml
+testing:
+  random_seed: 42               # Random seed for reproducibility
+  total_images: 50              # Number of test images
+  train_ratio: 0.6             # Ratio of training images
+  deterministic: true          # Enable deterministic operations
+
+  # Cross-validation settings
+  cross_validation:
+    enabled: true
+    num_folds: 5
+    validation_split: 0.2
+
+  # Image manipulation parameters
+  manipulations:
+    blur:
+      kernel_size: 3           # Blur kernel size
+      sigma: 0.5               # Blur sigma
+    compress:
+      quality: 85              # JPEG compression quality
+    rotate:
+      angle: 2                 # Rotation angle in degrees
+    crop:
+      percent: 5               # Crop percentage
+    resize:
+      factor: 0.8             # Resize factor
+    noise:
+      std: 5                  # Noise standard deviation
+```
+
+### Cleanup Configuration
+```yaml
+cleanup:
+  enabled: false               # Enable automatic cleanup
+  pre_run: false              # Clean before running
+  post_run: false             # Clean after running
+  preserve_runs: 5            # Number of recent runs to keep
+```
+
+### Logging Configuration
+```yaml
+logging:
+  level: 'INFO'               # Logging level
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  file: true                  # Enable file logging
+  console: true               # Enable console logging
+```
+
+### Performance Optimization
+```yaml
+performance:
+  enable_caching: true        # Enable result caching
+  cache_dir: 'cache'          # Cache directory location
+  optimization_level: 'high'  # Optimization level
+```
+
+### API Settings
+```yaml
+unsplash:
+  access_key: null            # Unsplash API key for test images
+```
+
+All parameters can be overridden via command-line arguments or environment variables. See [ADVANCED.md](./ADVANCED.md) for more details on advanced configuration options.
+
 ## Testing
 
 The project includes comprehensive tests:

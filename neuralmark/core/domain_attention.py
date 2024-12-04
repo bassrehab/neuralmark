@@ -13,6 +13,9 @@ class SpatialAttention(layers.Layer):
         self.num_heads = num_heads
         self.key_dim = key_dim
 
+        # Initial convolution to match dimensions
+        self.input_conv = layers.Conv2D(key_dim, 1, padding='same')
+
         self.mha = layers.MultiHeadAttention(
             num_heads=num_heads,
             key_dim=key_dim
@@ -23,8 +26,11 @@ class SpatialAttention(layers.Layer):
         self.conv_position = layers.Conv2D(key_dim, 1, padding='same')
 
     def call(self, inputs):
+        # Match input dimensions first
+        x = self.input_conv(inputs)
+
         # Position-aware encoding
-        position_features = self.conv_position(inputs)
+        position_features = self.conv_position(x)
 
         # Reshape for attention
         batch_size = tf.shape(inputs)[0]
@@ -33,7 +39,7 @@ class SpatialAttention(layers.Layer):
 
         # Flatten spatial dimensions
         queries = tf.reshape(position_features, [batch_size, -1, self.key_dim])
-        keys = tf.reshape(inputs, [batch_size, -1, tf.shape(inputs)[-1]])
+        keys = tf.reshape(x, [batch_size, -1, self.key_dim])
 
         # Apply attention
         attention_output = self.mha(
@@ -43,10 +49,10 @@ class SpatialAttention(layers.Layer):
         )
 
         # Reshape back to spatial dimensions
-        attention_output = tf.reshape(attention_output, [batch_size, height, width, -1])
+        attention_output = tf.reshape(attention_output, [batch_size, height, width, self.key_dim])
 
         # Skip connection and normalization
-        x1 = self.layernorm1(inputs + attention_output)
+        x1 = self.layernorm1(x + attention_output)
 
         return self.layernorm2(x1)
 
@@ -63,9 +69,22 @@ class FrequencyAttention(layers.Layer):
         self.freq_conv = layers.Conv2D(64, 3, padding='same')
         self.phase_attention = layers.Dense(1, activation='sigmoid')
 
+    def _apply_2d_dct(self, x):
+        """Apply 2D DCT using 1D DCT operations."""
+        # Apply DCT to rows
+        x = tf.transpose(x, perm=[0, 1, 3, 2])  # Move channels for row-wise operation
+        x = tf.signal.dct(x, type=2)
+        x = tf.transpose(x, perm=[0, 1, 3, 2])  # Restore original shape
+
+        # Apply DCT to columns
+        x = tf.transpose(x, perm=[0, 2, 3, 1])  # Move for column-wise operation
+        x = tf.signal.dct(x, type=2)
+        x = tf.transpose(x, perm=[0, 3, 1, 2])  # Restore original shape
+        return x
+
     def call(self, inputs):
         # Apply DCT
-        dct_features = tf.signal.dct2d(tf.cast(inputs, tf.float32))
+        dct_features = self._apply_2d_dct(tf.cast(inputs, tf.float32))
 
         # Split into frequency bands
         band_size = tf.shape(dct_features)[1] // self.num_bands
@@ -94,7 +113,21 @@ class FrequencyAttention(layers.Layer):
         freq_features = self.freq_conv(weighted_dct)
         freq_features = freq_features * phase_weights
 
-        return tf.signal.idct2d(freq_features)
+        # Apply inverse DCT
+        return self._apply_inverse_2d_dct(freq_features)
+
+    def _apply_inverse_2d_dct(self, x):
+        """Apply inverse 2D DCT using 1D inverse DCT operations."""
+        # Apply inverse DCT to columns
+        x = tf.transpose(x, perm=[0, 3, 1, 2])
+        x = tf.signal.idct(x, type=2)
+        x = tf.transpose(x, perm=[0, 2, 3, 1])
+
+        # Apply inverse DCT to rows
+        x = tf.transpose(x, perm=[0, 1, 3, 2])
+        x = tf.signal.idct(x, type=2)
+        x = tf.transpose(x, perm=[0, 1, 3, 2])
+        return x
 
 
 class WaveletAttention(layers.Layer):

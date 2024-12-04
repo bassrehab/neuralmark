@@ -21,8 +21,8 @@ cleanup:
 
 # Core algorithm parameters
 algorithm:
-  fingerprint_size: [64, 64]
-  input_shape: [256, 256, 3]
+  fingerprint_size: [32, 32] # Reduce from 64x64
+  input_shape: [123, 128, 3] # Reduce from 256x256
   resize_interpolation: 'LINEAR'  # Options: LINEAR, CUBIC, NEAREST
   embed_strength: 1.2
   similarity_threshold: 0.35
@@ -43,8 +43,8 @@ algorithm:
   # Neural attention settings
   neural_attention:
     enabled: true
-    feature_channels: 256
-    num_heads: 8
+    feature_channels: 128 # Reduce from 256
+    num_heads: 4 # Reduce from 8
     num_attack_types: 5
 
   # CDHA specific parameters

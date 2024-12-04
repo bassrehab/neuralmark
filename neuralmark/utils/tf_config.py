@@ -14,38 +14,68 @@ os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
 def configure_tensorflow(config: Optional[dict] = None, logger: Optional[logging.Logger] = None):
     """Configure TensorFlow based on config settings."""
-    # Limit memory growth
-    try:
-        gpumem = tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024)
-        tf.config.experimental.set_virtual_device_configuration(
-            tf.config.list_physical_devices('CPU')[0],
-            [gpumem]
-        )
-    except:
-        pass
-
     try:
         if config is None:
             config = {'resources': {'gpu_enabled': False}}
 
-        # Memory configuration first
-        if 'resources' in config and 'memory_limit' in config['resources']:
-            memory_limit = int(config['resources']['memory_limit'] * 1024)
-            try:
-                tf.config.set_logical_device_configuration(
-                    tf.config.list_physical_devices('CPU')[0],
-                    [tf.config.LogicalDeviceConfiguration(memory_limit=memory_limit)]
-                )
-            except:
-                if logger:
-                    logger.warning("Could not set memory limit")
-
-        # Force CPU on Apple Silicon
+        # Apple Silicon specific configuration
         if platform.system() == 'Darwin' and platform.processor() == 'arm':
+            try:
+                # Set default memory limit for Apple Silicon
+                memory_limit = 1024  # 1GB default
+                if 'resources' in config and 'memory_limit' in config['resources']:
+                    memory_limit = int(config['resources']['memory_limit'] * 1024)
+
+                # Configure CPU memory
+                physical_devices = tf.config.list_physical_devices('CPU')
+                if physical_devices:
+                    # Enable memory growth
+                    tf.config.experimental.set_memory_growth(physical_devices[0], True)
+
+                    # Set virtual device configuration
+                    device_config = tf.config.experimental.VirtualDeviceConfiguration(
+                        memory_limit=memory_limit
+                    )
+                    tf.config.experimental.set_virtual_device_configuration(
+                        physical_devices[0],
+                        [device_config]
+                    )
+
+                    if logger:
+                        logger.info(f"Set memory limit to {memory_limit}MB on Apple Silicon")
+            except Exception as e:
+                if logger:
+                    logger.warning(f"Could not set memory limit on Apple Silicon: {str(e)}")
+
+            # Disable GPU/Metal
             tf.config.set_visible_devices([], 'GPU')
+
+            # Configure threading for Apple Silicon
+            num_workers = config['resources'].get('num_workers', 2)
+            tf.config.threading.set_inter_op_parallelism_threads(num_workers)
+            tf.config.threading.set_intra_op_parallelism_threads(num_workers)
+
             if logger:
                 logger.info("Using CPU on Apple Silicon")
             return
+
+        # Non-Apple Silicon configuration
+        # Memory configuration
+        if 'resources' in config and 'memory_limit' in config['resources']:
+            memory_limit = int(config['resources']['memory_limit'] * 1024)
+            try:
+                device_config = tf.config.experimental.VirtualDeviceConfiguration(
+                    memory_limit=memory_limit
+                )
+                tf.config.experimental.set_virtual_device_configuration(
+                    tf.config.list_physical_devices('CPU')[0],
+                    [device_config]
+                )
+                if logger:
+                    logger.info(f"Set memory limit to {memory_limit}MB")
+            except Exception as e:
+                if logger:
+                    logger.warning(f"Could not set memory limit: {str(e)}")
 
         # GPU configuration
         if not config['resources'].get('gpu_enabled', False):
@@ -53,7 +83,6 @@ def configure_tensorflow(config: Optional[dict] = None, logger: Optional[logging
             if logger:
                 logger.info("GPU disabled - using CPU only")
         else:
-            # Configure GPU memory growth
             gpus = tf.config.list_physical_devices('GPU')
             if gpus:
                 try:
@@ -70,12 +99,9 @@ def configure_tensorflow(config: Optional[dict] = None, logger: Optional[logging
                     logger.warning("No GPU found - falling back to CPU")
 
         # Thread configuration
-        tf.config.threading.set_inter_op_parallelism_threads(
-            config['resources'].get('num_workers', 4)
-        )
-        tf.config.threading.set_intra_op_parallelism_threads(
-            config['resources'].get('num_workers', 4)
-        )
+        num_workers = config['resources'].get('num_workers', 4)
+        tf.config.threading.set_inter_op_parallelism_threads(num_workers)
+        tf.config.threading.set_intra_op_parallelism_threads(num_workers)
 
         # Mixed precision configuration for CDHA
         if config['algorithm_selection'].get('type') == 'cdha' or \
