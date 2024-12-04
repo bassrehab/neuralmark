@@ -86,22 +86,32 @@ class FrequencyAttention(layers.Layer):
         # Apply DCT
         dct_features = self._apply_2d_dct(tf.cast(inputs, tf.float32))
 
-        # Split into frequency bands
-        band_size = tf.shape(dct_features)[1] // self.num_bands
-        bands = []
+        # Calculate total size and band size
+        total_size = tf.shape(dct_features)[1]
+        band_size = total_size // self.num_bands
 
+        # Split into frequency bands
+        bands = []
         for i in range(self.num_bands):
             start = i * band_size
-            end = (i + 1) * band_size
+            end = min((i + 1) * band_size, total_size)
             band = dct_features[:, start:end, :, :]
             bands.append(band)
 
         # Calculate band weights
         band_features = tf.stack([tf.reduce_mean(band, axis=[1, 2]) for band in bands], axis=1)
-        weights = self.band_weights(band_features)
+        weights = self.band_weights(tf.reshape(band_features, [tf.shape(band_features)[0], -1]))
+
+        # Reshape weights for broadcasting
+        weights = tf.reshape(weights, [-1, self.num_bands, 1, 1, 1])
 
         # Apply weights to bands
-        weighted_bands = [bands[i] * weights[:, i:i + 1, None, None] for i in range(self.num_bands)]
+        weighted_bands = []
+        for i in range(self.num_bands):
+            band_weight = weights[:, i, :, :, :]
+            weighted_band = bands[i] * tf.squeeze(band_weight, axis=1)
+            weighted_bands.append(weighted_band)
+
         weighted_dct = tf.concat(weighted_bands, axis=1)
 
         # Phase attention
@@ -113,7 +123,6 @@ class FrequencyAttention(layers.Layer):
         freq_features = self.freq_conv(weighted_dct)
         freq_features = freq_features * phase_weights
 
-        # Apply inverse DCT
         return self._apply_inverse_2d_dct(freq_features)
 
     def _apply_inverse_2d_dct(self, x):
@@ -147,36 +156,54 @@ class WaveletAttention(layers.Layer):
         # Convert to numpy for wavelet transform
         inputs_np = inputs.numpy()
         batch_size = inputs_np.shape[0]
+        channels = inputs_np.shape[-1]
         attended_coeffs = []
 
         for b in range(batch_size):
-            # Wavelet decomposition
-            coeffs = pywt.wavedec2(inputs_np[b, ..., 0], self.wavelet, level=self.level)
+            channel_coeffs = []
+            for c in range(channels):
+                # Process each channel separately
+                # Wavelet decomposition
+                coeffs = pywt.wavedec2(inputs_np[b, ..., c], self.wavelet, level=self.level)
 
-            # Process approximation coefficient
-            approx = coeffs[0]
-            approx_weight = self.coeff_attention(tf.reshape(approx, [1, -1]))
-            attended_approx = approx * approx_weight.numpy()
+                # Process approximation coefficient
+                approx = coeffs[0]
+                approx_weight = self.coeff_attention(tf.reshape(approx, [1, -1]))
+                attended_approx = approx * approx_weight.numpy()
 
-            # Process detail coefficients
-            attended_details = []
-            for level_coeffs in coeffs[1:]:
-                # Get attention weights for each detail coefficient
-                h, v, d = level_coeffs
-                details = np.stack([h, v, d])
-                detail_weights = self.detail_attention(tf.reshape(details, [1, -1]))
+                # Process detail coefficients
+                attended_details = []
+                for level_coeffs in coeffs[1:]:
+                    # Get attention weights for each detail coefficient
+                    h, v, d = level_coeffs
+                    h = np.expand_dims(h, axis=-1)  # Add channel dimension
+                    v = np.expand_dims(v, axis=-1)
+                    d = np.expand_dims(d, axis=-1)
+                    details = np.stack([h, v, d])
 
-                # Apply attention weights
-                attended_h = h * detail_weights[0].numpy()
-                attended_v = v * detail_weights[1].numpy()
-                attended_d = d * detail_weights[2].numpy()
+                    detail_shape = details.shape[1:]  # Get shape for reshaping
+                    details_flat = details.reshape(3, -1)  # Flatten for attention
+                    detail_weights = self.detail_attention(tf.reshape(details_flat, [1, -1]))
+                    detail_weights = detail_weights.numpy().reshape(3, 1)  # Reshape weights
 
-                attended_details.append((attended_h, attended_v, attended_d))
+                    # Apply attention weights
+                    attended_h = h * detail_weights[0]
+                    attended_v = v * detail_weights[1]
+                    attended_d = d * detail_weights[2]
 
-            # Reconstruct with attended coefficients
-            attended_coeffs.append(
-                pywt.waverec2([attended_approx] + attended_details, self.wavelet)
-            )
+                    attended_details.append((
+                        np.squeeze(attended_h, axis=-1),
+                        np.squeeze(attended_v, axis=-1),
+                        np.squeeze(attended_d, axis=-1)
+                    ))
+
+                # Reconstruct channel
+                channel_coeffs.append(
+                    pywt.waverec2([attended_approx] + attended_details, self.wavelet)
+                )
+
+            # Stack channels back together
+            attended_coeffs.append(np.stack(channel_coeffs, axis=-1))
 
         # Convert back to tensor
         return tf.convert_to_tensor(np.stack(attended_coeffs, axis=0))
